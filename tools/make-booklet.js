@@ -43,6 +43,15 @@ function pickCases() {
     cases.push(...picked);
   }
   cases.forEach((c, k) => { c.no = k + 1; });
+  // every case in the book gets its own title
+  const used = new Set();
+  for (const c of cases) {
+    const stories = E.THEMES.find((t) => t.id === c.theme.id).stories;
+    let k = Math.max(0, stories.findIndex((st) => st[0] === c.title));
+    for (let tries = 0; used.has(stories[k][0]) && tries < stories.length; tries++) k = (k + 1) % stories.length;
+    [c.title, c.intro] = stories[k];
+    used.add(c.title);
+  }
   return cases;
 }
 
