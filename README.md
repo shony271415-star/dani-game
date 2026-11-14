@@ -1,20 +1,31 @@
-# 🕵️ תעלומה במשבצת
+# 🕵️ Mystery Grid
 
-סודוקו פוגש תעלומת רצח. מציבים את החשודים בזירת הפשע לפי הרמזים, ומגלים מי היה לבד עם הקורבן.
+Sudoku meets murder mystery. Place every suspect on the crime scene using their clues, then work out who was alone with the victim.
 
-## חוקים
-- כל אדם היה בשורה אחרת ובעמודה אחרת.
-- אפשר לעמוד על רצפה ריקה, כיסא, מיטה או שטיח. אי אפשר לעמוד על שולחן, טלוויזיה או עציץ.
-- הקורבן נמצא במשבצת האחרונה שנותרה.
-- מי שהיה לבד עם הקורבן באותו חדר הוא הרוצח.
+## Rules
+- Every person was in a different row and a different column.
+- Some objects can be stood on (chairs, beds, rugs, logs, crates…), others can't (tables, plants, statues…).
+- The victim (always a name starting with **V**) is in the last remaining square.
+- Whoever was alone with the victim in the same area is the murderer.
 
-## הפעלה
-פותחים את `index.html` בדפדפן. אין צורך בהתקנה.
+## Levels
+| Level | Grid | Suspects |
+|---|---|---|
+| Rookie | 4×4 | 3 |
+| Detective | 5×5 | 4 |
+| Inspector | 6×6 | 5 |
+| Expert | 8×8 | 7 |
+| Extreme | 10×10 | 9 |
 
-- `engine.js` יוצר תיקים ללא הגבלה (חדרים, רהיטים, חלונות, רמזים) ובודק שלכל תיק יש פתרון אחד בלבד.
-- `app.js` הוא ממשק המשחק: הצבה, סימוני ✕, ביטול, רמזים, טיימר, שמירת התקדמות.
-- שלוש רמות: 4×4, 5×5, 6×6.
+Suspects are named in alphabetical order (A, B, C…). Expert and Extreme puzzles are graded by a logic solver: they can't be finished by simple elimination and need "what if this person were here?" reasoning.
 
-## אפליקציה בטלפון
-המשחק הוא PWA: אחרי שמעלים אותו לכתובת https (למשל GitHub Pages) אפשר להוסיף אותו למסך הבית, והוא עובד גם בלי אינטרנט.
-השם וההתקדמות של כל שחקן נשמרים במכשיר שלו.
+## Scenes
+Mansion, ship, forest, space station, museum, night train, circus, castle and ski lodge, each with its own areas and objects.
+
+## Files
+- `engine.js`: builds cases, proves each has exactly one solution and grades its difficulty.
+- `worker.js`: runs the engine in the background so the screen never freezes.
+- `app.js` / `index.html`: the game.
+- `manifest.webmanifest`, `sw.js`, `icons/`: install as a phone app, works offline.
+
+Progress and the player's name are saved on the device.

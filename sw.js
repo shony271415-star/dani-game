@@ -1,6 +1,6 @@
-/* מאפשר למשחק לעבוד גם בלי אינטרנט: קודם מנסים רשת (כדי לקבל עדכונים), ואם אין — מהמטמון */
-const CACHE = 'mystery-grid-v2';
-const FILES = ['./', 'index.html', 'engine.js', 'app.js', 'manifest.webmanifest',
+/* Offline support: try the network first (to get updates), fall back to the cache */
+const CACHE = 'mystery-grid-v3';
+const FILES = ['./', 'index.html', 'engine.js', 'app.js', 'worker.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {

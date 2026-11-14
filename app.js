@@ -3,118 +3,168 @@
   const E = window.MysteryEngine;
   const $ = (id) => document.getElementById(id);
   const STORE_KEY = 'mystery-grid-v1';
-  const DIFF_LABEL = { easy: 'בלש מתחיל', medium: 'בלש ותיק', hard: 'מפקח ראשי' };
-  const DIFF_SEED = { easy: 100000, medium: 200000, hard: 300000 };
+
+  const DIFFS = [
+    { key: 'easy', label: '🔎 Rookie', sub: '4×4 grid · 3 suspects', seed: 100000 },
+    { key: 'medium', label: '🕵️ Detective', sub: '5×5 grid · 4 suspects', seed: 200000 },
+    { key: 'hard', label: '🎩 Inspector', sub: '6×6 grid · 5 suspects', seed: 300000 },
+    { key: 'expert', label: '🧠 Expert', sub: '8×8 grid · 7 suspects', seed: 400000 },
+    { key: 'extreme', label: '💀 Extreme', sub: '10×10 grid · 9 suspects · bring coffee', seed: 500000 },
+  ];
+  const DIFF = Object.fromEntries(DIFFS.map((d) => [d.key, d]));
+  const RANKS = [[0, 'Rookie'], [3, 'Junior Detective'], [10, 'Detective'], [25, 'Inspector'], [50, 'Chief Inspector'], [100, 'Legend of the Force']];
 
   let store = load();
-  let S = null; // מצב המשחק הנוכחי
+  let S = null;
   let timer = null;
 
   function load() {
-    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; }
+    let s;
+    try { s = JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { s = {}; }
+    if (s.engine !== E.VERSION) {
+      // cases from the old version can't be resumed, but progress and profile are kept
+      for (const d of DIFFS) if (s[d.key]) { s[d.key].cur = null; s[d.key].next = null; }
+      s.engine = E.VERSION;
+    }
+    return s;
   }
   function save() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (e) { /* מצב פרטי */ }
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (e) { /* storage full or private mode */ }
   }
   function prog(diff) {
-    if (!store[diff]) store[diff] = { caseNum: 1, solved: 0, best: null, cur: null };
+    if (!store[diff]) store[diff] = { caseNum: 1, solved: 0, best: null, cur: null, next: null };
     return store[diff];
   }
 
-  function fmtTime(sec) {
-    const m = Math.floor(sec / 60), s = sec % 60;
-    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-  }
-  function rich(text) {
-    const esc = text.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
-    return esc.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
-  }
-  const g = (p, m, f) => (p.g === 'm' ? m : f);
+  const fmtTime = (sec) => {
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    return (h ? h + ':' + String(m).padStart(2, '0') : String(m).padStart(2, '0')) + ':' + String(s).padStart(2, '0');
+  };
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const rich = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  const pr = (p, he, she) => (p.g === 'm' ? he : she);
 
-  /* ---------- פרופיל ---------- */
-  const RANKS = [[0, 'בלש מתלמד', 'בלשית מתלמדת'], [3, 'חוקר זוטר', 'חוקרת זוטרה'], [10, 'בלש בכיר', 'בלשית בכירה'],
-    [25, 'מפקח', 'מפקחת'], [50, 'אגדת המשטרה', 'אגדת המשטרה']];
-  function totalSolved() { return ['easy', 'medium', 'hard'].reduce((n, d) => n + prog(d).solved, 0); }
+  /* ---------- case building (in a worker when possible) ---------- */
+  let worker = null, reqId = 0;
+  const pending = {};
+  try {
+    if (/^https?:$/.test(location.protocol)) {
+      worker = new Worker('worker.js');
+      worker.onmessage = (e) => {
+        const cb = pending[e.data.id];
+        delete pending[e.data.id];
+        if (cb) cb(e.data.error ? null : e.data.puzzle);
+      };
+      worker.onerror = () => { worker = null; };
+    }
+  } catch (e) { worker = null; }
+
+  function buildCase(diff, caseNum, cb) {
+    const seed = DIFF[diff].seed + caseNum;
+    if (worker) {
+      const id = ++reqId;
+      pending[id] = (p) => (p ? cb(p) : cb(E.generate(seed, diff)));
+      worker.postMessage({ id, seed, diff });
+    } else {
+      setTimeout(() => cb(E.generate(seed, diff)), 30);
+    }
+  }
+  function prefetchNext(diff, caseNum) {
+    const p = prog(diff);
+    if (p.next && p.next.caseNum === caseNum + 1) return;
+    buildCase(diff, caseNum + 1, (puzzle) => {
+      prog(diff).next = { caseNum: caseNum + 1, puzzle };
+      save();
+    });
+  }
+
+  /* ---------- profile ---------- */
+  function totalSolved() { return DIFFS.reduce((n, d) => n + prog(d.key).solved, 0); }
   function rankName() {
-    const t = totalSolved(), f = store.profile && store.profile.g === 'f';
-    let r = RANKS[0];
-    for (const x of RANKS) if (t >= x[0]) r = x;
-    return f ? r[2] : r[1];
+    const t = totalSolved();
+    let r = RANKS[0][1];
+    for (const [n, name] of RANKS) if (t >= n) r = name;
+    return r;
   }
   function askProfile() {
-    const cur = store.profile || {};
-    modal(`<div class="big">🕵️</div><h2>מי חוקר היום?</h2>
-      <p>השם וההתקדמות נשמרים במכשיר הזה.</p>
-      <input class="name-in" id="name-in" maxlength="16" placeholder="השם שלך" autocomplete="off">
-      <div class="row"><button class="primary" data-act="f">אני בלשית 🕵️‍♀️</button><button class="primary" data-act="m">אני בלש 🕵️‍♂️</button></div>`,
-    {
-      f: () => saveProfile('f'), m: () => saveProfile('m'),
-    }, true);
-    $('name-in').value = cur.name || '';
+    modal(`<div class="big">🕵️</div><h2>Who's on the case?</h2>
+      <p>Your name and progress are saved on this device.</p>
+      <input class="name-in" id="name-in" maxlength="18" placeholder="Your name" autocomplete="off">
+      <div class="row"><button class="primary" data-act="ok">Let's go</button></div>`,
+    { ok: saveProfile }, true);
+    const cur = store.profile ? store.profile.name : '';
+    $('name-in').value = cur || '';
+    $('name-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') saveProfile(); });
   }
-  function saveProfile(gender) {
+  function saveProfile() {
     const name = $('name-in').value.trim();
-    if (!name) { $('name-in').focus(); $('modal-body').classList.remove('shake'); void $('modal-body').offsetWidth; $('modal-body').classList.add('shake'); return; }
-    store.profile = { name, g: gender };
-    save();
-    closeModal();
-    showHome();
+    if (!name) { $('name-in').focus(); shake($('modal-body')); return; }
+    store.profile = { name };
+    save(); closeModal(); showHome();
   }
   function renderGreet() {
     const el = $('greet');
-    el.innerHTML = '';
-    if (!store.profile) { el.textContent = 'הקישו כאן כדי להזדהות'; return; }
-    const b = document.createElement('b');
-    b.textContent = `שלום, ${store.profile.name}! 👋`;
-    const s = document.createElement('div');
+    if (!store.profile) { el.innerHTML = '<b>Tap here to sign in</b>'; return; }
     const t = totalSolved();
-    s.textContent = `דרגה: ${rankName()} · ${t === 1 ? 'תיק אחד פוענח' : t ? t + ' תיקים פוענחו' : 'עוד לא פוענח אף תיק'}`;
-    const sm = document.createElement('small');
-    sm.textContent = 'הקשה כאן מחליפה שם';
-    el.append(b, s, sm);
+    el.innerHTML = `<b>Hello, ${esc(store.profile.name)}! 👋</b>
+      <div>Rank: ${rankName()} · ${t === 1 ? '1 case solved' : t ? t + ' cases solved' : 'no cases solved yet'}</div>
+      <small>Tap to change name</small>`;
   }
 
-  /* ---------- מסך פתיחה ---------- */
+  /* ---------- home ---------- */
   function showHome() {
     stopTimer();
     $('home').classList.add('active');
     $('game').classList.remove('active');
     renderGreet();
-    for (const d of ['easy', 'medium', 'hard']) {
-      const p = prog(d);
-      $('badge-' + d).textContent = p.solved === 1 ? 'פוענח 1' : p.solved ? `${p.solved} פוענחו` : 'חדש!';
-    }
+    $('diffs').innerHTML = DIFFS.map((d) => {
+      const p = prog(d.key);
+      const badge = p.cur ? 'In progress' : p.solved ? `${p.solved} solved` : 'New!';
+      return `<button class="diff-btn ${d.key === 'extreme' ? 'extreme' : ''}" data-diff="${d.key}">
+        <span>${d.label}<small>${d.sub}</small></span><span class="badge">${badge}</span></button>`;
+    }).join('');
+    $('diffs').querySelectorAll('.diff-btn').forEach((b) => b.addEventListener('click', () => startGame(b.dataset.diff)));
   }
 
-  document.querySelectorAll('.diff-btn').forEach((b) => {
-    b.addEventListener('click', () => startGame(b.dataset.diff));
-  });
-
-  /* ---------- משחק ---------- */
+  /* ---------- game ---------- */
   function startGame(diff) {
     const p = prog(diff);
     const caseNum = p.caseNum;
-    const puzzle = E.generate(DIFF_SEED[diff] + caseNum, diff);
+    const go = (puzzle) => {
+      $('loading').classList.remove('show');
+      begin(diff, caseNum, puzzle);
+    };
+    if (p.cur && p.cur.caseNum === caseNum && p.cur.puzzle) return go(p.cur.puzzle);
+    if (p.next && p.next.caseNum === caseNum && p.next.puzzle) { const pz = p.next.puzzle; p.next = null; return go(pz); }
+    $('loading-text').textContent = diff === 'extreme' ? 'Building a really nasty crime scene…' : 'Building the crime scene…';
+    $('loading').classList.add('show');
+    buildCase(diff, caseNum, go);
+  }
+
+  function begin(diff, caseNum, puzzle) {
+    const p = prog(diff);
     S = {
       diff, caseNum, P: puzzle,
-      place: new Array(puzzle.N).fill(-1),
-      xs: new Set(),
+      place: new Array(puzzle.N).fill(-1), xs: new Set(),
       sel: -1, mode: 'place', history: [],
       elapsed: 0, hints: 0, solvedGrid: false, wrongAccuse: [],
     };
     if (p.cur && p.cur.caseNum === caseNum) {
-      S.place = p.cur.place; S.xs = new Set(p.cur.xs); S.elapsed = p.cur.elapsed;
+      S.place = p.cur.place || S.place; S.xs = new Set(p.cur.xs || []); S.elapsed = p.cur.elapsed || 0;
       S.hints = p.cur.hints || 0; S.wrongAccuse = p.cur.wrongAccuse || [];
     }
+    persist();
     $('home').classList.remove('active');
     $('game').classList.add('active');
-    $('case-title').textContent = `תיק #${caseNum}: ${puzzle.title}`;
+    $('case-title').textContent = `${puzzle.theme.icon} Case #${caseNum}: ${puzzle.title}`;
     $('intro').textContent = puzzle.intro;
+    buildLegend();
     setMode('place');
-    setStatus('בחרו חשוד מהרשימה ואז משבצת בלוח.');
     render();
     window.scrollTo(0, 0);
+    requestAnimationFrame(() => { $('play-area').style.top = $('topbar').offsetHeight + 'px'; });
     startTimer();
+    prefetchNext(diff, caseNum);
     if (!store.seenHowto) { store.seenHowto = true; save(); showHowto(); }
     checkDone(true);
   }
@@ -122,93 +172,77 @@
   function persist() {
     if (!S) return;
     prog(S.diff).cur = {
-      caseNum: S.caseNum, place: S.place, xs: [...S.xs], elapsed: S.elapsed,
+      caseNum: S.caseNum, puzzle: S.P, place: S.place, xs: [...S.xs], elapsed: S.elapsed,
       hints: S.hints, wrongAccuse: S.wrongAccuse,
     };
     save();
   }
 
   function startTimer() {
-    stopTimer();
-    updateSub();
+    stopTimer(); updateSub();
     timer = setInterval(() => {
-      if (document.hidden || S.solvedGrid) return;
-      S.elapsed++;
-      updateSub();
-      if (S.elapsed % 5 === 0) persist();
+      if (document.hidden || !S || S.solvedGrid) return;
+      S.elapsed++; updateSub();
+      if (S.elapsed % 10 === 0) persist();
     }, 1000);
   }
   function stopTimer() { if (timer) clearInterval(timer); timer = null; }
   function updateSub() {
-    $('case-sub').textContent = `${DIFF_LABEL[S.diff]} · ⏱ ${fmtTime(S.elapsed)}`;
+    $('case-sub').textContent = `${S.P.theme.name} · ${DIFF[S.diff].label.replace(/^\S+\s/, '')} · ⏱ ${fmtTime(S.elapsed)}`;
   }
 
-  function setStatus(msg, shake) {
-    const el = $('status');
-    el.textContent = msg;
-    if (shake) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
-  }
+  function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+  function setStatus(msg, bad) { $('status').textContent = msg; if (bad) shake($('status')); }
 
   function setMode(m) {
     S.mode = m;
     $('mode-place').classList.toggle('on', m === 'place');
     $('mode-x').classList.toggle('on', m === 'x');
-    if (m === 'x') { S.sel = -1; setStatus('מצב סימון: הקישו על משבצת כדי לסמן ✕ (מקום שאף אחד לא יכול להיות בו).'); }
-    else setStatus('בחרו חשוד מהרשימה ואז משבצת בלוח.');
-    if (S.P) render();
+    if (m === 'x') { S.sel = -1; setStatus('Mark mode: tap a square to cross it out ✕'); }
+    else setStatus('Pick a suspect below, then tap a square.');
+    render();
   }
 
   function snapshot() {
     S.history.push({ place: S.place.slice(), xs: [...S.xs] });
-    if (S.history.length > 200) S.history.shift();
+    if (S.history.length > 300) S.history.shift();
   }
-
-  function whoAt(cell) { return S.place.indexOf(cell); }
+  const whoAt = (cell) => S.place.indexOf(cell);
 
   function onCell(i) {
     if (S.solvedGrid) return;
-    const P = S.P;
-    const occupant = whoAt(i);
+    const P = S.P, occ = whoAt(i);
     if (S.mode === 'x') {
-      if (occupant >= 0) return;
+      if (occ >= 0) return;
       snapshot();
       if (S.xs.has(i)) S.xs.delete(i); else S.xs.add(i);
       render(); persist();
       return;
     }
     if (S.sel >= 0) {
-      if (E.BLOCKING[P.obj[i]]) {
-        setStatus(`אי אפשר לעמוד על ${E.OBJ_NAMES[P.obj[i]]}!`, true);
-        return;
-      }
+      if (E.isBlocked(P.obj[i])) { setStatus(`Nobody can stand on ${E.OBJECTS[P.obj[i]].name === 'TV' ? 'the TV' : 'the ' + E.OBJECTS[P.obj[i]].name}!`, true); return; }
       snapshot();
-      if (occupant >= 0) S.place[occupant] = -1;
-      S.place[S.sel] = i;
-      S.xs.delete(i);
-      S.sel = -1;
-      render(); persist();
-      checkDone(false);
+      if (occ >= 0) S.place[occ] = -1;
+      S.place[S.sel] = i; S.xs.delete(i); S.sel = -1;
+      setStatus('Pick a suspect below, then tap a square.');
+      render(); persist(); checkDone(false);
       return;
     }
-    if (occupant >= 0) {
+    if (occ >= 0) {
       snapshot();
-      S.place[occupant] = -1;
-      S.sel = occupant;
-      setStatus(`הרמתם את ${P.people[occupant].name}. בחרו משבצת חדשה.`);
+      S.place[occ] = -1; S.sel = occ;
+      setStatus(`You picked up ${P.people[occ].name}. Tap a new square.`);
       render(); persist();
       return;
     }
-    setStatus('קודם בחרו חשוד מהרשימה למטה 👇', true);
+    setStatus('First pick a suspect from the list below 👇', true);
   }
 
   function onSuspect(p) {
     if (S.solvedGrid) return;
     if (S.mode === 'x') setMode('place');
     S.sel = S.sel === p ? -1 : p;
-    if (S.sel >= 0) {
-      const person = S.P.people[p];
-      setStatus(`איפה ${g(person, 'היה', 'הייתה')} ${person.name}? הקישו על משבצת.`);
-    }
+    if (S.sel >= 0) setStatus(`Where was ${S.P.people[p].name}? Tap a square.`);
     render();
   }
 
@@ -225,87 +259,98 @@
   function checkDone(silent) {
     const P = S.P;
     if (S.place.some((x) => x < 0)) return;
-    const bad = conflicts();
-    if (bad.size) {
-      if (!silent) setStatus('שני אנשים באותה שורה או עמודה — זה לא יכול להיות!', true);
-      return;
-    }
-    const correct = S.place.every((x, p) => x === P.solution[p]);
-    if (!correct) {
-      if (!silent) setStatus('🤔 משהו לא מסתדר... יש מישהו שלא עומד בכל הרמזים שלו.', true);
+    if (conflicts().size) { if (!silent) setStatus('Two people share a row or column. That can\'t be right!', true); return; }
+    if (!S.place.every((x, p) => x === P.solution[p])) {
+      if (!silent) setStatus('🤔 Something doesn\'t add up… someone breaks one of their clues.', true);
       return;
     }
     S.solvedGrid = true;
-    persist();
-    render();
-    setStatus('✅ כל החשודים במקום! עכשיו — מי הרוצח?');
+    persist(); render();
+    setStatus('✅ Everyone is in place! Now… who did it?');
     setTimeout(showAccuse, 450);
   }
 
-  /* ---------- ציור ---------- */
-  function roomLabelCells(P) {
-    const N = P.N, best = {};
-    P.roomOf.forEach((room, i) => {
-      const r = Math.floor(i / N), c = i % N;
-      const score = r * 10 - Math.abs(c - (N - 1) / 2) + (P.obj[i] ? -0.5 : 0);
-      if (!(room in best) || score > best[room].score) best[room] = { i, score };
-    });
+  /* ---------- drawing ---------- */
+  function zoneLabelCells(P) {
+    // one label per area, on a square near its bottom, without two labels overlapping
+    const N = P.N, cellPx = Math.min(window.innerWidth * 0.94, 470, window.innerHeight * 0.52) / N;
+    const fontPx = Math.max(8, cellPx * 0.19);
+    const span = (z) => (P.zones[z].name.length * fontPx * 0.58 + 10) / cellPx; // label width in squares
+    const taken = []; // [row, from, to]
     const out = {};
-    Object.keys(best).forEach((room) => { out[best[room].i] = +room; });
+    const zonesBySize = [...P.zones.keys()].sort((a, b) => P.zoneOf.filter((x) => x === a).length - P.zoneOf.filter((x) => x === b).length);
+    for (const z of zonesBySize) {
+      const w = span(z);
+      const cells = [];
+      P.zoneOf.forEach((zz, i) => {
+        if (zz !== z) return;
+        const r = Math.floor(i / N), c = i % N;
+        let run = 0; for (let k = 0; k < N; k++) if (P.zoneOf[r * N + k] === z) run++;
+        const score = r * 10 + Math.min(run, w) * 3 + (P.obj[i] ? -2 : 0) - Math.abs(c - (N - 1) / 2) * 0.2;
+        cells.push([i, score]);
+      });
+      cells.sort((a, b) => b[1] - a[1]);
+      let chosen = cells[0][0];
+      for (const [i] of cells) {
+        const r = Math.floor(i / N), c = i % N + 0.5;
+        const from = Math.max(0, c - w / 2), to = Math.min(N, c + w / 2);
+        if (!taken.some(([tr, tf, tt]) => tr === r && from < tt && to > tf)) { chosen = i; break; }
+      }
+      const r = Math.floor(chosen / N), c = chosen % N + 0.5;
+      taken.push([r, c - w / 2, c + w / 2]);
+      out[chosen] = z;
+    }
     return out;
   }
 
+  const isOuter = (N, i, s) => {
+    const r = Math.floor(i / N), c = i % N;
+    return (s === 'n' && r === 0) || (s === 's' && r === N - 1) || (s === 'w' && c === 0) || (s === 'e' && c === N - 1);
+  };
+
   function render() {
-    const P = S.P, N = P.N;
+    if (!S) return;
+    const P = S.P, N = P.N, big = N > 6;
     const board = $('board');
     board.style.setProperty('--n', N);
     board.style.gridTemplateColumns = `repeat(${N}, 1fr)`;
     board.style.gridTemplateRows = `repeat(${N}, 1fr)`;
     board.innerHTML = '';
-    const labels = roomLabelCells(P);
-    const bad = conflicts();
-    const usedRows = new Set(), usedCols = new Set();
-    if (S.sel >= 0) S.place.forEach((x, p) => { if (x >= 0 && p !== S.sel) { usedRows.add(Math.floor(x / N)); usedCols.add(x % N); } });
-    const winSet = new Set(P.windows);
+    const labels = zoneLabelCells(P), bad = conflicts();
+    const usedR = new Set(), usedC = new Set();
+    if (S.sel >= 0) S.place.forEach((x, p) => { if (x >= 0 && p !== S.sel) { usedR.add(Math.floor(x / N)); usedC.add(x % N); } });
+    const edges = new Set(P.edges);
 
     for (let i = 0; i < N * N; i++) {
       const cell = document.createElement('div');
       cell.className = 'cell';
+      cell.style.background = P.zones[P.zoneOf[i]].color;
       const w = P.walls[i];
-      cell.style.background = P.rooms[P.roomOf[i]].color;
       ['n', 's', 'e', 'w'].forEach((s) => { if (w[s] && !isOuter(N, i, s)) cell.classList.add('wall-' + s); });
-      const o = P.obj[i];
-      if (o === 'carpet') cell.classList.add('carpet');
+      const o = P.obj[i], def = o && E.OBJECTS[o];
+      if (def && def.css === 'rug') cell.classList.add('rug');
       const who = whoAt(i);
       if (who >= 0) cell.classList.add('has-token');
-      if (S.sel >= 0 && (usedRows.has(Math.floor(i / N)) || usedCols.has(i % N) || E.BLOCKING[o])) cell.classList.add('dim');
-
-      if (o === 'table') { const t = document.createElement('div'); t.className = 'table-obj'; cell.appendChild(t); }
-      else if (o && o !== 'carpet') {
-        const em = document.createElement('div');
-        em.className = 'obj';
-        em.textContent = { chair: '🪑', bed: '🛏️', tv: '📺', plant: '🪴' }[o];
-        cell.appendChild(em);
-      }
+      if (S.sel >= 0 && (usedR.has(Math.floor(i / N)) || usedC.has(i % N) || E.isBlocked(o))) cell.classList.add('dim');
+      if (def && def.css === 'table') { const t = document.createElement('div'); t.className = 'table-obj'; cell.appendChild(t); }
+      else if (def && def.e) { const em = document.createElement('div'); em.className = 'obj'; em.textContent = def.e; cell.appendChild(em); }
       ['n', 's', 'e', 'w'].forEach((s) => {
-        if (winSet.has(i + s)) { const wi = document.createElement('div'); wi.className = 'win ' + s; cell.appendChild(wi); }
+        if (edges.has(i + s)) { const d = document.createElement('div'); d.className = 'edge ' + s; d.style.background = P.theme.edgeColor; cell.appendChild(d); }
       });
       if (i in labels) {
         const lb = document.createElement('div');
-        lb.className = 'room-label';
-        lb.textContent = P.rooms[labels[i]].name;
+        lb.className = 'zone-label'; lb.textContent = P.zones[labels[i]].name;
         cell.appendChild(lb);
       }
       if (who >= 0) {
         const person = P.people[who];
         const t = document.createElement('div');
-        t.className = 'token' + (person.isVictim ? ' victim' : '') + (bad.has(who) ? ' conflict' : '') + (S.solvedGrid ? ' locked' : '');
-        t.textContent = person.emoji;
+        t.className = 'token' + (big ? ' letter' : '') + (person.isVictim ? ' victim' : '') + (bad.has(who) ? ' conflict' : '') + (S.solvedGrid ? ' locked' : '');
+        if (big) { t.textContent = person.letter; t.style.background = person.color; }
+        else t.textContent = person.emoji;
         cell.appendChild(t);
       } else if (S.xs.has(i)) {
-        const x = document.createElement('div');
-        x.className = 'xmark'; x.textContent = '✕';
-        cell.appendChild(x);
+        const x = document.createElement('div'); x.className = 'xmark'; x.textContent = '✕'; cell.appendChild(x);
       }
       cell.addEventListener('click', () => onCell(i));
       board.appendChild(cell);
@@ -317,20 +362,36 @@
       const card = document.createElement('button');
       card.className = 'suspect' + (person.isVictim ? ' is-victim' : '') + (S.sel === p ? ' sel' : '') + (S.place[p] >= 0 ? ' placed' : '');
       const clues = person.isVictim
-        ? `<b>${g(person, 'הקורבן', 'הקורבן')}.</b> ${g(person, 'נמצא', 'נמצאה')} במשבצת האחרונה שנותרה.`
-        : person.clues.map(rich).join('<br>');
-      card.innerHTML = `<div class="face">${person.emoji}</div><div><div class="nm">${person.name}${person.isVictim ? ' ☠️' : ''}</div><div class="cl">${clues}</div></div>`;
+        ? '<div><b>The victim.</b> Found in the last remaining square.</div>'
+        : person.clues.map((c) => `<div>${rich(c)}</div>`).join('');
+      card.innerHTML = `<div class="face">${person.emoji}<span class="lt" style="background:${person.color}">${person.letter}</span></div>
+        <div><div class="nm">${esc(person.name)}${person.isVictim ? ' ☠️' : ''}</div><div class="cl">${clues}</div></div>`;
       card.addEventListener('click', () => onSuspect(p));
       list.appendChild(card);
     });
   }
 
-  function isOuter(N, i, s) {
-    const r = Math.floor(i / N), c = i % N;
-    return (s === 'n' && r === 0) || (s === 's' && r === N - 1) || (s === 'w' && c === 0) || (s === 'e' && c === N - 1);
+  function buildLegend() {
+    const P = S.P, T = P.theme;
+    const present = [...new Set(P.obj.filter(Boolean))];
+    const show = (o) => (E.OBJECTS[o].e || (o === 'rug' ? '▨' : '▬')) + ' ' + E.OBJECTS[o].name;
+    const can = present.filter((o) => !E.isBlocked(o)).map(show);
+    const cant = present.filter((o) => E.isBlocked(o)).map(show);
+    $('legend').innerHTML = `<summary>📖 Detective's dictionary</summary><ul>
+      <li>Every person was in a <b>different row</b> and a <b>different column</b>.</li>
+      <li>You <b>can</b> stand on: bare ${T.floor}${can.length ? ', ' + can.join(', ') : ''}.</li>
+      ${cant.length ? `<li>You <b>can't</b> stand on: ${cant.join(', ')}.</li>` : ''}
+      <li><b>Beside</b> something = in a square directly above, below, left or right of it, in the same ${T.area}.</li>
+      <li><b>In a corner</b> = a square where two walls of the ${T.area} meet.</li>
+      <li><b>${T.center[0].toUpperCase() + T.center.slice(1)}</b> = none of the square's 4 sides is a wall.</li>
+      <li><b>By a ${T.edge}</b> = the colored bar on the outer wall is on that square's side.</li>
+      <li><b>Higher row</b> = closer to the top. <b>To the left</b> = closer to the left side.</li>
+      <li><b>Diagonally next to</b> = touching only by a corner.</li>
+      <li>The victim was in the last free square. Whoever was <b>alone with them</b> in the same ${T.area} is the murderer.</li>
+    </ul>`;
   }
 
-  /* ---------- כלים ---------- */
+  /* ---------- tools ---------- */
   $('mode-place').addEventListener('click', () => setMode('place'));
   $('mode-x').addEventListener('click', () => setMode('x'));
   $('undo').addEventListener('click', () => {
@@ -341,38 +402,33 @@
   });
   $('reset').addEventListener('click', () => {
     if (S.solvedGrid) return;
-    modal(`<div class="big">🗑️</div><h2>לנקות את הלוח?</h2><p>כל ההצבות והסימונים יימחקו.</p>
-      <div class="row"><button class="primary" data-act="yes">כן, נקו</button><button class="secondary" data-act="close">ביטול</button></div>`, {
+    modal(`<div class="big">🗑️</div><h2>Clear the board?</h2><p>All placements and marks will be erased.</p>
+      <div class="row"><button class="primary" data-act="yes">Yes, clear</button><button class="secondary" data-act="close">Cancel</button></div>`, {
       yes: () => { snapshot(); S.place.fill(-1); S.xs.clear(); S.sel = -1; render(); persist(); closeModal(); },
     });
   });
   $('hint').addEventListener('click', () => {
     if (S.solvedGrid) return;
     const P = S.P;
-    // קודם מתקנים טעות, אחר כך מציבים מישהו חדש (לא את הקורבן)
     let p = S.place.findIndex((x, q) => x >= 0 && x !== P.solution[q]);
-    let wasWrong = p >= 0;
+    const wasWrong = p >= 0;
     if (p < 0) p = S.place.findIndex((x, q) => x < 0 && !P.people[q].isVictim);
     if (p < 0) p = S.place.findIndex((x) => x < 0);
     if (p < 0) return;
     snapshot();
-    const target = P.solution[p];
-    const occ = whoAt(target);
+    const target = P.solution[p], occ = whoAt(target);
     if (occ >= 0) S.place[occ] = -1;
-    S.place[p] = target;
-    S.xs.delete(target);
-    S.sel = -1;
-    S.hints++;
+    S.place[p] = target; S.xs.delete(target); S.sel = -1; S.hints++;
     const person = P.people[p];
-    setStatus(wasWrong ? `💡 ${person.name} לא ${g(person, 'היה', 'הייתה')} במקום הנכון — תיקנתי.` : `💡 הצבתי את ${person.name} במקום הנכון.`);
-    render(); persist();
-    checkDone(false);
+    setStatus(wasWrong ? `💡 ${person.name} was in the wrong place. Fixed it.` : `💡 Placed ${person.name} in the right spot.`);
+    render(); persist(); checkDone(false);
   });
   $('back').addEventListener('click', () => { persist(); showHome(); });
   $('howto-home').addEventListener('click', showHowto);
   $('howto-game').addEventListener('click', showHowto);
+  $('greet').addEventListener('click', askProfile);
 
-  /* ---------- חלונות ---------- */
+  /* ---------- modals ---------- */
   let modalActions = {}, modalSticky = false;
   function modal(html, actions, sticky) {
     $('modal-body').innerHTML = html;
@@ -385,75 +441,67 @@
     if (e.target === $('modal')) { if (!modalSticky) closeModal(); return; }
     const btn = e.target.closest('[data-act]');
     if (!btn) return;
-    const act = btn.dataset.act;
-    if (act === 'close') closeModal();
-    else if (modalActions[act]) modalActions[act](btn);
+    if (btn.dataset.act === 'close') closeModal();
+    else if (modalActions[btn.dataset.act]) modalActions[btn.dataset.act](btn);
   });
 
   function showHowto() {
-    modal(`<div class="big">👮</div><h2>ברוכים הבאים, בלשים!</h2>
+    modal(`<div class="big">👮</div><h2>Welcome, detective!</h2>
       <div class="howto">
-      <p>אתמול בלילה היה — כן, ניחשתם — רצח. החדשות הטובות? יש לנו רשימת חשודים ומידע על כל אחד מהם.</p>
-      <p><b>המטרה:</b> לגלות מי הרוצח — מי ${'היה'} לבד בחדר עם הקורבן.</p>
+      <p>There was (yep, you guessed it) a murder last night. The good news? We have a lineup of suspects and a clue about each of them.</p>
+      <p><b>Your goal:</b> find the murderer: the one person who was <b>alone with the victim</b> in the same room.</p>
       <ul>
-        <li>כל אדם היה ב<b>שורה אחרת</b> וב<b>עמודה אחרת</b> (כמו בסודוקו).</li>
-        <li>אפשר לעמוד על רצפה ריקה, כיסא, מיטה או שטיח. <b>אי אפשר</b> לעמוד על שולחן, טלוויזיה או עציץ.</li>
-        <li>הקורבן נמצא ב<b>משבצת האחרונה שנותרה</b>.</li>
-        <li>מי שהיה <b>לבד</b> עם הקורבן באותו חדר — הוא הרוצח!</li>
+        <li>Every person was in a <b>different row</b> and a <b>different column</b>, like sudoku.</li>
+        <li>Some objects can be stood on (chairs, beds, rugs…), others can't (tables, plants…). Check the dictionary under the suspects.</li>
+        <li>The victim (<b>V</b>) is in the <b>last remaining square</b>.</li>
       </ul>
-      <p><b>איך משחקים:</b> הקישו על כרטיס של חשוד ואז על משבצת בלוח. הקשה על חשוד שכבר בלוח מרימה אותו. במצב <b>✕ סימון</b> אפשר לסמן משבצות שנפסלו.</p>
+      <p><b>How to play:</b> tap a suspect card, then a square. Tap a placed suspect to pick them up again. Use <b>✕ Mark</b> to cross out squares you've ruled out.</p>
+      <p>Each scene is different: a mansion, a ship, a forest, a space station and more.</p>
       </div>
-      <div class="row"><button class="primary" data-act="close">יאללה, לחקור!</button></div>`);
+      <div class="row"><button class="primary" data-act="close">Let's investigate!</button></div>`);
   }
 
   function showAccuse() {
-    const P = S.P;
+    const P = S.P, v = P.people[P.victim];
+    const zone = P.zones[P.zoneOf[P.solution[P.victim]]].name;
     const btns = P.people.map((person, p) => person.isVictim ? '' :
-      `<button data-act="acc" data-p="${p}" class="${S.wrongAccuse.includes(p) ? 'nope' : ''}"><span>${person.emoji}</span>${person.name}</button>`).join('');
-    const v = P.people[P.victim];
-    modal(`<div class="big">🔪</div><h2>הרוצח הוא...</h2>
-      <p>${v.name} ${g(v, 'נמצא', 'נמצאה')} ${P.rooms[P.roomOf[P.solution[P.victim]]].inForm}. מי ${g(v, 'היה איתו', 'היה איתה')} לבד?</p>
+      `<button data-act="acc" data-p="${p}" class="${S.wrongAccuse.includes(p) ? 'nope' : ''}"><span>${person.emoji}</span>${esc(person.name)}</button>`).join('');
+    modal(`<div class="big">🔪</div><h2>The murderer is…</h2>
+      <p>${esc(v.name)} was found in the <b>${esc(zone)}</b>. Who was alone with ${pr(v, 'him', 'her')}?</p>
       <div class="accuse-grid">${btns}</div>
       <p id="acc-msg" style="min-height:24px;color:var(--accent);font-weight:700"></p>`, {
       acc: (btn) => {
         const p = +btn.dataset.p;
-        if (p === P.murderer) win();
-        else {
-          if (!S.wrongAccuse.includes(p)) S.wrongAccuse.push(p);
-          persist();
-          btn.classList.add('nope');
-          const person = P.people[p];
-          $('acc-msg').textContent = `${person.name} בכלל לא ${g(person, 'היה', 'הייתה')} באותו חדר! נסו שוב.`;
-          $('modal-body').classList.remove('shake'); void $('modal-body').offsetWidth; $('modal-body').classList.add('shake');
-        }
+        if (p === P.murderer) return win();
+        if (!S.wrongAccuse.includes(p)) S.wrongAccuse.push(p);
+        persist();
+        btn.classList.add('nope');
+        $('acc-msg').textContent = `${P.people[p].name} wasn't even in the ${zone}! Try again.`;
+        shake($('modal-body'));
       },
     });
   }
 
   function win() {
-    const P = S.P, pr = prog(S.diff);
+    const P = S.P, pg = prog(S.diff);
     const m = P.people[P.murderer], v = P.people[P.victim];
-    pr.solved++;
-    pr.caseNum++;
-    pr.cur = null;
-    const isBest = !S.hints && (pr.best === null || S.elapsed < pr.best);
-    if (isBest) pr.best = S.elapsed;
-    save();
-    stopTimer();
-    const stars = S.hints === 0 && S.wrongAccuse.length === 0 ? '⭐⭐⭐' : S.hints <= 1 ? '⭐⭐' : '⭐';
-    modal(`<div class="big">${m.emoji}🚔</div><h2>התיק פוענח!</h2>
-      <p><b>${m.name}</b> ${g(m, 'היה', 'הייתה')} לבד עם ${v.name} ${P.rooms[P.roomOf[P.solution[P.victim]]].inForm}.<br>${g(m, 'הוא', 'היא')} בדרך לכלא. 🔒</p>
+    const zone = P.zones[P.zoneOf[P.solution[P.victim]]].name;
+    pg.solved++; pg.caseNum++; pg.cur = null;
+    const isBest = !S.hints && (pg.best == null || S.elapsed < pg.best);
+    if (isBest) pg.best = S.elapsed;
+    save(); stopTimer();
+    const stars = !S.hints && !S.wrongAccuse.length ? '⭐⭐⭐' : S.hints <= 1 ? '⭐⭐' : '⭐';
+    modal(`<div class="big">${m.emoji}🚔</div><h2>Case closed!</h2>
+      <p><b>${esc(m.name)}</b> was alone with ${esc(v.name)} in the ${esc(zone)}.<br>${pr(m, 'He', 'She')}'s on the way to jail. 🔒</p>
       <p style="font-size:28px;margin:6px 0">${stars}</p>
-      <p>⏱ ${fmtTime(S.elapsed)}${S.hints ? ` · 💡 ${S.hints} רמזים` : ''}${isBest ? '<br>🏆 שיא חדש!' : ''}</p>
-      <div class="row"><button class="primary" data-act="next">לתיק הבא ←</button><button class="secondary" data-act="home">לתפריט</button></div>`, {
+      <p>⏱ ${fmtTime(S.elapsed)}${S.hints ? ` · 💡 ${S.hints} hint${S.hints > 1 ? 's' : ''}` : ''}${isBest ? '<br>🏆 New personal best!' : ''}</p>
+      <div class="row"><button class="primary" data-act="next">Next case →</button><button class="secondary" data-act="home">Menu</button></div>`, {
       next: () => { closeModal(); startGame(S.diff); },
       home: () => { closeModal(); showHome(); },
     });
   }
 
-  $('greet').addEventListener('click', askProfile);
-
-  /* ---------- התקנה כאפליקציה ---------- */
+  /* ---------- install as an app ---------- */
   let installEvent = null;
   const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -462,24 +510,24 @@
   if (!standalone && isIOS) $('install-btn').hidden = false;
   $('install-btn').addEventListener('click', () => {
     if (installEvent) { installEvent.prompt(); installEvent = null; return; }
-    modal(`<div class="big">📲</div><h2>התקנה באייפון</h2>
+    modal(`<div class="big">📲</div><h2>Install on iPhone</h2>
       <ol class="steps">
-        <li>פתחו את הדף ב־<b>Safari</b>.</li>
-        <li>הקישו על כפתור <b>השיתוף</b> (ריבוע עם חץ למעלה).</li>
-        <li>בחרו <b>"הוסף למסך הבית"</b>.</li>
-        <li>מעכשיו פותחים את המשחק מהאייקון במסך הבית.</li>
+        <li>Open this page in <b>Safari</b>.</li>
+        <li>Tap the <b>Share</b> button (square with an arrow).</li>
+        <li>Choose <b>"Add to Home Screen"</b>.</li>
+        <li>From now on, open the game from the icon.</li>
       </ol>
-      <p><small>כדאי להתקין לפני שמתחילים לשחק: באייפון ההתקדמות של האפליקציה נשמרת בנפרד מזו של Safari.</small></p>
-      <div class="row"><button class="primary" data-act="close">הבנתי</button></div>`);
+      <p><small>Install before you start playing: on iPhone the app keeps its progress separately from Safari.</small></p>
+      <div class="row"><button class="primary" data-act="close">Got it</button></div>`);
   });
 
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
-  // מבקשים מהדפדפן לא למחוק את ההתקדמות כשנגמר המקום
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 
   document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
+  window.addEventListener('resize', () => { if (S) $('play-area').style.top = $('topbar').offsetHeight + 'px'; });
   showHome();
   if (!store.profile) askProfile();
 })();
