@@ -19,6 +19,14 @@ Sudoku meets murder mystery. Place every suspect on the crime scene using their 
 
 Suspects are named in alphabetical order (A, B, C…). Expert and Extreme puzzles are graded by a logic solver: they can't be finished by simple elimination and need "what if this person were here?" reasoning.
 
+## Two editions
+- `/` (index.html): the original edition, emoji graphics.
+- `/v2/`: the illustrated edition. All objects, scenes and characters are original SVG artwork drawn in `art.js`, with textured floors. Both editions share `engine.js` and `app.js` (and progress on the same device).
+
+## Daily case and tutorial
+- **Daily Case**: one case per day, the same for everyone (seeded by the date), harder towards the weekend, with a streak counter.
+- **Tutorial**: a hand-made 4×4 case that walks a beginner through the logic step by step.
+
 ## Tools
 - **Place**: pick a suspect, tap a square.
 - **Draft**: pencil in every square where a suspect *might* be (small colored letters), erase as you rule them out.

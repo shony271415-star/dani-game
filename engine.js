@@ -939,7 +939,15 @@
     return facts.map(({ id, text, dup }, k) => ({ id, text, dup, score: scores[k] }));
   }
 
-  const API = { generate, solve, grade, sceneFacts, evalUnary, isBlocked, OBJECTS, THEMES, DIFFICULTY, VERSION };
+  // turns a hand-made layout (like the tutorial case) into a full puzzle object
+  function finishCustom(P) {
+    P.walls = computeWalls(P.N, P.zoneOf);
+    const view = { ...P, edges: new Set(P.edges) };
+    P.facts = P.zoneOf.map((_, i) => cellFacts(view, i));
+    return P;
+  }
+
+  const API = { generate, solve, grade, sceneFacts, finishCustom, evalUnary, isBlocked, OBJECTS, THEMES, DIFFICULTY, VERSION };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   else root.MysteryEngine = API;
 })(typeof window !== 'undefined' ? window : globalThis);

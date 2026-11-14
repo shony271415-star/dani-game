@@ -5,14 +5,69 @@
   const STORE_KEY = 'mystery-grid-v1';
 
   const DIFFS = [
-    { key: 'easy', label: '🔎 Rookie', sub: '4×4 grid · 3 suspects', seed: 100000 },
-    { key: 'medium', label: '🕵️ Detective', sub: '5×5 grid · 4 suspects', seed: 200000 },
-    { key: 'hard', label: '🎩 Inspector', sub: '6×6 grid · 5 suspects', seed: 300000 },
-    { key: 'expert', label: '🧠 Expert', sub: '8×8 grid · 7 suspects', seed: 400000 },
-    { key: 'extreme', label: '💀 Extreme', sub: '10×10 grid · 9 suspects · bring coffee', seed: 500000 },
+    { key: 'easy', name: 'Rookie', emoji: '🔎', art: 'logo', sub: '4×4 grid · 3 suspects', seed: 100000 },
+    { key: 'medium', name: 'Detective', emoji: '🕵️', art: 'eye', sub: '5×5 grid · 4 suspects', seed: 200000 },
+    { key: 'hard', name: 'Inspector', emoji: '🎩', art: 'cap', sub: '6×6 grid · 5 suspects', seed: 300000 },
+    { key: 'expert', name: 'Expert', emoji: '🧠', art: 'bulb', sub: '8×8 grid · 7 suspects', seed: 400000 },
+    { key: 'extreme', name: 'Extreme', emoji: '💀', art: 'knife', sub: '10×10 grid · 9 suspects · bring coffee', seed: 500000 },
   ];
+  DIFFS.forEach((d) => { d.label = d.emoji + ' ' + d.name; });
   const DIFF = Object.fromEntries(DIFFS.map((d) => [d.key, d]));
   const RANKS = [[0, 'Rookie'], [3, 'Junior Detective'], [10, 'Detective'], [25, 'Inspector'], [50, 'Chief Inspector'], [100, 'Legend of the Force']];
+
+  /* ---------- look: emoji edition, or the illustrated edition when art.js is loaded ---------- */
+  const ART = window.MysteryArt || null;
+  const ic = (name, emoji) => (ART ? `<span class="ic">${ART.ui(name)}</span>` : emoji);
+  const face = (person) => (ART ? ART.avatar(person) : person.emoji);
+  const plain = (t) => (ART ? t.replace(/(?:[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B50}\u{2705}]\uFE0F?)\s?/gu, '') : t);
+  const stars = (n) => (ART ? [1, 2, 3].map((k) => `<span class="ic star">${ART.ui(k <= n ? 'star' : 'starOff')}</span>`).join('') : '⭐'.repeat(n));
+
+  /* ---------- daily case: same case for everyone on the same day ---------- */
+  const DAILY_DIFF = ['hard', 'medium', 'hard', 'hard', 'expert', 'expert', 'extreme']; // Sunday → Saturday
+  const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  function today() {
+    const d = new Date();
+    return { num: Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000), weekday: d.getDay() };
+  }
+  const dailyLog = () => (store.dailyLog = store.dailyLog || {});
+  function dailyStreak() {
+    const log = dailyLog(), t = today().num;
+    let day = log[t] ? t : t - 1, n = 0;
+    while (log[day]) { n++; day--; }
+    return n;
+  }
+
+  /* ---------- tutorial: a hand-made first case ---------- */
+  function tutorialPuzzle() {
+    const P = {
+      N: 4, tutorial: true,
+      theme: { id: 'mansion', name: 'The Mansion', icon: '🏚️', area: 'room', edge: 'window', edgeColor: '#7fc4f0', floor: 'floor', wall: 'beside a wall', center: 'not beside a wall' },
+      zones: [{ name: 'Living Room', color: '#cfe0f3' }, { name: 'Kitchen', color: '#fbefc4' }, { name: 'Bedroom', color: '#e6d5ef' }],
+      zoneOf: [0, 0, 1, 1, 0, 0, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1],
+      obj: ['tv', null, 'table', null, 'plant', 'chair', null, null, null, 'rug', null, null, 'bed', 'bed', null, 'plant'],
+      edges: ['3n', '8w'],
+      people: [
+        { letter: 'A', name: 'Ava', g: 'f', emoji: '👩', color: '#e74c3c', clues: ['She was **sitting on a chair**.'], rawClues: [{ t: 'on', a: 'chair' }] },
+        { letter: 'B', name: 'Ben', g: 'm', emoji: '👨', color: '#2980b9', clues: ['He was **lying on a bed**.'], rawClues: [{ t: 'on', a: 'bed' }] },
+        { letter: 'C', name: 'Chloe', g: 'f', emoji: '👱‍♀️', color: '#27ae60', clues: ['She was in the **Kitchen**.', 'She was **by a window**.'], rawClues: [{ t: 'zone', a: 1 }, { t: 'edge' }] },
+        { letter: 'V', name: 'Victor', g: 'm', emoji: '🧔', color: '#7f1d1d', isVictim: true, clues: [], rawClues: [] },
+      ],
+      solution: [5, 12, 3, 10], murderer: 1, victim: 3,
+      title: 'Your First Case', intro: 'A quiet evening, a loud scream. Let\'s learn the ropes together.',
+    };
+    return E.finishCustom(P);
+  }
+  const TUTORIAL = [
+    { text: '👋 Welcome, detective! I\'ll walk you through your very first case. Tap <b>Next</b>.', next: true },
+    { text: 'This is the <b>crime scene</b>. Thick lines are walls: they split the house into rooms. You <b>can</b> stand on chairs, beds and rugs, but <b>not</b> on tables, plants or TVs.', next: true },
+    { text: 'The golden rule: every person was in a <b>different row</b> and a <b>different column</b>, just like sudoku.', next: true },
+    { text: '<b>Ava</b> was sitting on a chair. There is only <b>one chair</b> in the house! Tap Ava\'s card below, then tap the chair.', expect: { p: 0, cell: 5 }, card: 0, cells: [5] },
+    { text: 'Nice! Ava now owns her row and her column, so nobody else can use them. When you pick another suspect, those squares turn gray.', next: true },
+    { text: '<b>Ben</b> was lying on a bed. The bed covers two squares, but one of them is in Ava\'s column. So there is only one choice left. Place Ben!', expect: { p: 1, cell: 12 }, card: 1, cells: [12, 13] },
+    { text: '<b>Chloe</b> was in the Kitchen, <b>by a window</b> (the little bar on the outer wall). Only one Kitchen square touches a window. Place Chloe!', expect: { p: 2, cell: 3 }, card: 2, cells: [3] },
+    { text: 'The victim is always in the <b>last free square</b>: only one row and one column are left. Place <b>Victor</b> there.', expect: { p: 3, cell: 10 }, card: 3, cells: [10] },
+    { text: 'Everyone is in place! Victor was found in the <b>Bedroom</b>. Who else was in the Bedroom? That person is the murderer!' },
+  ];
 
   let store = load();
   let S = null;
@@ -31,7 +86,8 @@
   function save() {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (e) { /* storage full or private mode */ }
   }
-  function prog(diff) {
+  function prog(slot) {
+    const diff = slot;
     if (!store[diff]) store[diff] = { caseNum: 1, solved: 0, best: null, cur: null, next: null };
     return store[diff];
   }
@@ -59,8 +115,8 @@
     }
   } catch (e) { worker = null; }
 
-  function buildCase(diff, caseNum, cb) {
-    const seed = DIFF[diff].seed + caseNum;
+  function buildCase(diff, caseNum, cb, seedOverride) {
+    const seed = seedOverride || DIFF[diff].seed + caseNum;
     if (worker) {
       const id = ++reqId;
       pending[id] = (p) => (p ? cb(p) : cb(E.generate(seed, diff)));
@@ -87,7 +143,7 @@
     return r;
   }
   function askProfile() {
-    modal(`<div class="big">🕵️</div><h2>Who's on the case?</h2>
+    modal(`<div class="big">${ic('logo', '🕵️')}</div><h2>Who's on the case?</h2>
       <p>Your name and progress are saved on this device.</p>
       <input class="name-in" id="name-in" maxlength="18" placeholder="Your name" autocomplete="off">
       <div class="row"><button class="primary" data-act="ok">Let's go</button></div>`,
@@ -99,14 +155,16 @@
   function saveProfile() {
     const name = $('name-in').value.trim();
     if (!name) { $('name-in').focus(); shake($('modal-body')); return; }
+    const firstTime = !store.profile;
     store.profile = { name };
     save(); closeModal(); showHome();
+    if (firstTime && !store.tutorialDone && !totalSolved()) offerTutorial();
   }
   function renderGreet() {
     const el = $('greet');
     if (!store.profile) { el.innerHTML = '<b>Tap here to sign in</b>'; return; }
     const t = totalSolved();
-    el.innerHTML = `<b>Hello, ${esc(store.profile.name)}! 👋</b>
+    el.innerHTML = `<b>Hello, ${esc(store.profile.name)}! ${ic('wave', '👋')}</b>
       <div>Rank: ${rankName()} · ${t === 1 ? '1 case solved' : t ? t + ' cases solved' : 'no cases solved yet'}</div>
       <small>Tap to change name</small>`;
   }
@@ -117,16 +175,50 @@
     $('home').classList.add('active');
     $('game').classList.remove('active');
     renderGreet();
+    renderDaily();
     $('diffs').innerHTML = DIFFS.map((d) => {
       const p = prog(d.key);
       const badge = p.cur ? 'In progress' : p.solved ? `${p.solved} solved` : 'New!';
       return `<button class="diff-btn ${d.key === 'extreme' ? 'extreme' : ''}" data-diff="${d.key}">
-        <span>${d.label}<small>${d.sub}</small></span><span class="badge">${badge}</span></button>`;
+        <span>${ART ? `<span class="ic dic">${ART.ui(d.art)}</span>${d.name}` : d.label}<small>${d.sub}</small></span><span class="badge">${badge}</span></button>`;
     }).join('');
     $('diffs').querySelectorAll('.diff-btn').forEach((b) => b.addEventListener('click', () => startGame(b.dataset.diff)));
   }
 
+  function renderDaily() {
+    const t = today(), diff = DAILY_DIFF[t.weekday], d = DIFF[diff];
+    const done = dailyLog()[t.num], p = prog('daily'), streak = dailyStreak();
+    const status = done ? `<span class="dc-done">✓ ${fmtTime(done.t)}</span>` : p.cur && p.cur.caseNum === t.num ? 'Continue' : 'Play';
+    $('daily').innerHTML = `<button class="daily-card" id="daily-btn">
+        <span class="dc-ic">${ic('calendar', '📅')}</span>
+        <span class="dc-tx"><b>Daily Case</b><small>${WEEKDAYS[t.weekday]} · ${d.name} · ${d.sub.split(' · ')[0]}</small></span>
+        <span class="badge">${status}</span>
+      </button>
+      <div class="streak">${streak ? `${ic('flame', '🔥')} ${streak}-day streak${done ? '' : ', solve today to keep it!'}` : 'A new case every day. Same one for everyone!'}</div>`;
+    $('daily-btn').addEventListener('click', startDaily);
+  }
+
+  function offerTutorial() {
+    modal(`<div class="big">${ic('cap', '🎓')}</div><h2>New here?</h2><p>Take the 2-minute tutorial: we'll solve a tiny case together, step by step.</p>
+      <div class="row"><button class="primary" data-act="go">Start tutorial</button><button class="secondary" data-act="close">I know how to play</button></div>`, {
+      go: () => { closeModal(); startTutorial(); },
+    });
+  }
+
   /* ---------- game ---------- */
+  function startDaily() {
+    const t = today(), diff = DAILY_DIFF[t.weekday], p = prog('daily');
+    const go = (puzzle) => { $('loading').classList.remove('show'); begin(diff, t.num, puzzle, 'daily'); };
+    if (p.cur && p.cur.caseNum === t.num && p.cur.puzzle) return go(p.cur.puzzle);
+    $('loading-text').textContent = 'Opening today\'s case file…';
+    $('loading').classList.add('show');
+    buildCase(diff, t.num, go, 1000000 + t.num);
+  }
+
+  function startTutorial() {
+    begin('easy', 0, tutorialPuzzle(), 'tutorial');
+  }
+
   function startGame(diff) {
     const p = prog(diff);
     const caseNum = p.caseNum;
@@ -141,15 +233,16 @@
     buildCase(diff, caseNum, go);
   }
 
-  function begin(diff, caseNum, puzzle) {
-    const p = prog(diff);
+  function begin(diff, caseNum, puzzle, slot) {
+    slot = slot || diff;
+    const p = prog(slot);
     S = {
-      diff, caseNum, P: puzzle,
+      diff, slot, caseNum, P: puzzle, tut: slot === 'tutorial' ? 0 : -1,
       place: new Array(puzzle.N).fill(-1), xs: new Set(), draft: {},
       sel: -1, mode: 'place', history: [],
       elapsed: 0, hints: 0, helps: 0, extra: [], solvedGrid: false, wrongAccuse: [],
     };
-    if (p.cur && p.cur.caseNum === caseNum) {
+    if (slot !== 'tutorial' && p.cur && p.cur.caseNum === caseNum) {
       S.place = p.cur.place || S.place; S.xs = new Set(p.cur.xs || []); S.elapsed = p.cur.elapsed || 0;
       S.hints = p.cur.hints || 0; S.wrongAccuse = p.cur.wrongAccuse || [];
       S.draft = p.cur.draft || {}; S.helps = p.cur.helps || 0; S.extra = p.cur.extra || [];
@@ -157,22 +250,35 @@
     persist();
     $('home').classList.remove('active');
     $('game').classList.add('active');
-    $('case-title').textContent = `${puzzle.theme.icon} Case #${caseNum}: ${puzzle.title}`;
+    const label = slot === 'daily' ? `Daily Case: ${puzzle.title}` : slot === 'tutorial' ? puzzle.title : `Case #${caseNum}: ${puzzle.title}`;
+    $('case-title').innerHTML = (ART ? `<span class="tic">${ART.theme(puzzle.theme.id)}</span>` : puzzle.theme.icon + ' ') + esc(label);
     $('intro').textContent = puzzle.intro;
+    $('game').classList.toggle('tut', slot === 'tutorial');
     buildLegend();
     setMode('place');
     render();
     window.scrollTo(0, 0);
     requestAnimationFrame(() => { $('play-area').style.top = $('topbar').offsetHeight + 'px'; });
     startTimer();
-    prefetchNext(diff, caseNum);
-    if (!store.seenHowto) { store.seenHowto = true; save(); showHowto(); }
+    if (slot === diff) prefetchNext(diff, caseNum);
+    if (slot === 'tutorial') renderCoach();
+    else if (!store.seenHowto && !store.tutorialDone) { store.seenHowto = true; save(); showHowto(); }
     checkDone(true);
   }
 
+  function renderCoach() {
+    const el = $('coach');
+    if (!S || S.tut < 0) { el.hidden = true; return; }
+    const step = TUTORIAL[S.tut];
+    el.hidden = false;
+    el.innerHTML = `<div class="coach-face">${ART ? ART.ui('logo') : '🕵️'}</div><div class="coach-tx">${plain(step.text)}</div>
+      ${step.next ? '<button class="primary coach-next" id="coach-next">Next</button>' : ''}`;
+    if (step.next) $('coach-next').addEventListener('click', () => { S.tut++; renderCoach(); render(); });
+  }
+
   function persist() {
-    if (!S) return;
-    prog(S.diff).cur = {
+    if (!S || S.slot === 'tutorial') return;
+    prog(S.slot).cur = {
       caseNum: S.caseNum, puzzle: S.P, place: S.place, xs: [...S.xs], elapsed: S.elapsed,
       hints: S.hints, wrongAccuse: S.wrongAccuse, draft: S.draft, helps: S.helps, extra: S.extra,
     };
@@ -189,11 +295,12 @@
   }
   function stopTimer() { if (timer) clearInterval(timer); timer = null; }
   function updateSub() {
-    $('case-sub').textContent = `${S.P.theme.name} · ${DIFF[S.diff].label.replace(/^\S+\s/, '')} · ⏱ ${fmtTime(S.elapsed)}`;
+    const kind = S.slot === 'daily' ? `Daily · ${DIFF[S.diff].name}` : S.slot === 'tutorial' ? 'Tutorial' : DIFF[S.diff].name;
+    $('case-sub').textContent = `${S.P.theme.name} · ${kind} · ${ART ? '' : '⏱ '}${fmtTime(S.elapsed)}`;
   }
 
   function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
-  function setStatus(msg, bad) { $('status').textContent = msg; if (bad) shake($('status')); }
+  function setStatus(msg, bad) { $('status').textContent = plain(msg); if (bad) shake($('status')); }
 
   function setMode(m) {
     S.mode = m;
@@ -232,6 +339,17 @@
       if (k >= 0) list.splice(k, 1); else { list.push(S.sel); list.sort((x, y) => x - y); }
       if (list.length) S.draft[i] = list; else delete S.draft[i];
       render(); persist();
+      return;
+    }
+    if (S.tut >= 0) {
+      const step = TUTORIAL[S.tut];
+      if (!step.expect) { setStatus(step.next ? 'Tap Next in the box above first.' : 'Pick a suspect card below.', true); return; }
+      if (S.sel < 0) { setStatus(`First tap ${P.people[step.expect.p].name}'s card below 👇`, true); return; }
+      if (S.sel !== step.expect.p) { setStatus(`Let's place ${P.people[step.expect.p].name} first.`, true); S.sel = -1; render(); return; }
+      if (i !== step.expect.cell) { setStatus('Not quite. Read the clue again 🙂', true); return; }
+      S.place[S.sel] = i; S.sel = -1; S.tut++;
+      setStatus('');
+      renderCoach(); render(); checkDone(false);
       return;
     }
     if (S.sel >= 0) {
@@ -348,7 +466,10 @@
     for (let i = 0; i < N * N; i++) {
       const cell = document.createElement('div');
       cell.className = 'cell';
-      cell.style.background = P.zones[P.zoneOf[i]].color;
+      cell.style.backgroundColor = P.zones[P.zoneOf[i]].color;
+      if (ART) cell.classList.add('fl-' + ART.floor(P.theme.id, P.zoneOf[i]));
+      const step = S.tut >= 0 ? TUTORIAL[S.tut] : null;
+      if (step && step.cells && step.cells.includes(i)) cell.classList.add('coach-hl');
       const w = P.walls[i];
       ['n', 's', 'e', 'w'].forEach((s) => { if (w[s] && !isOuter(N, i, s)) cell.classList.add('wall-' + s); });
       const o = P.obj[i], def = o && E.OBJECTS[o];
@@ -359,7 +480,8 @@
       const drafts = who < 0 ? S.draft[i] || [] : [];
       if (drafts.length) cell.classList.add('has-draft');
       if (S.mode === 'draft' && S.sel >= 0 && drafts.includes(S.sel)) cell.classList.add('draft-sel');
-      if (def && def.css === 'table') { const t = document.createElement('div'); t.className = 'table-obj'; cell.appendChild(t); }
+      if (ART && o && ART.has(o)) { const em = document.createElement('div'); em.className = 'obj art'; em.innerHTML = ART.icon(o); cell.appendChild(em); }
+      else if (def && def.css === 'table') { const t = document.createElement('div'); t.className = 'table-obj'; cell.appendChild(t); }
       else if (def && def.e) { const em = document.createElement('div'); em.className = 'obj'; em.textContent = def.e; cell.appendChild(em); }
       ['n', 's', 'e', 'w'].forEach((s) => {
         if (edges.has(i + s)) { const d = document.createElement('div'); d.className = 'edge ' + s; d.style.background = P.theme.edgeColor; cell.appendChild(d); }
@@ -374,6 +496,7 @@
         const t = document.createElement('div');
         t.className = 'token' + (big ? ' letter' : '') + (person.isVictim ? ' victim' : '') + (bad.has(who) ? ' conflict' : '') + (S.solvedGrid ? ' locked' : '');
         if (big) { t.textContent = person.letter; t.style.background = person.color; }
+        else if (ART) { t.innerHTML = ART.avatar(person); t.classList.add('art'); t.style.borderColor = person.isVictim ? '' : person.color; }
         else t.textContent = person.emoji;
         cell.appendChild(t);
       } else {
@@ -398,18 +521,19 @@
 
     const notes = $('extra');
     notes.hidden = !S.extra.length;
-    notes.innerHTML = '<b>🧾 Extra clues from headquarters</b>' + S.extra.map((x) => `<div>• ${rich(x.text)}</div>`).join('');
+    notes.innerHTML = `<b>${ART ? '' : '🧾 '}Extra clues from headquarters</b>` + S.extra.map((x) => `<div>• ${rich(x.text)}</div>`).join('');
 
     const list = $('suspects');
     list.innerHTML = '';
     P.people.forEach((person, p) => {
       const card = document.createElement('button');
-      card.className = 'suspect' + (person.isVictim ? ' is-victim' : '') + (S.sel === p ? ' sel' : '') + (S.place[p] >= 0 ? ' placed' : '');
+      card.className = 'suspect' + (person.isVictim ? ' is-victim' : '') + (S.sel === p ? ' sel' : '') + (S.place[p] >= 0 ? ' placed' : '')
+        + (S.tut >= 0 && TUTORIAL[S.tut].card === p && S.place[p] < 0 ? ' coach-hl' : '');
       const clues = person.isVictim
         ? '<div><b>The victim.</b> Found in the last remaining square.</div>'
         : person.clues.map((c) => `<div>${rich(c)}</div>`).join('');
-      card.innerHTML = `<div class="face">${person.emoji}<span class="lt" style="background:${person.color}">${person.letter}</span></div>
-        <div><div class="nm">${esc(person.name)}${person.isVictim ? ' ☠️' : ''}</div><div class="cl">${clues}</div></div>`;
+      card.innerHTML = `<div class="face">${face(person)}<span class="lt" style="background:${person.color}">${person.letter}</span></div>
+        <div><div class="nm">${esc(person.name)}${person.isVictim ? (ART ? ' <span class="rip">rip</span>' : ' ☠️') : ''}</div><div class="cl">${clues}</div></div>`;
       card.addEventListener('click', () => onSuspect(p));
       list.appendChild(card);
     });
@@ -418,10 +542,10 @@
   function buildLegend() {
     const P = S.P, T = P.theme;
     const present = [...new Set(P.obj.filter(Boolean))];
-    const show = (o) => (E.OBJECTS[o].e || (o === 'rug' ? '▨' : '▬')) + ' ' + E.OBJECTS[o].name;
+    const show = (o) => (ART && ART.has(o) ? `<span class="ic lg">${ART.icon(o)}</span>` : E.OBJECTS[o].e || (o === 'rug' ? '▨' : '▬')) + ' ' + E.OBJECTS[o].name;
     const can = present.filter((o) => !E.isBlocked(o)).map(show);
     const cant = present.filter((o) => E.isBlocked(o)).map(show);
-    $('legend').innerHTML = `<summary>📖 Detective's dictionary</summary><ul>
+    $('legend').innerHTML = `<summary>${ART ? '' : '📖 '}Detective's dictionary</summary><ul>
       <li>Every person was in a <b>different row</b> and a <b>different column</b>.</li>
       <li>You <b>can</b> stand on: bare ${T.floor}${can.length ? ', ' + can.join(', ') : ''}.</li>
       ${cant.length ? `<li>You <b>can't</b> stand on: ${cant.join(', ')}.</li>` : ''}
@@ -447,19 +571,20 @@
   });
   $('reset').addEventListener('click', () => {
     if (S.solvedGrid) return;
-    modal(`<div class="big">🗑️</div><h2>Clear the board?</h2><p>All placements, drafts and ✕ marks will be erased. Extra clues stay.</p>
+    modal(`<div class="big">${ic('trash', '🗑️')}</div><h2>Clear the board?</h2><p>All placements, drafts and ✕ marks will be erased. Extra clues stay.</p>
       <div class="row"><button class="primary" data-act="yes">Yes, clear</button><button class="secondary" data-act="close">Cancel</button></div>`, {
       yes: () => { snapshot(); S.place.fill(-1); S.xs.clear(); S.draft = {}; S.sel = -1; render(); persist(); closeModal(); },
     });
   });
   $('hint').addEventListener('click', () => {
     if (S.solvedGrid) return;
-    modal(`<div class="big">💡</div><h2>Need a hand, detective?</h2>
+    if (S.tut >= 0) { setStatus('Follow the hints in the box above 🙂'); return; }
+    modal(`<div class="big">${ic('bulb', '💡')}</div><h2>Need a hand, detective?</h2>
       <p>Pick how much help you want:</p>
       <div class="help-list">
-        <button class="primary" data-act="clue">🧾 Give me an extra clue<small>A fact about the whole scene. Nobody's spot is revealed.</small></button>
-        <button class="secondary" data-act="check">✔️ Check my placements<small>Tells you if someone on the board is in the wrong spot.</small></button>
-        <button class="secondary" data-act="reveal">👁️ Reveal one suspect<small>The last resort.</small></button>
+        <button class="primary" data-act="clue">${ic('note', '🧾')} Give me an extra clue<small>A fact about the whole scene. Nobody's spot is revealed.</small></button>
+        <button class="secondary" data-act="check">${ic('check', '✔️')} Check my placements<small>Tells you if someone on the board is in the wrong spot.</small></button>
+        <button class="secondary" data-act="reveal">${ic('eye', '👁️')} Reveal one suspect<small>The last resort.</small></button>
       </div>
       <div class="row"><button class="secondary" data-act="close">Never mind</button></div>`, {
       clue: () => { closeModal(); giveExtraClue(); },
@@ -525,6 +650,7 @@
   $('howto-home').addEventListener('click', showHowto);
   $('howto-game').addEventListener('click', showHowto);
   $('greet').addEventListener('click', askProfile);
+  $('tut-btn').addEventListener('click', startTutorial);
 
   /* ---------- modals ---------- */
   let modalActions = {}, modalSticky = false;
@@ -544,7 +670,7 @@
   });
 
   function showHowto() {
-    modal(`<div class="big">👮</div><h2>Welcome, detective!</h2>
+    modal(`<div class="big">${ic('logo', '👮')}</div><h2>Welcome, detective!</h2>
       <div class="howto">
       <p>There was (yep, you guessed it) a murder last night. The good news? We have a lineup of suspects and a clue about each of them.</p>
       <p><b>Your goal:</b> find the murderer: the one person who was <b>alone with the victim</b> in the same room.</p>
@@ -557,15 +683,17 @@
       <p><b>Stuck?</b> 💡 gives you an extra clue about the whole scene, checks your board, or (last resort) reveals a suspect.</p>
       <p>Each scene is different: a mansion, a ship, a forest, a space station and more.</p>
       </div>
-      <div class="row"><button class="primary" data-act="close">Let's investigate!</button></div>`);
+      <div class="row"><button class="primary" data-act="close">Let's investigate!</button><button class="secondary" data-act="tut">Guided tutorial</button></div>`, {
+      tut: () => { closeModal(); startTutorial(); },
+    });
   }
 
   function showAccuse() {
     const P = S.P, v = P.people[P.victim];
     const zone = P.zones[P.zoneOf[P.solution[P.victim]]].name;
     const btns = P.people.map((person, p) => person.isVictim ? '' :
-      `<button data-act="acc" data-p="${p}" class="${S.wrongAccuse.includes(p) ? 'nope' : ''}"><span>${person.emoji}</span>${esc(person.name)}</button>`).join('');
-    modal(`<div class="big">🔪</div><h2>The murderer is…</h2>
+      `<button data-act="acc" data-p="${p}" class="${S.wrongAccuse.includes(p) ? 'nope' : ''}"><span class="af">${face(person)}</span>${esc(person.name)}</button>`).join('');
+    modal(`<div class="big">${ic('knife', '🔪')}</div><h2>The murderer is…</h2>
       <p>${esc(v.name)} was found in the <b>${esc(zone)}</b>. Who was alone with ${pr(v, 'him', 'her')}?</p>
       <div class="accuse-grid">${btns}</div>
       <p id="acc-msg" style="min-height:24px;color:var(--accent);font-weight:700"></p>`, {
@@ -582,20 +710,44 @@
   }
 
   function win() {
-    const P = S.P, pg = prog(S.diff);
+    const P = S.P, pg = prog(S.slot);
     const m = P.people[P.murderer], v = P.people[P.victim];
     const zone = P.zones[P.zoneOf[P.solution[P.victim]]].name;
-    pg.solved++; pg.caseNum++; pg.cur = null;
-    const isBest = !S.hints && !S.helps && (pg.best == null || S.elapsed < pg.best);
-    if (isBest) pg.best = S.elapsed;
-    save(); stopTimer();
-    const stars = !S.hints && !S.helps && !S.wrongAccuse.length ? '⭐⭐⭐' : !S.hints ? '⭐⭐' : '⭐';
+    stopTimer();
+    if (S.slot === 'tutorial') {
+      store.tutorialDone = true; store.seenHowto = true; save();
+      S.tut = -1; renderCoach();
+      modal(`<div class="big">${ic('cap', '🎓')}</div><h2>You did it, detective!</h2>
+        <p><b>Ben</b> was alone with Victor in the Bedroom. Case closed!</p>
+        <div class="howto"><p>Real cases have more suspects and trickier clues. Your tools:</p><ul>
+          <li><b>Draft</b>: pencil in every square where a suspect <i>might</i> be.</li>
+          <li><b>Mark</b>: cross out squares nobody can use.</li>
+          <li><b>Help</b>: an extra clue when you're stuck.</li></ul></div>
+        <div class="row"><button class="primary" data-act="first">Play my first case</button><button class="secondary" data-act="home">Menu</button></div>`, {
+        first: () => { closeModal(); startGame('easy'); },
+        home: () => { closeModal(); showHome(); },
+      });
+      return;
+    }
+    const nStars = !S.hints && !S.helps && !S.wrongAccuse.length ? 3 : !S.hints ? 2 : 1;
+    let isBest = false, dailyTxt = '';
+    if (S.slot === 'daily') {
+      dailyLog()[S.caseNum] = { t: S.elapsed, stars: nStars };
+      pg.cur = null;
+      const n = dailyStreak();
+      dailyTxt = `<br>${ic('flame', '🔥')} ${n}-day streak! Come back tomorrow for a new case.`;
+    } else {
+      pg.solved++; pg.caseNum++; pg.cur = null;
+      isBest = !S.hints && !S.helps && (pg.best == null || S.elapsed < pg.best);
+      if (isBest) pg.best = S.elapsed;
+    }
+    save();
     const helpTxt = [S.helps ? `🧾 ${S.helps} clue${S.helps > 1 ? 's' : ''}/check${S.helps > 1 ? 's' : ''}` : '', S.hints ? `👁️ ${S.hints} reveal${S.hints > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ');
-    modal(`<div class="big">${m.emoji}🚔</div><h2>Case closed!</h2>
-      <p><b>${esc(m.name)}</b> was alone with ${esc(v.name)} in the ${esc(zone)}.<br>${pr(m, 'He', 'She')}'s on the way to jail. 🔒</p>
-      <p style="font-size:28px;margin:6px 0">${stars}</p>
-      <p>⏱ ${fmtTime(S.elapsed)}${helpTxt ? ' · ' + helpTxt : ''}${isBest ? '<br>🏆 New personal best!' : ''}</p>
-      <div class="row"><button class="primary" data-act="next">Next case →</button><button class="secondary" data-act="home">Menu</button></div>`, {
+    modal(`<div class="big">${ART ? `<span class="ic win-face">${face(m)}</span><span class="ic">${ART.ui('siren')}</span>` : m.emoji + '🚔'}</div><h2>Case closed!</h2>
+      <p><b>${esc(m.name)}</b> was alone with ${esc(v.name)} in the ${esc(zone)}.<br>${pr(m, 'He', 'She')}'s on the way to jail. ${ic('lock', '🔒')}</p>
+      <p class="stars-row" style="font-size:28px;margin:6px 0">${stars(nStars)}</p>
+      <p>${ART ? '' : '⏱ '}${fmtTime(S.elapsed)}${helpTxt ? ' · ' + plain(helpTxt) : ''}${isBest ? '<br>New personal best!' : ''}${dailyTxt}</p>
+      <div class="row">${S.slot === 'daily' ? '' : '<button class="primary" data-act="next">Next case →</button>'}<button class="${S.slot === 'daily' ? 'primary' : 'secondary'}" data-act="home">Menu</button></div>`, {
       next: () => { closeModal(); startGame(S.diff); },
       home: () => { closeModal(); showHome(); },
     });
@@ -610,7 +762,7 @@
   if (!standalone && isIOS) $('install-btn').hidden = false;
   $('install-btn').addEventListener('click', () => {
     if (installEvent) { installEvent.prompt(); installEvent = null; return; }
-    modal(`<div class="big">📲</div><h2>Install on iPhone</h2>
+    modal(`<div class="big">${ic('phone', '📲')}</div><h2>Install on iPhone</h2>
       <ol class="steps">
         <li>Open this page in <b>Safari</b>.</li>
         <li>Tap the <b>Share</b> button (square with an arrow).</li>
@@ -630,4 +782,5 @@
   window.addEventListener('resize', () => { if (S) $('play-area').style.top = $('topbar').offsetHeight + 'px'; });
   showHome();
   if (!store.profile) askProfile();
+  else if (location.hash === '#daily') startDaily();
 })();
