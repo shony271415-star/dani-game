@@ -547,20 +547,37 @@
       <div class="friend-list">${list}</div>
       <div class="row"><button class="primary" data-act="mine">Send my link</button><button class="secondary" data-act="add">Add a friend</button></div>
       <div class="row"><button class="secondary" data-act="close">Close</button></div>`, {
-      mine: () => share(`Join me on Mystery Grid! I'm on level ${prog('journey').caseNum}. Add me as a friend:`, linkFor('friend', myCard())),
+      mine: () => share(`Join me on Mystery Grid! I'm on level ${prog('journey').caseNum}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Friends → Add a friend):`, linkFor('friend', myCard())),
       add: () => {
         modal(`<h2>Add a friend</h2><p><small>Paste the link (or code) your friend sent you.</small></p>
           <textarea class="name-in share-box" id="friend-in" placeholder="https://…#friend=…"></textarea>
           <div class="row"><button class="primary" data-act="ok">Add</button><button class="secondary" data-act="back">Back</button></div>`, {
           ok: () => {
             const raw = $('friend-in').value.trim(), m = raw.match(/friend=([A-Za-z0-9_-]+)/), card = b64d(m ? m[1] : raw);
-            if (!addFriend(card)) { shake($('modal-body')); return; }
-            showFriends(); if ($('map').classList.contains('active')) showMap();
+            if (!addFriend(card, true)) { shake($('modal-body')); return; }
+            if ($('map').classList.contains('active')) showMap();
+            offerShareBack(card.n, '');
           },
           back: showFriends,
         });
       },
       rm: (b) => { store.friends = (store.friends || []).filter((x) => x.i !== b.dataset.id); save(); showFriends(); if ($('map').classList.contains('active')) showMap(); },
+    });
+  }
+
+  // friendship goes one way (no server), so right after adding someone, offer to send our link back
+  function offerShareBack(name, code) {
+    const inApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const iosBrowser = /iphone|ipad|ipod/i.test(navigator.userAgent) && !inApp;
+    modal(`<div class="big">${ic('hand', '🤝')}</div><h2>${esc(name)} is your friend!</h2>
+      <p>${esc(name)} is now on your map. To show up on <b>${esc(name)}'s</b> map too, send your link back.</p>
+      ${iosBrowser ? `<div class="ios-note"><b>Using the installed app on iPhone?</b> This link opened in Safari, which keeps its own copy of the game. Open the app, go to <b>Map → Friends → Add a friend</b> and paste the same link there.
+        <button class="secondary" data-act="copy">Copy this friend's link</button></div>` : ''}
+      <div class="row"><button class="primary" data-act="back">Send my link to ${esc(name)}</button><button class="secondary" data-act="close">Later</button></div>`, {
+      back: () => { closeModal(); share(`Hey ${name}, add me back on Mystery Grid! I'm on level ${prog('journey').caseNum}:`, linkFor('friend', myCard())); },
+      copy: async (b) => {
+        try { await navigator.clipboard.writeText(`${location.origin}${location.pathname}#friend=${code}`); b.textContent = 'Copied! Now paste it in the app'; } catch (e) { b.textContent = 'Copy failed: long-press the link in WhatsApp and copy it'; }
+      },
     });
   }
 
@@ -691,8 +708,11 @@
     const m = h.match(/^#(friend|challenge)=([A-Za-z0-9_-]+)/);
     if (!m) return;
     const data = b64d(m[2]);
-    if (m[1] === 'friend') { if (addFriend(data)) showMap(); }
-    else startChallenge(data);
+    if (m[1] === 'friend') {
+      if (!addFriend(data, true)) return;
+      showMap();
+      offerShareBack(data.n, m[2]);
+    } else startChallenge(data);
   }
 
   function offerTutorial() {
