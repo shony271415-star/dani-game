@@ -105,10 +105,50 @@
 
   /* ---------- sound, vibration, confetti ---------- */
   let audio = null;
+  const getAudio = () => (audio = audio || new (window.AudioContext || window.webkitAudioContext)());
+  // iPhone/iPad: Safari only allows sound after a touch, and can suspend it in the background.
+  // The first touch anywhere wakes the audio up by playing a tiny silent sound.
+  function unlockAudio() {
+    try {
+      const ac = getAudio();
+      if (ac.state !== 'running') ac.resume();
+      const src = ac.createBufferSource();
+      src.buffer = ac.createBuffer(1, 1, 22050);
+      src.connect(ac.destination); src.start(0);
+    } catch (e) { /* no audio available */ }
+  }
+  ['touchend', 'pointerdown', 'keydown'].forEach((ev) => document.addEventListener(ev, unlockAudio, { once: true, capture: true }));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && audio && audio.state !== 'running') audio.resume().catch(() => {}); });
+
+  // Vibration: Android supports navigator.vibrate. iPhone doesn't, but since iOS 18 toggling a
+  // switch-style checkbox plays the system's light haptic tap, so a hidden one is used there.
+  let hapticSwitch = null;
+  function iosHaptic() {
+    if (!hapticSwitch) {
+      hapticSwitch = document.createElement('label');
+      hapticSwitch.setAttribute('aria-hidden', 'true');
+      hapticSwitch.style.cssText = 'position:fixed;left:-200px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none';
+      const input = document.createElement('input');
+      input.type = 'checkbox'; input.setAttribute('switch', ''); input.tabIndex = -1;
+      hapticSwitch.appendChild(input);
+      document.body.appendChild(hapticSwitch);
+    }
+    hapticSwitch.click();
+  }
+  function haptic(kind) {
+    if (kind === 'tick') return;
+    if (navigator.vibrate) { navigator.vibrate(kind === 'wrong' ? 40 : kind === 'win' ? [30, 50, 30] : 12); return; }
+    if (/iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+      iosHaptic();
+      if (kind === 'win' || kind === 'wrong') setTimeout(iosHaptic, 120);
+    }
+  }
+
   function sfx(kind) {
     if (store.sound === false) return;
     try {
-      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      getAudio();
+      if (audio.state !== 'running') audio.resume().catch(() => {});
       const notes = {
         place: [[660, 0, 0.07], [990, 0.05, 0.08]], tick: [[1400, 0, 0.03]], wrong: [[190, 0, 0.16]],
         coin: [[1320, 0, 0.07], [1760, 0.07, 0.12]], win: [[523, 0, 0.12], [659, 0.1, 0.12], [784, 0.2, 0.12], [1047, 0.3, 0.3]],
@@ -126,7 +166,7 @@
         o.start(t0 + at); o.stop(t0 + at + dur + 0.02);
       }
     } catch (e) { /* no audio available */ }
-    if (navigator.vibrate) navigator.vibrate(kind === 'wrong' ? 40 : kind === 'win' ? [30, 50, 30] : kind === 'tick' ? 0 : 12);
+    haptic(kind);
   }
   function confetti() {
     const cv = document.createElement('canvas');
