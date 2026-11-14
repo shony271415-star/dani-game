@@ -473,7 +473,7 @@
       diff, slot, caseNum, P: puzzle, tut: slot === 'tutorial' ? 0 : -1,
       place: new Array(puzzle.N).fill(-1), xs: new Set(), draft: {},
       sel: -1, mode: 'place', history: [],
-      elapsed: 0, hints: 0, helps: 0, extra: [], solvedGrid: false, wrongAccuse: [],
+      elapsed: 0, hints: 0, helps: 0, extra: [], solvedGrid: false, won: false, wrongAccuse: [],
     };
     if (slot !== 'tutorial' && p.cur && p.cur.caseNum === caseNum) {
       S.place = p.cur.place || S.place; S.xs = new Set(p.cur.xs || []); S.elapsed = p.cur.elapsed || 0;
@@ -710,6 +710,7 @@
       if (def && def.css === 'rug') cell.classList.add('rug');
       const who = whoAt(i);
       if (who >= 0) cell.classList.add('has-token');
+      if (S.solvedGrid && P.zoneOf[i] === P.zoneOf[P.solution[P.victim]]) cell.classList.add('vzone');
       if (S.sel >= 0 && (usedR.has(Math.floor(i / N)) || usedC.has(i % N) || E.isBlocked(o))) cell.classList.add('dim');
       const drafts = who < 0 ? S.draft[i] || [] : [];
       if (drafts.length) cell.classList.add('has-draft');
@@ -771,6 +772,7 @@
       card.addEventListener('click', () => onSuspect(p));
       list.appendChild(card);
     });
+    renderAccuse();
   }
 
   function buildLegend() {
@@ -931,25 +933,53 @@
     });
   }
 
-  function showAccuse() {
-    const P = S.P, v = P.people[P.victim];
-    const zone = P.zones[P.zoneOf[P.solution[P.victim]]].name;
-    const btns = P.people.map((person, p) => person.isVictim ? '' :
-      `<button data-act="acc" data-p="${p}" class="${S.wrongAccuse.includes(p) ? 'nope' : ''}"><span class="af">${face(person)}</span>${esc(person.name)}</button>`).join('');
-    modal(`<div class="big">${ic('knife', '🔪')}</div><h2>The murderer is…</h2>
-      <p>${esc(v.name)} was found in the <b>${esc(zone)}</b>. Who was alone with ${pr(v, 'him', 'her')}?</p>
-      <div class="accuse-grid">${btns}</div>
-      <p id="acc-msg" style="min-height:24px;color:var(--accent);font-weight:700"></p>`, {
-      acc: (btn) => {
+  /* the accusation lives in a panel under the board, so the board stays visible and it can't be lost */
+  function showAccuse() { renderAccuse(); }
+
+  function nextCase() {
+    closeModal();
+    if (S.slot === 'journey' || S.slot === 'tutorial') startJourney();
+    else if (S.slot === 'daily') showHome();
+    else startGame(S.diff);
+  }
+
+  function renderAccuse() {
+    let el = $('accuse');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'accuse'; el.className = 'accuse';
+      $('status').insertAdjacentElement('afterend', el);
+      el.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn || !S) return;
+        if (btn.dataset.next) return nextCase();
+        if (btn.dataset.home) { closeModal(); return showHome(); }
         const p = +btn.dataset.p;
+        if (Number.isNaN(p) || S.won) return;
+        const P = S.P, zone = P.zones[P.zoneOf[P.solution[P.victim]]].name;
         if (p === P.murderer) return win();
         if (!S.wrongAccuse.includes(p)) S.wrongAccuse.push(p);
-        persist();
-        btn.classList.add('nope');
-        $('acc-msg').textContent = `${P.people[p].name} wasn't even in the ${zone}! Try again.`;
-        shake($('modal-body'));
-      },
-    });
+        persist(); renderAccuse();
+        $('acc-msg').textContent = `${P.people[p].name} wasn't alone with ${P.people[P.victim].name} in the ${zone}! Look again.`;
+        shake(el); sfx('wrong');
+      });
+    }
+    const on = !!(S && S.solvedGrid);
+    el.hidden = !on;
+    $('game').classList.toggle('accusing', on);
+    if (!on) return;
+    const P = S.P, v = P.people[P.victim], zone = P.zones[P.zoneOf[P.solution[P.victim]]].name;
+    if (S.won) {
+      const m = P.people[P.murderer];
+      const nextLabel = S.slot === 'journey' ? `Level ${S.caseNum + 1} →` : S.slot === 'tutorial' ? 'Play level 1 →' : S.slot === 'daily' ? '' : 'Next case →';
+      el.innerHTML = `<div class="acc-t">Case closed: <b>${esc(m.name)}</b> did it.</div>
+        <div class="acc-btns">${nextLabel ? `<button class="primary" data-next="1">${nextLabel}</button>` : ''}<button class="secondary" data-home="1">Menu</button></div>`;
+      return;
+    }
+    const btns = P.people.map((person, p) => person.isVictim ? '' :
+      `<button data-p="${p}" class="${S.wrongAccuse.includes(p) ? 'nope' : ''}"><span class="af">${face(person)}</span>${esc(person.name)}</button>`).join('');
+    el.innerHTML = `<div class="acc-t">${ic('knife', '🔪')} <b>Who did it?</b> ${esc(v.name)} was found in the <b>${esc(zone)}</b> (highlighted). Who was alone with ${pr(v, 'him', 'her')}?</div>
+      <div class="acc-row">${btns}</div><div class="acc-msg" id="acc-msg"></div>`;
   }
 
   function win() {
@@ -957,6 +987,7 @@
     const m = P.people[P.murderer], v = P.people[P.victim];
     const zone = P.zones[P.zoneOf[P.solution[P.victim]]].name;
     stopTimer();
+    S.won = true; renderAccuse();
     if (S.slot === 'tutorial') {
       store.tutorialDone = true; store.seenHowto = true; save();
       S.tut = -1; renderCoach();
@@ -1002,7 +1033,7 @@
       <p class="earned">${coinIc()} +<b id="earned">0</b> coins</p>
       <p>${ART ? '' : '⏱ '}${fmtTime(S.elapsed)}${helpTxt ? ' · ' + plain(helpTxt) : ''}${isBest ? '<br>New personal best!' : ''}${dailyTxt}</p>
       <div class="row">${S.slot === 'daily' ? '' : `<button class="primary" data-act="next">${S.slot === 'journey' ? `Level ${S.caseNum + 1} →` : 'Next case →'}</button>`}<button class="${S.slot === 'daily' ? 'primary' : 'secondary'}" data-act="home">Menu</button></div>`, {
-      next: () => { closeModal(); if (S.slot === 'journey') startJourney(); else startGame(S.diff); },
+      next: nextCase,
       home: () => { closeModal(); showHome(); },
     });
     // count the coins up, then hand out any new trophies
