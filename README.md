@@ -38,7 +38,8 @@ Progress and the player's name are saved on the device.
 
 ## Printable casebook
 24 cases (6 Inspector, 12 Expert, 6 Extreme) that never appear in the app, black & white and light on ink.
-- `casebook-print.pdf` (same as `casebook-read.pdf`): **single-sided** A4 landscape, one whole case per sheet (clues left, board right). Print everything at 100%, no folding.
-- `casebook-booklet.pdf`: the same pages imposed for a folded A5 booklet. Print double-sided, flip on short edge, fold the stack, staple on the fold.
+- `casebook-print.pdf`: **single-sided** A4 landscape. Fold every sheet in half with the print on the outside (right half to the front), keep them in order, stack and bind along the fold. Opens as an A5 booklet with each case on a two-page spread.
+- `casebook-read.pdf`: one whole case per A4 sheet, for a screen or loose sheets.
+- `casebook-booklet.pdf`: double-sided version (flip on short edge), fold the whole stack once and staple on the fold.
 
 Rebuild with `node tools/make-booklet.js . "Name"`.

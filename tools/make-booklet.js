@@ -1,6 +1,7 @@
 /* Builds a printable, ink-light black & white casebook from the Mystery Grid engine.
    Output:
-     casebook-print.pdf    single-sided A4 landscape, one whole case per sheet, no folding (same file as casebook-read.pdf)
+     casebook-print.pdf    single-sided A4 landscape; fold each sheet in half (print outside), stack, staple on the fold
+     casebook-read.pdf     single-sided A4 landscape, one whole case per sheet (for a screen or loose sheets)
      casebook-booklet.pdf  double-sided A4 landscape, imposed to fold and staple into an A5 booklet
    Usage: node tools/make-booklet.js [out-dir] [owner name]
    Cases come from seeds 9,000,000+, a range the app never uses, so nothing in the
@@ -280,6 +281,8 @@ b { font-weight: 700; }
 .pg { width: 148.5mm; height: 210mm; padding: 9mm 10mm 12mm; position: relative; overflow: hidden; background: #fff; }
 .sheet { width: 297mm; height: 210mm; display: flex; page-break-after: always; }
 .sheet:last-child { page-break-after: auto; }
+.sheet.fold { position: relative; }
+.sheet.fold::after { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; border-left: .2mm dashed #cfcfcf; }
 .reader .pg { page-break-after: always; }
 .reader .pg:last-child { page-break-after: auto; }
 .script { font-family: "Pacifico", cursive; font-weight: 400; }
@@ -445,13 +448,22 @@ async function main() {
   for (let k = 0; k < sols.length; k += 2) flat.push([sols[k], sols[k + 1] || notesPage('')]);
   const flatHtml = `${head('297mm 210mm')}<body>${flat.map(([l, r]) => `<div class="sheet">${l}${r}</div>`).join('')}</body></html>`;
   console.log(`single-sided version: ${flat.length} sheets`);
+  // single-sided folded booklet: every sheet is printed on one side, folded in half with the print
+  // outside, and the folded sheets are stacked and stapled along the fold. Sheet k carries
+  // [page 2k | page 2k-1]: page 2k-1 becomes the front of the folded leaf, page 2k its back.
+  const fold = pages.slice(0, solStart + sols.length);
+  if (fold.length % 2) fold.push(backCover());
+  const foldSheets = [];
+  for (let k = 0; k < fold.length; k += 2) foldSheets.push([fold[k + 1], fold[k]]);
+  const foldHtml = `${head('297mm 210mm')}<body>${foldSheets.map(([l, r]) => `<div class="sheet fold">${l}${r}</div>`).join('')}</body></html>`;
+  console.log(`single-sided folded booklet: ${fold.length} pages on ${foldSheets.length} sheets`);
   const printHtml = `${head('297mm 210mm')}<body>${impose(pages).map(([l, r]) => `<div class="sheet">${pages[l - 1]}${pages[r - 1]}</div>`).join('')}</body></html>`;
 
   fs.mkdirSync(OUT, { recursive: true });
   const { chromium } = require('playwright');
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  for (const [name, html] of [['casebook-print', flatHtml], ['casebook-read', flatHtml], ['casebook-booklet', printHtml]]) {
+  for (const [name, html] of [['casebook-print', foldHtml], ['casebook-read', flatHtml], ['casebook-booklet', printHtml]]) {
     const file = path.join(OUT, name + '.html');
     fs.writeFileSync(file, html);
     await page.goto('file://' + file);
