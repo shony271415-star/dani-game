@@ -1,7 +1,7 @@
 /* Builds a printable, ink-light black & white casebook from the Mystery Grid engine.
    Output:
      casebook-print.pdf  A4 landscape sheets, pages imposed for a folded, stapled A5 booklet
-     casebook-read.pdf   the same A5 pages in reading order (for a screen)
+     casebook-read.pdf   the same pages as landscape two-page spreads, in reading order (for a screen)
    Usage: node tools/make-booklet.js [out-dir] [owner name]
    Cases come from seeds 9,000,000+, a range the app never uses, so nothing in the
    booklet can be a case the player already met on their phone. */
@@ -280,6 +280,8 @@ b { font-weight: 700; }
 .pg { width: 148.5mm; height: 210mm; padding: 9mm 10mm 12mm; position: relative; overflow: hidden; background: #fff; }
 .sheet { width: 297mm; height: 210mm; display: flex; page-break-after: always; }
 .sheet:last-child { page-break-after: auto; }
+.spread .pg:first-child { box-shadow: inset -2mm 0 2mm -2mm rgba(0,0,0,.18); }
+.spread .pg:last-child { box-shadow: inset 2mm 0 2mm -2mm rgba(0,0,0,.18); }
 .reader .pg { page-break-after: always; }
 .reader .pg:last-child { page-break-after: auto; }
 .script { font-family: "Pacifico", cursive; font-weight: 400; }
@@ -436,7 +438,12 @@ async function main() {
   const head = (size) => `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${esc(OWNER)}'s Mystery Grid Casebook</title>
     <style>${FONTS}
 @page { size: ${size}; margin: 0; }${CSS}</style></head>`;
-  const readerHtml = `${head('148.5mm 210mm')}<body class="reader">${pages.join('')}</body></html>`;
+  // reading copy: landscape spreads like an open book (cover alone on the right, back cover alone on the left)
+  const blank = '<div class="pg"></div>';
+  const spreads = [[blank, pages[0]]];
+  for (let k = 1; k < pages.length - 1; k += 2) spreads.push([pages[k], pages[k + 1]]);
+  spreads.push([pages[pages.length - 1], blank]);
+  const readerHtml = `${head('297mm 210mm')}<body>${spreads.map(([l, r]) => `<div class="sheet spread">${l}${r}</div>`).join('')}</body></html>`;
   const printHtml = `${head('297mm 210mm')}<body>${impose(pages).map(([l, r]) => `<div class="sheet">${pages[l - 1]}${pages[r - 1]}</div>`).join('')}</body></html>`;
 
   fs.mkdirSync(OUT, { recursive: true });
