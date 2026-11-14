@@ -1,5 +1,5 @@
 /* Offline support: try the network first (to get updates), fall back to the cache */
-const CACHE = 'mystery-grid-v10';
+const CACHE = 'mystery-grid-v11';
 const FILES = ['./', 'index.html', 'engine.js', 'app.js', 'worker.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
 
@@ -14,7 +14,8 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
   e.respondWith(
-    fetch(e.request).then((res) => {
+    // 'no-cache' asks the server every time (cheap when nothing changed), so updates are never stuck
+    fetch(e.request.url, { cache: 'no-cache', credentials: 'same-origin' }).then((res) => {
       if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(e.request, copy)); }
       return res;
     }).catch(() => caches.match(e.request, { ignoreSearch: true }).then((hit) => hit || caches.match('index.html')))

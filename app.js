@@ -298,7 +298,7 @@
   function totalSolved() { return DIFFS.reduce((n, d) => n + prog(d.key).solved, 0) + prog('journey').solved + Object.keys(store.dailyLog || {}).length; }
   function coins() { if (typeof store.coins !== 'number') store.coins = 100; return store.coins; }
   function addCoins(n) { coins(); store.coins += n; save(); renderCoins(); }
-  function renderCoins() { const el = $('coins-pill'); if (el) el.innerHTML = `${coinIc()} <b>${coins()}</b>`; }
+  function renderCoins() { const el = $('coins-pill'); if (el) el.innerHTML = `${coinIc()} <b>${coins()}</b><span class="cp-shop">SHOP</span>`; }
   function checkAchievements(ctx) {
     store.ach = store.ach || {};
     for (const x of ACH) {
@@ -351,6 +351,7 @@
     renderCoins();
     renderJourney();
     renderDaily();
+    renderShopCard();
     $('sound-btn').innerHTML = `${ic(store.sound === false ? 'mute' : 'sound', store.sound === false ? '🔇' : '🔊')} Sound`;
     const got = Object.keys(store.ach || {}).length;
     $('ach-btn').innerHTML = `${ic('trophy', '🏆')} Trophies ${got}/${ACH.length}`;
@@ -379,6 +380,22 @@
       <div class="journey-bar"><div style="width:${pct}%"></div></div>
       <div class="streak">${tier ? `${tier[0] - n} level${tier[0] - n === 1 ? '' : 's'} to ${tier[1]}` : 'Boss levels every 5 · how far can you go?'}</div>`;
     $('play-btn').addEventListener('click', startJourney);
+  }
+
+  function renderShopCard() {
+    let el = $('shop-card');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'shop-card';
+      $('daily').insertAdjacentElement('afterend', el);
+    }
+    const owned = (store.owned || ['classic']).length, next = PACKS.find((x) => !(store.owned || ['classic']).includes(x.id));
+    el.innerHTML = `<button class="shop-card" id="shop-card-btn">
+        <span class="sc-faces">${SHOP_PEOPLE.slice(0, 3).map((p) => `<span class="pf skin-${next ? next.id : skinId()}">${face(p, next ? next.id : skinId())}</span>`).join('')}</span>
+        <span class="sc-tx"><b>Detective Shop</b><small>${next ? `New look: ${next.name} · ${next.price} coins` : 'You own every pack!'} · ${owned}/${PACKS.length} owned</small></span>
+        <span class="badge">Open</span>
+      </button>`;
+    $('shop-card-btn').addEventListener('click', showShop);
   }
 
   function maybeDailyBonus() {
@@ -1123,7 +1140,19 @@
   });
 
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => {
+      reg.update().catch(() => {});
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); });
+    }).catch(() => {});
+    // a new version took over: reload once, but only on the home screen so no game is interrupted
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || reloaded) return;
+      const go = () => { if (!reloaded && $('home').classList.contains('active') && !$('modal').classList.contains('show')) { reloaded = true; location.reload(); } };
+      go();
+      if (!reloaded) document.addEventListener('click', () => setTimeout(go, 50), { once: true });
+    });
   }
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 

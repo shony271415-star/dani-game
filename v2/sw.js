@@ -1,5 +1,5 @@
 /* Offline support for the illustrated edition: network first (for updates), cache as fallback */
-const CACHE = 'mystery-grid-art-v6';
+const CACHE = 'mystery-grid-art-v7';
 const FILES = ['./', 'index.html', 'worker.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png',
   '../engine.js', '../app.js', '../art.js',
   '../tools/fonts/fredoka-latin-500-normal.woff2', '../tools/fonts/fredoka-latin-600-normal.woff2', '../tools/fonts/quicksand-latin-600-normal.woff2',
@@ -17,7 +17,8 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
   e.respondWith(
-    fetch(e.request).then((res) => {
+    // 'no-cache' asks the server every time (cheap when nothing changed), so updates are never stuck
+    fetch(e.request.url, { cache: 'no-cache', credentials: 'same-origin' }).then((res) => {
       if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(e.request, copy)); }
       return res;
     }).catch(() => caches.match(e.request, { ignoreSearch: true }).then((hit) => hit || caches.match('index.html')))
