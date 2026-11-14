@@ -33,6 +33,7 @@ Suspects are named in alphabetical order (A, B, C…). Expert and Extreme puzzle
 - **Daily gift**: grows over a 7-day streak.
 - **Daily calendar**: a trophy for solving every daily case of a month.
 - **Trophies**: 12 achievements, 50 coins each.
+- **Coin shop**: skin packs for every suspect and victim, from Pet Detectives (150) to Neon Legends (2,000); pricier packs get fancier art and animated frames.
 - **Feel**: sounds, vibration, confetti, coin count-up (sound can be turned off).
 
 ## Tools

@@ -235,6 +235,115 @@
     </svg>`;
   }
 
+  /* ---------- character skins for the shop ---------- */
+  const SVG64 = (body, defs = '') => `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${body}</svg>`;
+  const eyesAt = (dead, x1, x2, y, r = 2.3, col = INK) => dead
+    ? `<path d="M${x1 - 2.4} ${y - 2.4}l4.8 4.8M${x1 + 2.4} ${y - 2.4}l-4.8 4.8M${x2 - 2.4} ${y - 2.4}l4.8 4.8M${x2 + 2.4} ${y - 2.4}l-4.8 4.8" stroke="${col}" stroke-width="2" stroke-linecap="round"/>`
+    : `<circle cx="${x1}" cy="${y}" r="${r}" fill="${col}"/><circle cx="${x2}" cy="${y}" r="${r}" fill="${col}"/><circle cx="${x1 + 0.8}" cy="${y - 0.9}" r="${r * 0.33}" fill="#fff"/><circle cx="${x2 + 0.8}" cy="${y - 0.9}" r="${r * 0.33}" fill="#fff"/>`;
+  const smile = (dead, y = 39, w = 4) => dead ? `<path d="M${32 - w} ${y + 1}c2-1.2 ${w * 2 - 4} -1.2 ${w * 2} 0" fill="none" ${st(1.6)}/>` : `<path d="M${32 - w} ${y}c2 2.4 ${w * 2 - 4} 2.4 ${w * 2} 0" fill="none" ${st(1.6)}/>`;
+  const shirt = (c) => `<path d="M10 64c0-11 9-17 22-17s22 6 22 17Z" fill="${c}" ${st(1.6)}/>`;
+  const pickH = (person, k, arr) => arr[(hash(person.name + person.letter) >>> k) % arr.length];
+
+  // Pet Detectives: animal heads with a little bow tie
+  function petAvatar(p) {
+    const d = p.isVictim, kind = pickH(p, 3, ['cat', 'dog', 'fox', 'bunny', 'bear', 'panda', 'owl', 'frog']);
+    const fur = { cat: pickH(p, 7, ['#f2a65a', '#9a9aa8', '#3d3540', '#f4e6d0']), dog: pickH(p, 7, ['#c98d62', '#e8c48f', '#7a5236']), fox: '#e8833a', bunny: pickH(p, 7, ['#f1ece6', '#c9b4a0']), bear: '#9a6a43', panda: '#fbfbfb', owl: '#a9805a', frog: '#7cc47a' }[kind];
+    const bow = `<path d="M24 50l8 3.5-8 3.5ZM40 50l-8 3.5 8 3.5Z" fill="${p.color}" ${st(1.3)}/><circle cx="32" cy="53.5" r="2" fill="${p.color}" ${st(1.2)}/>`;
+    let head = '', ex = 25.5, ex2 = 38.5, ey = 31;
+    if (kind === 'cat') head = `<path d="M17 24l2-13 9 8ZM47 24l-2-13-9 8Z" fill="${fur}" ${st(1.5)}/><circle cx="32" cy="32" r="15.5" fill="${fur}" ${st(1.6)}/><path d="M30 36l2 2 2-2Z" fill="#f4a3b5" ${st(1)}/><path d="M16 35h8M16 39l8-2M48 35h-8M48 39l-8-2" stroke="${INK}" stroke-width="1"/>`;
+    if (kind === 'dog') head = `<circle cx="32" cy="32" r="15" fill="${fur}" ${st(1.6)}/><path d="M17 22c-6 2-6 14-2 17 3-1 4-9 4-15ZM47 22c6 2 6 14 2 17-3-1-4-9-4-15Z" fill="#6b4226" ${st(1.5)}/><ellipse cx="32" cy="38" rx="6.5" ry="5" fill="#f4e6d0" ${st(1.3)}/><ellipse cx="32" cy="35.5" rx="2.6" ry="1.9" fill="${INK}"/>`;
+    if (kind === 'fox') head = `<path d="M17 25l1-15 10 8ZM47 25l-1-15-10 8Z" fill="${fur}" ${st(1.5)}/><path d="M16 28c0-8 7-13 16-13s16 5 16 13c0 9-7 16-16 18-9-2-16-9-16-18Z" fill="${fur}" ${st(1.6)}/><path d="M20 33c4 2 8 6 12 12 4-6 8-10 12-12-3 8-7 12-12 13-5-1-9-5-12-13Z" fill="#fff" ${st(1.2)}/><ellipse cx="32" cy="41" rx="2.2" ry="1.6" fill="${INK}"/>`;
+    if (kind === 'bunny') head = `<ellipse cx="25" cy="12" rx="4.5" ry="11" fill="${fur}" ${st(1.5)}/><ellipse cx="39" cy="12" rx="4.5" ry="11" fill="${fur}" ${st(1.5)}/><ellipse cx="25" cy="13" rx="2" ry="7" fill="#f4a3b5"/><ellipse cx="39" cy="13" rx="2" ry="7" fill="#f4a3b5"/><circle cx="32" cy="33" r="15" fill="${fur}" ${st(1.6)}/><path d="M30.4 36.5h3.2l-1.6 2Z" fill="#f4a3b5"/>`;
+    if (kind === 'bear') head = `<circle cx="19" cy="20" r="6" fill="${fur}" ${st(1.5)}/><circle cx="45" cy="20" r="6" fill="${fur}" ${st(1.5)}/><circle cx="32" cy="32" r="15.5" fill="${fur}" ${st(1.6)}/><ellipse cx="32" cy="38" rx="7" ry="5.5" fill="#d9b48a" ${st(1.2)}/><ellipse cx="32" cy="35.5" rx="2.6" ry="1.9" fill="${INK}"/>`;
+    if (kind === 'panda') head = `<circle cx="19" cy="19" r="6" fill="#2b2530" ${st(1.4)}/><circle cx="45" cy="19" r="6" fill="#2b2530" ${st(1.4)}/><circle cx="32" cy="32" r="15.5" fill="${fur}" ${st(1.6)}/><ellipse cx="25" cy="31" rx="4.6" ry="5.6" fill="#2b2530" transform="rotate(-20 25 31)"/><ellipse cx="39" cy="31" rx="4.6" ry="5.6" fill="#2b2530" transform="rotate(20 39 31)"/><ellipse cx="32" cy="37.5" rx="2.4" ry="1.7" fill="${INK}"/>`;
+    if (kind === 'owl') { head = `<path d="M17 19l5 6M47 19l-5 6" ${st(2)}/><ellipse cx="32" cy="34" rx="16" ry="16" fill="${fur}" ${st(1.6)}/><circle cx="25" cy="31" r="6.5" fill="#fff" ${st(1.4)}/><circle cx="39" cy="31" r="6.5" fill="#fff" ${st(1.4)}/><path d="M32 34l-2.6 3h5.2Z" fill="#f6c85f" ${st(1.1)}/>`; ex = 25; ex2 = 39; }
+    if (kind === 'frog') { head = `<circle cx="23" cy="21" r="6.5" fill="${fur}" ${st(1.5)}/><circle cx="41" cy="21" r="6.5" fill="${fur}" ${st(1.5)}/><ellipse cx="32" cy="35" rx="17" ry="12.5" fill="${fur}" ${st(1.6)}/><circle cx="23" cy="21" r="3.6" fill="#fff"/><circle cx="41" cy="21" r="3.6" fill="#fff"/>`; ex = 23; ex2 = 41; ey = 21; }
+    const panda = kind === 'panda';
+    return SVG64(`${shirt(p.color)}${head}${eyesAt(d, ex, ex2, ey, 2.2, panda && !d ? '#fff' : INK)}${kind === 'frog' ? smile(d, 38, 7) : smile(d, 41, 3)}${bow}`);
+  }
+
+  // Noir Gangsters: fedoras, trench coats, shades and a mustache or two
+  function gangsterAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter), f = p.g === 'f';
+    const skin = ['#f2d3b5', '#e0b28a', '#c48a5e', '#8f6040'][h % 4], hat = ['#2b2530', '#3d3540', '#5a4a3a'][(h >>> 3) % 3];
+    const shades = !d && (h >>> 5) % 3 === 0, stache = !f && (h >>> 7) % 2 === 0;
+    const coat = `<path d="M8 64c0-12 10-18 24-18s24 6 24 18Z" fill="#b59a6c" ${st(1.6)}/><path d="M32 46l-8 18M32 46l8 18" ${st(1.4)}/><path d="M24 46l8 9 8-9" fill="#efe4cf" ${st(1.3)}/><path d="M30 52h4l-1 12h-2Z" fill="${p.color}" ${st(1)}/>`;
+    const hair = f ? `<path d="M18 30c-2 6 0 14 4 16 0-6-1-10 1-14M46 30c2 6 0 14-4 16 0-6 1-10-1-14" fill="#2b2530" ${st(1.3)}/>` : '';
+    const face = `<ellipse cx="32" cy="32" rx="12.5" ry="13.5" fill="${skin}" ${st(1.6)}/>`;
+    const hatSvg = `<path d="M12 23c6 2 34 2 40 0-1 3-6 5-20 5s-19-2-20-5Z" fill="${hat}" ${st(1.5)}/><path d="M20 24c0-9 4-14 12-14s12 5 12 14c-6 1.5-18 1.5-24 0Z" fill="${hat}" ${st(1.5)}/><path d="M20.5 20.5c7 1.4 16 1.4 23 0v3.4c-7 1.4-16 1.4-23 0Z" fill="${p.color}"/><path d="M28 12c2 2 6 2 8 0" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="1.4"/>`;
+    const eyes = shades ? `<path d="M21 30h22v2c0 3-2 5-5 5h-2c-2 0-4-2-4-4 0 2-2 4-4 4h-2c-3 0-5-2-5-5Z" fill="#1c1822"/><path d="M24 31.5h3" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/>` : eyesAt(d, 27, 37, 31.5, 1.9);
+    const mouth = stache ? `<path d="M26 38c2-2 4-2 6-.6 2-1.4 4-1.4 6 .6-2 1.6-4 1.4-6 .2-2 1.2-4 1.4-6-.2Z" fill="#2b2530"/>` : f ? `<path d="M29 38.5c2 1.4 4 1.4 6 0-1 2-5 2-6 0Z" fill="#b5243a" ${st(1)}/>` : smile(d, 38, 3);
+    return SVG64(`${coat}${hair}${face}${eyes}${mouth}${hatSvg}`);
+  }
+
+  // Monster Mash
+  function monsterAvatar(p) {
+    const d = p.isVictim, kind = pickH(p, 2, ['vampire', 'zombie', 'mummy', 'ghost', 'witch', 'franken', 'wolf', 'skeleton']);
+    let b = '';
+    if (kind === 'vampire') b = `<path d="M8 64c2-12 10-18 24-18s22 6 24 18Z" fill="#2b2530" ${st(1.6)}/><path d="M14 50l18 8 18-8-4 14H18Z" fill="#b5243a" ${st(1.4)}/><ellipse cx="32" cy="31" rx="12.5" ry="14" fill="#e9e4ef" ${st(1.6)}/><path d="M19.5 28c0-9 6-14 12.5-14s12.5 5 12.5 14c-3-3-6-5-9-5l-3.5 6-3.5-6c-3 0-6 2-9 5Z" fill="#1c1822" ${st(1.4)}/>${eyesAt(d, 27, 37, 31, 2, '#b5243a')}<path d="M27 38c3 2 7 2 10 0" fill="none" ${st(1.5)}/>${d ? '' : '<path d="M29 38.6l1 3 1-2.6M35 38.6l-1 3-1-2.6" fill="#fff" stroke="#3d3250" stroke-width=".9"/>'}`;
+    if (kind === 'zombie') b = `${shirt('#6b7a5a')}<path d="M20 52l4 4 4-4 4 4 4-4 4 4 4-4" fill="none" ${st(1.3)}/><ellipse cx="32" cy="31" rx="13" ry="14" fill="#9cc48c" ${st(1.6)}/><path d="M19 24l4-8 3 5 4-7 3 6 4-6 2 6 5-3-2 8c-6-2-16-2-23-1Z" fill="#4a3a2a" ${st(1.3)}/>${d ? eyesAt(d, 27, 37, 31) : `<circle cx="27" cy="31" r="3.4" fill="#fff" ${st(1.2)}/><circle cx="27" cy="31.5" r="1.4" fill="${INK}"/><circle cx="37" cy="31" r="2" fill="${INK}"/>`}<path d="M27 39h10" ${st(1.5)}/><path d="M29 37.5v3M32 37.5v3M35 37.5v3" stroke="${INK}" stroke-width="1"/><path d="M39 22l4 4M41 21l-1 4" stroke="#b5243a" stroke-width="1.2"/>`;
+    if (kind === 'mummy') b = `${shirt('#e9dfc8')}<ellipse cx="32" cy="31" rx="13.5" ry="14.5" fill="#efe6d2" ${st(1.6)}/><path d="M19 22c8-3 18-3 26 1M18.5 28c9-2 18-2 27 0M19 35c8 2 18 2 26-1M21 41c7 2 15 2 22-1M20 25l24 4M20 38l23-3" fill="none" stroke="#c9b48a" stroke-width="1.6"/><rect x="22" y="28" width="20" height="6" rx="3" fill="#2b2530"/>${eyesAt(d, 27, 37, 31, 1.6, d ? '#efe6d2' : '#f6c85f')}`;
+    if (kind === 'ghost') b = `<path d="M14 64V32c0-11 8-19 18-19s18 8 18 19v32l-4.5-4-4.5 4-4.5-4-4.5 4-4.5-4-4.5 4-4.5-4Z" fill="#f7f4fb" ${st(1.6)}/>${d ? eyesAt(d, 26, 38, 30, 2.4) : '<ellipse cx="26" cy="30" rx="3" ry="4.2" fill="#1c1822"/><ellipse cx="38" cy="30" rx="3" ry="4.2" fill="#1c1822"/>'}<ellipse cx="32" cy="41" rx="3" ry="${d ? 1.4 : 3.6}" fill="#1c1822"/>`;
+    if (kind === 'witch') b = `${shirt('#4a2a5a')}<path d="M20 36c-3 6-2 12 2 14M44 36c3 6 2 12-2 14" fill="none" stroke="#7a3b2e" stroke-width="4" stroke-linecap="round"/><ellipse cx="32" cy="33" rx="12" ry="13" fill="#a8d29a" ${st(1.6)}/>${eyesAt(d, 27, 37, 33, 2)}${smile(d, 40, 3)}<path d="M30 34l2 4 1-1" fill="none" ${st(1.3)}/><path d="M10 23c8 3 36 3 44 0-3 4-12 5-22 5s-19-1-22-5Z" fill="#2b2530" ${st(1.5)}/><path d="M20 24c4-4 7-12 10-20 2 2 6 3 10 2-2 6-1 13 4 18-8 1.4-16 1.4-24 0Z" fill="#2b2530" ${st(1.5)}/><path d="M21 21c7 1.4 15 1.4 22 0" stroke="${p.color}" stroke-width="2.6"/>`;
+    if (kind === 'franken') b = `${shirt('#3d3540')}<rect x="19" y="18" width="26" height="28" rx="6" fill="#8fbf85" ${st(1.6)}/><path d="M19 24V16h26v8c-4-2-8-3-13-3s-9 1-13 3Z" fill="#1c1822" ${st(1.3)}/><path d="M14 33h5M45 33h5" stroke="#9a9aa8" stroke-width="3.4" stroke-linecap="round"/>${eyesAt(d, 27, 37, 30, 2)}<path d="M26 39h12M28 37.5v3M31 37.5v3M34 37.5v3M37 37.5v3" stroke="${INK}" stroke-width="1.2"/><path d="M25 23l3 2M33 22l4 1" stroke="${INK}" stroke-width="1.6"/>`;
+    if (kind === 'wolf') b = `${shirt(p.color)}<path d="M16 26l2-15 10 9ZM48 26l-2-15-10 9Z" fill="#6b5a4e" ${st(1.5)}/><path d="M16 30c0-9 7-15 16-15s16 6 16 15c0 6-3 10-6 12l-10 6-10-6c-3-2-6-6-6-12Z" fill="#7a6a5e" ${st(1.6)}/><path d="M25 36c2 6 4 9 7 10 3-1 5-4 7-10-3-2-11-2-14 0Z" fill="#c9b8a6" ${st(1.2)}/><ellipse cx="32" cy="37" rx="2.6" ry="1.9" fill="${INK}"/>${eyesAt(d, 26, 38, 29, 2, d ? INK : '#f6c85f')}${d ? '' : '<path d="M29 43l1 2 1-2M33 43l1 2 1-2" fill="#fff" stroke="#3d3250" stroke-width=".8"/>'}`;
+    if (kind === 'skeleton') b = `<path d="M10 64c0-11 9-17 22-17s22 6 22 17Z" fill="#2b2530" ${st(1.6)}/><path d="M22 52h20M24 56h16M26 60h12M32 47v17" stroke="#efe6d2" stroke-width="2"/><path d="M19 30c0-9 6-15 13-15s13 6 13 15c0 5-2 8-4 9v5H23v-5c-2-1-4-4-4-9Z" fill="#f5efe2" ${st(1.6)}/>${d ? eyesAt(d, 27, 37, 30, 2) : '<ellipse cx="27" cy="30" rx="3.6" ry="4" fill="#1c1822"/><ellipse cx="37" cy="30" rx="3.6" ry="4" fill="#1c1822"/>'}<path d="M32 33l-2 4h4Z" fill="#1c1822"/><path d="M27 42v2M30 42v2M33 42v2M36 42v2" stroke="${INK}" stroke-width="1"/>`;
+    return SVG64(b);
+  }
+
+  // Royal Court: crowns, jewels and an ermine cape
+  function royalAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter), f = p.g === 'f';
+    const skin = SKIN[h % SKIN.length], hair = ['#3a2a22', '#a8652f', '#e3b65c', '#b8452f', '#cfc8d8'][(h >>> 4) % 5];
+    const cape = `<path d="M8 64c0-12 10-18 24-18s24 6 24 18Z" fill="#6b2a8a" ${st(1.6)}/><path d="M14 52c6-4 12-6 18-6s12 2 18 6l-2 5c-5-3-11-4-16-4s-11 1-16 4Z" fill="#fbf8f2" ${st(1.3)}/><path d="M20 53v1.4M26 51.5v1.4M32 51v1.4M38 51.5v1.4M44 53v1.4" stroke="#1c1822" stroke-width="1.6" stroke-linecap="round"/><circle cx="32" cy="59" r="2.6" fill="#e8615a" ${st(1.2)}/>`;
+    const back = f ? `<path d="M18 30c-1-10 6-16 14-16s15 6 14 16c0 7-1 12-4 15H22c-3-3-4-8-4-15Z" fill="${hair}" ${st(1.4)}/>` : '';
+    const face = `<ellipse cx="32" cy="32" rx="12.5" ry="13.5" fill="${skin}" ${st(1.6)}/>`;
+    const fringe = `<path d="M19.5 29c0-8 5-12 12.5-12s12.5 4 12.5 12c-4-3-8-5-12.5-5s-8.5 2-12.5 5Z" fill="${hair}" ${st(1.3)}/>`;
+    const crown = f
+      ? `<path d="M22 18l4-6 3 4 3-6 3 6 3-4 4 6Z" fill="#f6c85f" ${st(1.3)}/><circle cx="32" cy="12" r="1.8" fill="#8fd3f4" ${st(.9)}/><circle cx="26" cy="15.5" r="1.2" fill="#e8615a"/><circle cx="38" cy="15.5" r="1.2" fill="#e8615a"/>`
+      : `<path d="M20 20V10l5 5 7-8 7 8 5-5v10Z" fill="#f6c85f" ${st(1.4)}/><path d="M20 20h24" ${st(1.4)}/><circle cx="32" cy="14" r="2" fill="#e8615a" ${st(1)}/><circle cx="25" cy="17" r="1.4" fill="#8fd3f4"/><circle cx="39" cy="17" r="1.4" fill="#8fd3f4"/>`;
+    const beard = !f && (h >>> 6) % 2 === 0 ? `<path d="M20 34c1 8 6 12 12 12s11-4 12-12c-2 3-5 4-7 4H27c-2 0-5-1-7-4Z" fill="${hair}" ${st(1.3)}/>` : '';
+    const ear = f ? `<circle cx="19" cy="37" r="1.8" fill="#8fd3f4" ${st(1)}/><circle cx="45" cy="37" r="1.8" fill="#8fd3f4" ${st(1)}/>` : '';
+    return SVG64(`${back}${cape}${face}${beard}${eyesAt(d, 27, 37, 31.5)}${beard ? '' : smile(d, 38, 3)}${fringe}${crown}${ear}`);
+  }
+
+  // Space Crew: astronauts and the odd alien
+  function spaceAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter), alien = (h >>> 3) % 3 === 0;
+    const stars = '<circle cx="8" cy="10" r="1" fill="#fff"/><circle cx="56" cy="8" r="1.3" fill="#fff"/><circle cx="54" cy="30" r=".9" fill="#fff"/><circle cx="7" cy="34" r="1.1" fill="#fff"/><circle cx="14" cy="20" r=".7" fill="#f6c85f"/>';
+    const bg = '<circle cx="32" cy="32" r="32" fill="#1b1a3a"/>' + stars;
+    const suit = `<path d="M8 64c0-12 10-18 24-18s24 6 24 18Z" fill="#eef1f6" ${st(1.6)}/><rect x="26" y="52" width="12" height="7" rx="1.5" fill="#cfd6e2" ${st(1.2)}/><circle cx="29" cy="55.5" r="1.3" fill="#e8615a"/><circle cx="33" cy="55.5" r="1.3" fill="${p.color}"/><path d="M12 56c4-2 6-2 8 0" stroke="${p.color}" stroke-width="3"/>`;
+    if (alien) {
+      const skin = ['#9ee6a0', '#c4a2f0', '#8fd3f4'][(h >>> 5) % 3];
+      return SVG64(`${bg}${suit}<path d="M24 14l-4-7M40 14l4-7" ${st(1.6)}/><circle cx="20" cy="7" r="2.4" fill="${skin}" ${st(1.2)}/><circle cx="44" cy="7" r="2.4" fill="${skin}" ${st(1.2)}/><path d="M17 28c0-10 7-15 15-15s15 5 15 15c0 9-8 17-15 17s-15-8-15-17Z" fill="${skin}" ${st(1.6)}/>${d ? eyesAt(d, 25, 39, 29, 2.6) : '<ellipse cx="25" cy="29" rx="5" ry="6.5" fill="#1c1822" transform="rotate(-15 25 29)"/><ellipse cx="39" cy="29" rx="5" ry="6.5" fill="#1c1822" transform="rotate(15 39 29)"/><circle cx="24" cy="27" r="1.4" fill="#fff"/><circle cx="38" cy="27" r="1.4" fill="#fff"/>'}${smile(d, 39, 2.5)}<circle cx="32" cy="30" r="20" fill="#bfe6ff" fill-opacity=".18" ${st(1.4)}/><path d="M18 22a16 16 0 0 1 9-8" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7"/>`);
+    }
+    const skin = SKIN[h % SKIN.length];
+    return SVG64(`${bg}${suit}<circle cx="32" cy="30" r="19" fill="#eef1f6" ${st(1.6)}/><circle cx="32" cy="31" r="14.5" fill="#24315c" ${st(1.4)}/><ellipse cx="32" cy="32" rx="10" ry="11" fill="${skin}"/>${eyesAt(d, 28, 36, 31, 1.8)}${smile(d, 37, 2.6)}<path d="M21 24a13 13 0 0 1 8-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".75"/><rect x="47" y="24" width="4" height="10" rx="2" fill="${p.color}" ${st(1.2)}/>`);
+  }
+
+  // Neon Legends: glowing outlines on a midnight disc
+  function neonAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter), f = p.g === 'f';
+    const c = d ? '#ff3b5c' : ['#3bf0ff', '#ff4fd8', '#9dff4a', '#ffd84a', '#a77bff'][h % 5];
+    const id = 'ng' + h;
+    const glow = `<defs><filter id="${id}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
+    const s = `fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"`;
+    const hair = f ? `<path d="M18 33c-2-12 5-19 14-19s16 7 14 19M18 33c0 6 1 10 3 12M46 33c0 6-1 10-3 12" ${s}/>` : ['<path d="M19 27l3-9 4 5 3-8 3 7 4-7 2 8 4-5 2 9" ' + s + '/>', '<path d="M19 28c0-9 6-14 13-14s13 5 13 14c-5-4-9-5-13-5s-8 1-13 5Z" ' + s + '/>'][(h >>> 4) % 2];
+    const shades = !d && (h >>> 6) % 2 === 0;
+    const eyes = shades ? `<path d="M21 29h22l-1 4c-1 2-3 3-5 3h-2c-2 0-3-1-3-3 0 2-1 3-3 3h-2c-2 0-4-1-5-3Z" fill="${c}" fill-opacity=".25" stroke="${c}" stroke-width="2"/>` : eyesAt(d, 27, 37, 31, 2, c);
+    return SVG64(`<circle cx="32" cy="32" r="32" fill="#0b0a18"/><g filter="url(#${id})"><path d="M10 64c0-11 9-17 22-17s22 6 22 17" ${s}/><path d="M32 47v8" ${s}/><ellipse cx="32" cy="32" rx="12.5" ry="13.5" ${s}/>${hair}${eyes}${d ? `<path d="M28 39.5c2-1.2 6-1.2 8 0" ${s}/>` : `<path d="M28 38c2 2.4 6 2.4 8 0" ${s}/>`}</g>`, glow);
+  }
+
+  const SKINS = {
+    classic: { name: 'Classic Detectives', price: 0, rarity: 'Basic', desc: 'The original cast.', draw: (p) => avatar(p), emoji: null },
+    pets: { name: 'Pet Detectives', price: 150, rarity: 'Common', desc: 'Cats, dogs, foxes, owls and more. Paws off the evidence!', draw: petAvatar, emoji: ['🐱', '🐶', '🦊', '🐰', '🐻', '🐼', '🦉', '🐸', '🐯', '🐨'] },
+    gangsters: { name: 'Noir Gangsters', price: 300, rarity: 'Rare', desc: 'Fedoras, trench coats and very dark sunglasses.', draw: gangsterAvatar, emoji: ['🕴️', '🤵', '🤵‍♀️', '🧔‍♂️', '👩‍🦰', '🧑‍💼', '👨‍💼', '👩‍💼'] },
+    monsters: { name: 'Monster Mash', price: 500, rarity: 'Rare', desc: 'Vampires, mummies, ghosts and one very polite werewolf.', draw: monsterAvatar, emoji: ['🧛', '🧟', '👻', '🧙', '🧌', '🐺', '🎃', '💀', '🧞'] },
+    royals: { name: 'Royal Court', price: 800, rarity: 'Epic', desc: 'Crowns, jewels and ermine. Comes with a golden frame.', draw: royalAvatar, emoji: ['🤴', '👸', '🫅', '👑', '🦄', '💎'] },
+    space: { name: 'Space Crew', price: 1200, rarity: 'Epic', desc: 'Astronauts and aliens, framed by the stars.', draw: spaceAvatar, emoji: ['👩‍🚀', '🧑‍🚀', '👨‍🚀', '👽', '🤖', '👾', '🛸'] },
+    neon: { name: 'Neon Legends', price: 2000, rarity: 'Legendary', desc: 'Glowing neon characters with a pulsing frame. The finest skins in town.', draw: neonAvatar, emoji: ['🌟', '💫', '⚡', '🔮', '🌈', '🪩', '✨'] },
+  };
+
   /* floor finish for each area: wood, tiles, grass, metal, deck... */
   const FLOORS = {
     mansion: ['wood', 'tile', 'wood', 'check', 'wood', 'tile', 'carpet', 'check'],
@@ -254,6 +363,8 @@
     theme: (id) => svg(THEMES[id] || THEMES.mansion),
     ui: (name) => svg(UI[name] || ''),
     avatar,
+    SKINS,
+    skinAvatar: (person, id) => (SKINS[id] || SKINS.classic).draw(person),
     appIcon,
     floor: (themeId, z) => (FLOORS[themeId] || FLOORS.mansion)[z % 8],
   };

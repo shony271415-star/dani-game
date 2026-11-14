@@ -18,7 +18,28 @@
   /* ---------- look: emoji edition, or the illustrated edition when art.js is loaded ---------- */
   const ART = window.MysteryArt || null;
   const ic = (name, emoji) => (ART ? `<span class="ic">${ART.ui(name)}</span>` : emoji);
-  const face = (person) => (ART ? ART.avatar(person) : person.emoji);
+  /* ---------- skin packs sold in the coin shop ---------- */
+  const PACKS = [
+    { id: 'classic', name: 'Classic Detectives', price: 0, rarity: 'Basic', desc: 'The original cast.', emoji: null },
+    { id: 'pets', name: 'Pet Detectives', price: 150, rarity: 'Common', desc: 'Cats, dogs, foxes, owls and more. Paws off the evidence!', emoji: ['🐱', '🐶', '🦊', '🐰', '🐻', '🐼', '🦉', '🐸', '🐯', '🐨'] },
+    { id: 'gangsters', name: 'Noir Gangsters', price: 300, rarity: 'Rare', desc: 'Fedoras, trench coats and very dark sunglasses.', emoji: ['🕴️', '🤵', '🤵‍♀️', '🧔‍♂️', '👩‍🦰', '🧑‍💼', '👨‍💼', '👩‍💼'] },
+    { id: 'monsters', name: 'Monster Mash', price: 500, rarity: 'Rare', desc: 'Vampires, mummies, ghosts and one very polite werewolf.', emoji: ['🧛', '🧟', '👻', '🧙', '🧌', '🐺', '🎃', '💀', '🧞'] },
+    { id: 'royals', name: 'Royal Court', price: 800, rarity: 'Epic', desc: 'Crowns, jewels and ermine, in a shimmering gold frame.', emoji: ['🤴', '👸', '🫅', '👑', '🦄', '💎'] },
+    { id: 'space', name: 'Space Crew', price: 1200, rarity: 'Epic', desc: 'Astronauts and aliens, framed by the stars.', emoji: ['👩‍🚀', '🧑‍🚀', '👨‍🚀', '👽', '🤖', '👾', '🛸'] },
+    { id: 'neon', name: 'Neon Legends', price: 2000, rarity: 'Legendary', desc: 'Glowing neon characters in a pulsing frame. The finest skins in town.', emoji: ['🌟', '💫', '⚡', '🔮', '🌈', '🪩', '✨'] },
+  ];
+  const PACK = Object.fromEntries(PACKS.map((x) => [x.id, x]));
+  const skinId = () => (store && PACK[store.skin] ? store.skin : 'classic');
+  const nameHash = (s) => { let h = 7; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
+  function skinEmoji(person, id) {
+    const pack = PACK[id || skinId()];
+    if (!pack || !pack.emoji) return person.emoji;
+    return person.isVictim ? '💀' : pack.emoji[nameHash(person.name + person.letter) % pack.emoji.length];
+  }
+  const face = (person, id) => (ART ? ART.skinAvatar(person, id || skinId()) : skinEmoji(person, id));
+  function applySkin() {
+    PACKS.forEach((x) => document.body.classList.toggle('skin-' + x.id, x.id === skinId()));
+  }
   const plain = (t) => (ART ? t.replace(/(?:[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B50}\u{2705}]\uFE0F?)\s?/gu, '') : t);
   const stars = (n) => (ART ? [1, 2, 3].map((k) => `<span class="ic star">${ART.ui(k <= n ? 'star' : 'starOff')}</span>`).join('') : '⭐'.repeat(n));
 
@@ -333,6 +354,7 @@
     $('sound-btn').innerHTML = `${ic(store.sound === false ? 'mute' : 'sound', store.sound === false ? '🔇' : '🔊')} Sound`;
     const got = Object.keys(store.ach || {}).length;
     $('ach-btn').innerHTML = `${ic('trophy', '🏆')} Trophies ${got}/${ACH.length}`;
+    $('shop-btn').innerHTML = `${ic('coin', '🛍️')} Shop`;
     setTimeout(maybeDailyBonus, 350);
     $('diffs').innerHTML = DIFFS.map((d) => {
       const p = prog(d.key);
@@ -394,6 +416,38 @@
       <p><b>${solved}</b> of ${days} days solved.</p>
       <p class="cal-tro">${ic(won ? 'trophy' : 'trophyOff', '🏆')} ${won ? `You won the ${monthName} trophy!` : `Solve every daily case this month to win the ${monthName} trophy.`}</p>
       <div class="row"><button class="primary" data-act="close">Close</button></div>`);
+  }
+
+  const SHOP_PEOPLE = [
+    { name: 'Ava', g: 'f', letter: 'A', color: '#e74c3c', emoji: '👩' }, { name: 'Ben', g: 'm', letter: 'B', color: '#2980b9', emoji: '👨' },
+    { name: 'Chloe', g: 'f', letter: 'C', color: '#27ae60', emoji: '👱‍♀️' }, { name: 'Victor', g: 'm', letter: 'V', color: '#7f1d1d', emoji: '🧔', isVictim: true },
+  ];
+  function showShop() {
+    store.owned = store.owned || ['classic'];
+    const cards = PACKS.map((x) => {
+      const owned = store.owned.includes(x.id), on = skinId() === x.id, short = x.price - coins();
+      const btn = on ? '<button class="secondary" disabled>Equipped ✓</button>'
+        : owned ? `<button class="primary" data-act="equip" data-id="${x.id}">Equip</button>`
+        : short > 0 ? `<button class="secondary" disabled>${coinIc()} ${x.price} · need ${short} more</button>`
+        : `<button class="primary" data-act="buy" data-id="${x.id}">Buy for ${coinIc()} ${x.price}</button>`;
+      return `<div class="pack rar-${x.rarity.toLowerCase()}${on ? ' on' : ''}">
+        <div class="pk-top"><b>${x.name}</b><span class="rar">${x.rarity}</span></div>
+        <div class="pk-faces">${SHOP_PEOPLE.map((p) => `<span class="pf skin-${x.id}">${face(p, x.id)}</span>`).join('')}</div>
+        <small>${x.desc}</small>${btn}</div>`;
+    }).join('');
+    modal(`<h2>${ic('coin', '🪙')} Detective Shop</h2><p>You have ${coinIc()} <b>${coins()}</b> coins. New looks for every suspect and victim.</p>
+      <div class="shop-list">${cards}</div>
+      <div class="row"><button class="secondary" data-act="close">Close</button></div>`, {
+      buy: (b) => {
+        const x = PACK[b.dataset.id];
+        if (!x || coins() < x.price) return;
+        store.coins -= x.price; store.owned.push(x.id); store.skin = x.id; save();
+        applySkin(); renderCoins(); sfx('unlock'); confetti();
+        showShop();
+        toast(`<span class="ti">${ic('gift', '🎁')}</span><span><b>${x.name} unlocked!</b><small>Equipped on every suspect.</small></span>`);
+      },
+      equip: (b) => { store.skin = b.dataset.id; save(); applySkin(); sfx('coin'); showShop(); },
+    });
   }
 
   function showTrophies() {
@@ -731,8 +785,8 @@
         const t = document.createElement('div');
         t.className = 'token' + (big ? ' letter' : '') + (person.isVictim ? ' victim' : '') + (bad.has(who) ? ' conflict' : '') + (S.solvedGrid ? ' locked' : '');
         if (big) { t.textContent = person.letter; t.style.background = person.color; }
-        else if (ART) { t.innerHTML = ART.avatar(person); t.classList.add('art'); t.style.borderColor = person.isVictim ? '' : person.color; }
-        else t.textContent = person.emoji;
+        else if (ART) { t.innerHTML = face(person); t.classList.add('art'); t.style.borderColor = person.isVictim ? '' : person.color; }
+        else t.textContent = skinEmoji(person);
         cell.appendChild(t);
       } else {
         if (S.xs.has(i)) { const x = document.createElement('div'); x.className = 'xmark'; x.textContent = '✕'; cell.appendChild(x); }
@@ -895,6 +949,8 @@
   $('greet').addEventListener('click', askProfile);
   $('tut-btn').addEventListener('click', startTutorial);
   $('ach-btn').addEventListener('click', showTrophies);
+  $('shop-btn').addEventListener('click', showShop);
+  $('coins-pill').addEventListener('click', showShop);
   $('sound-btn').addEventListener('click', () => { store.sound = store.sound === false; save(); showHome(); if (store.sound) sfx('coin'); });
 
   /* ---------- modals ---------- */
@@ -1073,6 +1129,7 @@
 
   document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
   window.addEventListener('resize', () => { if (S) $('play-area').style.top = $('topbar').offsetHeight + 'px'; });
+  applySkin();
   showHome();
   if (!store.profile) askProfile();
   else if (location.hash === '#daily') startDaily();
