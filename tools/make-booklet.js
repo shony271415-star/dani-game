@@ -1,7 +1,7 @@
 /* Builds a printable, ink-light black & white casebook from the Mystery Grid engine.
    Output:
-     casebook-print.pdf  A4 landscape sheets, pages imposed for a folded, stapled A5 booklet
-     casebook-read.pdf   the same pages as landscape two-page spreads, in reading order (for a screen)
+     casebook-print.pdf    single-sided A4 landscape, one whole case per sheet, no folding (same file as casebook-read.pdf)
+     casebook-booklet.pdf  double-sided A4 landscape, imposed to fold and staple into an A5 booklet
    Usage: node tools/make-booklet.js [out-dir] [owner name]
    Cases come from seeds 9,000,000+, a range the app never uses, so nothing in the
    booklet can be a case the player already met on their phone. */
@@ -112,7 +112,7 @@ const heart = (sizeMm, opts = {}) => `<svg class="hrt" width="${sizeMm}mm" heigh
 const letterHeart = (person, size) => `<div class="lh" style="width:${size}mm;height:${size * 0.94}mm">${heart(size, { dash: person.isVictim, broken: person.isVictim })}<span>${person.letter}</span></div>`;
 const sparkle = (sizeMm) => `<svg class="spk" width="${sizeMm}mm" height="${sizeMm}mm" viewBox="0 0 20 20"><path d="M10 1 C11 7 13 9 19 10 C13 11 11 13 10 19 C9 13 7 11 1 10 C7 9 9 7 10 1Z" fill="none" stroke="#000" stroke-width="1.1"/></svg>`;
 const flourish = `<div class="flourish"><span class="ln"></span>${heart(3.2, { w: 1.8 })}<span class="ln"></span></div>`;
-const pageNo = (n) => `<div class="pn">${heart(5.2, { w: 1.2 })}<span>${n}</span></div>`;
+const pageNo = (n) => (n === '' ? '' : `<div class="pn">${heart(5.2, { w: 1.2 })}<span>${n}</span></div>`);
 
 function stands(P) {
   const present = [...new Set(P.obj.filter(Boolean))];
@@ -280,8 +280,6 @@ b { font-weight: 700; }
 .pg { width: 148.5mm; height: 210mm; padding: 9mm 10mm 12mm; position: relative; overflow: hidden; background: #fff; }
 .sheet { width: 297mm; height: 210mm; display: flex; page-break-after: always; }
 .sheet:last-child { page-break-after: auto; }
-.spread .pg:first-child { box-shadow: inset -2mm 0 2mm -2mm rgba(0,0,0,.18); }
-.spread .pg:last-child { box-shadow: inset 2mm 0 2mm -2mm rgba(0,0,0,.18); }
 .reader .pg { page-break-after: always; }
 .reader .pg:last-child { page-break-after: auto; }
 .script { font-family: "Pacifico", cursive; font-weight: 400; }
@@ -438,19 +436,22 @@ async function main() {
   const head = (size) => `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${esc(OWNER)}'s Mystery Grid Casebook</title>
     <style>${FONTS}
 @page { size: ${size}; margin: 0; }${CSS}</style></head>`;
-  // reading copy: landscape spreads like an open book (cover alone on the right, back cover alone on the left)
-  const blank = '<div class="pg"></div>';
-  const spreads = [[blank, pages[0]]];
-  for (let k = 1; k < pages.length - 1; k += 2) spreads.push([pages[k], pages[k + 1]]);
-  spreads.push([pages[pages.length - 1], blank]);
-  const readerHtml = `${head('297mm 210mm')}<body>${spreads.map(([l, r]) => `<div class="sheet spread">${l}${r}</div>`).join('')}</body></html>`;
+  // simple copy: single-sided A4 landscape, no folding. Every case fills exactly one sheet
+  // (clues left, board right), so it prints in one go and also reads well on a screen.
+  const nCase = cases.length, solStart = 3 + nCase * 2;
+  const flat = [[pages[0], pages[1]], [pages[2], notesPage('')]];
+  for (let k = 3; k < solStart; k += 2) flat.push([pages[k], pages[k + 1]]);
+  const sols = pages.slice(solStart, solStart + Math.ceil(nCase / 4));
+  for (let k = 0; k < sols.length; k += 2) flat.push([sols[k], sols[k + 1] || notesPage('')]);
+  const flatHtml = `${head('297mm 210mm')}<body>${flat.map(([l, r]) => `<div class="sheet">${l}${r}</div>`).join('')}</body></html>`;
+  console.log(`single-sided version: ${flat.length} sheets`);
   const printHtml = `${head('297mm 210mm')}<body>${impose(pages).map(([l, r]) => `<div class="sheet">${pages[l - 1]}${pages[r - 1]}</div>`).join('')}</body></html>`;
 
   fs.mkdirSync(OUT, { recursive: true });
   const { chromium } = require('playwright');
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  for (const [name, html] of [['casebook-read', readerHtml], ['casebook-print', printHtml]]) {
+  for (const [name, html] of [['casebook-print', flatHtml], ['casebook-read', flatHtml], ['casebook-booklet', printHtml]]) {
     const file = path.join(OUT, name + '.html');
     fs.writeFileSync(file, html);
     await page.goto('file://' + file);

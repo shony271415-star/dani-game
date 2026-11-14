@@ -37,6 +37,8 @@ Mansion, ship, forest, space station, museum, night train, circus, castle and sk
 Progress and the player's name are saved on the device.
 
 ## Printable casebook
-`casebook-print.pdf` is a black & white booklet with 24 cases (6 Inspector, 12 Expert, 6 Extreme) that never appear in the app.
-Print it on A4, **double-sided, flip on short edge**, at **actual size / 100%**. Fold the stack in half and staple along the fold.
-`casebook-read.pdf` has the same pages in reading order. Rebuild with `node tools/make-booklet.js . "Name"`.
+24 cases (6 Inspector, 12 Expert, 6 Extreme) that never appear in the app, black & white and light on ink.
+- `casebook-print.pdf` (same as `casebook-read.pdf`): **single-sided** A4 landscape, one whole case per sheet (clues left, board right). Print everything at 100%, no folding.
+- `casebook-booklet.pdf`: the same pages imposed for a folded A5 booklet. Print double-sided, flip on short edge, fold the stack, staple on the fold.
+
+Rebuild with `node tools/make-booklet.js . "Name"`.
