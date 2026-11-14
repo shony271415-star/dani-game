@@ -35,3 +35,8 @@ Mansion, ship, forest, space station, museum, night train, circus, castle and sk
 - `manifest.webmanifest`, `sw.js`, `icons/`: install as a phone app, works offline.
 
 Progress and the player's name are saved on the device.
+
+## Printable casebook
+`casebook-print.pdf` is a black & white booklet with 24 cases (6 Inspector, 12 Expert, 6 Extreme) that never appear in the app.
+Print it on A4, **double-sided, flip on short edge**, at **actual size / 100%**. Fold the stack in half and staple along the fold.
+`casebook-read.pdf` has the same pages in reading order. Rebuild with `node tools/make-booklet.js . "Name"`.
