@@ -8,15 +8,20 @@
   @font-face { font-family: "Fredoka"; font-weight: 500; src: url(../fonts/fredoka-latin-500-normal.woff2) format("woff2"); }
   @font-face { font-family: "Quicksand"; font-weight: 700; src: url(../fonts/quicksand-latin-700-normal.woff2) format("woff2"); }
   @font-face { font-family: "Pacifico"; src: url(../fonts/pacifico-latin-400-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Playfair Display"; font-weight: 900; src: url(../fonts/playfair-display-latin-900-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Special Elite"; src: url(../fonts/special-elite-latin-400-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Courier Prime"; font-weight: 700; src: url(../fonts/courier-prime-latin-700-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Oswald"; font-weight: 600; src: url(../fonts/oswald-latin-600-normal.woff2) format("woff2"); }
   * { box-sizing: border-box; }
   html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; }
-  body { background: radial-gradient(circle at 50% 18%, #8a6cc9, #4a3b63 70%); font-family: "Quicksand", sans-serif; font-weight: 700; color: #3d3250; position: relative; }
+  body { background: radial-gradient(ellipse 70% 30% at 50% 0%, rgba(255,214,150,.16), transparent 70%), radial-gradient(ellipse at 50% 30%, #3a2238 0%, #1d1626 50%, #0c0a11 100%); font-family: "Quicksand", sans-serif; font-weight: 700; color: #3d3250; position: relative; }
   .layer { position: absolute; inset: 0; }
   #cap { position: absolute; left: 70px; right: 70px; top: 150px; height: 200px; display: flex; align-items: center; justify-content: center; text-align: center;
-    font-family: "Fredoka"; font-weight: 600; font-size: 58px; line-height: 1.15; color: #fff; text-shadow: 0 4px 0 rgba(0,0,0,.25); }
-  #cap b { color: #ffd166; }
+    font-family: "Playfair Display"; font-weight: 900; font-size: 56px; line-height: 1.15; color: #f3e6c8; text-shadow: 0 4px 0 rgba(0,0,0,.25); }
+  #cap b { color: #ff7b8b; }
   #boardwrap { position: absolute; left: 50%; top: 370px; transform-origin: 50% 0; }
-  .board { display: grid; position: relative; background: #fff; border: 12px solid #2e2442; border-radius: 28px; box-shadow: 0 24px 50px rgba(0,0,0,.35); }
+  .board { display: grid; position: relative; background: #fff; border: 14px solid #0b090f; border-radius: 16px; box-shadow: 0 0 0 2px rgba(217,164,65,.5), 0 24px 50px rgba(0,0,0,.7); }
+  .board .cell { filter: saturate(.6) brightness(.94) contrast(1.03); }
   .cell { position: relative; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(74,59,99,.1); }
   .cell.wn { border-top: 6px solid #2e2442; } .cell.ws { border-bottom: 6px solid #2e2442; } .cell.we { border-right: 6px solid #2e2442; } .cell.ww { border-left: 6px solid #2e2442; }
   .obj { width: 76%; height: 76%; display: flex; } .obj svg { width: 100%; height: 100%; filter: drop-shadow(0 3px 0 rgba(61,50,80,.18)); }
@@ -25,31 +30,31 @@
   .edge { position: absolute; border: 4px solid #2e2442; border-radius: 6px; box-shadow: inset 0 0 0 3px rgba(255,255,255,.75); z-index: 2; }
   .edge.n { top: -16px; left: 20%; right: 20%; height: 18px; } .edge.s { bottom: -16px; left: 20%; right: 20%; height: 18px; }
   .edge.w { left: -16px; top: 20%; bottom: 20%; width: 18px; } .edge.e { right: -16px; top: 20%; bottom: 20%; width: 18px; }
-  .zl { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,.93); border: 3px solid #2e2442; border-radius: 20px; padding: 0 12px;
-    font-family: "Fredoka"; font-weight: 500; white-space: nowrap; z-index: 4; line-height: 1.35; }
+  .zl { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); background: #efe4cf; border: 2px solid #1c1822; border-radius: 4px; padding: 0 10px; text-transform: uppercase; letter-spacing: 1px;
+    font-family: "Oswald"; font-weight: 600; color: #1c1822; white-space: nowrap; z-index: 4; line-height: 1.35; }
   .tok { position: absolute; inset: 7%; border-radius: 50%; background: #fff; border: 7px solid; overflow: hidden; z-index: 5; box-shadow: 0 6px 12px rgba(0,0,0,.25); }
   .tok svg { width: 100%; height: 100%; }
   .tok.letter { display: flex; align-items: center; justify-content: center; color: #fff; font-family: "Fredoka"; font-weight: 600; border-color: #fff; }
   .hl { position: absolute; inset: 0; box-shadow: inset 0 0 0 10px #ffb703; z-index: 6; border-radius: 4px; }
   .zoneglow { position: absolute; inset: 0; background: rgba(255,92,92,.28); z-index: 3; }
   #cards { position: absolute; left: 60px; right: 60px; top: 1200px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  .card { background: #fffdf8; border-radius: 28px; padding: 18px 20px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 10px 0 rgba(0,0,0,.18); }
-  .card.victim { background: #ffe9ee; }
-  .face { flex: 0 0 auto; width: 92px; height: 92px; border-radius: 20px; background: #f6ecff; position: relative; }
+  .card { background: linear-gradient(#efe4cf, #e4d4b2); border-radius: 6px; padding: 18px 20px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 10px 0 rgba(0,0,0,.18); }
+  .card.victim { background: linear-gradient(#ead5cf, #dcc0b8); }
+  .face { flex: 0 0 auto; width: 92px; height: 92px; border-radius: 2px; background: #fff; padding: 5px 5px 12px; position: relative; transform: rotate(-3deg); box-shadow: 0 3px 6px rgba(0,0,0,.35); }
   .face svg { width: 100%; height: 100%; }
   .face .lt { position: absolute; right: -10px; bottom: -10px; width: 42px; height: 42px; border-radius: 50%; color: #fff; border: 4px solid #fff; display: flex; align-items: center; justify-content: center; font-family: "Fredoka"; font-weight: 600; font-size: 24px; }
-  .nm { font-family: "Fredoka"; font-weight: 600; font-size: 38px; }
-  .cl { font-size: 30px; line-height: 1.25; } .cl b { color: #c0392b; }
+  .nm { font-family: "Oswald"; font-weight: 600; font-size: 36px; text-transform: uppercase; letter-spacing: 1px; color: #1c1822; }
+  .cl { font-family: "Courier Prime"; font-weight: 700; font-size: 29px; line-height: 1.25; color: #1c1822; } .cl b { color: #b5243a; }
   .rip { font-family: "Pacifico"; color: #c0392b; font-size: 28px; }
   #over { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #fff; z-index: 20; }
-  #over .big { font-family: "Fredoka"; font-weight: 600; font-size: 104px; line-height: 1.05; text-shadow: 0 6px 0 rgba(0,0,0,.25); padding: 0 60px; }
-  #over .sub { font-family: "Quicksand"; font-size: 48px; margin-top: 30px; opacity: .95; }
+  #over .big { font-family: "Playfair Display"; font-weight: 900; font-size: 100px; color: #f3e6c8; line-height: 1.05; text-shadow: 0 6px 0 rgba(0,0,0,.25); padding: 0 60px; }
+  #over .sub { font-family: "Special Elite"; font-size: 44px; color: #c9b48a; margin-top: 30px; opacity: .95; }
   #over .ic svg { width: 300px; height: 300px; }
-  #over .ring { width: 300px; height: 300px; border-radius: 50%; border: 18px solid #ffd166; display: flex; align-items: center; justify-content: center; font-family: "Fredoka"; font-weight: 600; font-size: 160px; margin-top: 40px; background: rgba(46,36,66,.55); }
-  #dim { position: absolute; inset: 0; background: rgba(46,36,66,.82); z-index: 19; }
-  #brand { position: absolute; left: 0; right: 0; top: 1720px; text-align: center; color: rgba(255,255,255,.85); font-family: "Fredoka"; font-weight: 600; font-size: 40px; display: flex; align-items: center; justify-content: center; gap: 14px; z-index: 30; }
+  #over .ring { width: 300px; height: 300px; border-radius: 50%; border: 18px solid #d9a441; color: #f3e6c8; display: flex; align-items: center; justify-content: center; font-family: "Fredoka"; font-weight: 600; font-size: 160px; margin-top: 40px; background: rgba(46,36,66,.55); }
+  #dim { position: absolute; inset: 0; background: rgba(10,8,14,.86); z-index: 19; }
+  #brand { position: absolute; left: 0; right: 0; top: 1720px; text-align: center; color: #f3e6c8; font-family: "Playfair Display"; font-weight: 900; font-size: 40px; display: flex; align-items: center; justify-content: center; gap: 14px; z-index: 30; }
   #brand svg { width: 54px; height: 54px; }
-  #timer { position: absolute; right: 70px; top: 190px; width: 140px; height: 140px; border-radius: 50%; border: 12px solid #ffd166; color: #fff; font-family: "Fredoka"; font-weight: 600; font-size: 70px; display: flex; align-items: center; justify-content: center; background: rgba(46,36,66,.4); z-index: 10; opacity: 0; }
+  #timer { position: absolute; right: 70px; top: 190px; width: 140px; height: 140px; border-radius: 50%; border: 12px solid #d9a441; color: #fff; font-family: "Fredoka"; font-weight: 600; font-size: 70px; display: flex; align-items: center; justify-content: center; background: rgba(46,36,66,.4); z-index: 10; opacity: 0; }
   .facerow { display: flex; gap: 28px; margin-top: 50px; }
   .facerow .f { width: 150px; text-align: center; font-family: "Fredoka"; font-size: 34px; }
   .facerow .f div { width: 150px; height: 150px; border-radius: 34px; background: #fffdf8; overflow: hidden; margin-bottom: 8px; position: relative; }
@@ -196,7 +201,7 @@ const VIDEOS = {
         dim.style.opacity = 0.75 * ease(x) * (1 - out); o.style.opacity = ease(x) * (1 - out);
         o.innerHTML = `<div class="big">Pause &amp; try!</div><div class="sub">Who did it?</div><div class="ring">${t < 9.6 ? 3 : Math.max(1, k)}</div>`;
       } else if (t >= 22) {
-        endCard(span(t, 22, 22.6), ['A new murder every day', 'Rookie → Extreme', '<b style="color:#ffd166">Free · link in bio</b>']);
+        endCard(span(t, 22, 22.6), ['A new murder every day', 'Rookie → Extreme', '<b style="color:#ff7b8b">Free · link in bio</b>']);
       } else { dim.style.opacity = 0; o.style.opacity = 0; }
 
       const bx = pop(span(t, 2.6, 3.3));
@@ -282,7 +287,7 @@ const VIDEOS = {
         const out = span(t, 2.5, 3);
         dim.style.opacity = 0.92 * (1 - out); o.style.opacity = 1 - out;
         o.innerHTML = `<div class="ic" style="transform:scale(${pop(span(t, 0, 0.6))}) rotate(${Math.sin(t * 8) * 6}deg)">${A.ui('knife')}</div>
-          <div class="big" style="color:#ff6b6b">LEVEL: EXTREME</div><div class="sub" style="opacity:${ease(span(t, 1, 1.5))}">10×10 · 9 suspects · 1 killer</div>`;
+          <div class="big" style="color:#ff5c70">LEVEL: EXTREME</div><div class="sub" style="opacity:${ease(span(t, 1, 1.5))}">10×10 · 9 suspects · 1 killer</div>`;
       } else if (t >= 18.5) {
         endCard(span(t, 18.5, 19.1), ['From 4×4 Rookie to 10×10 Extreme', 'New case every day', 'Free · link in bio']);
       } else { dim.style.opacity = 0; o.style.opacity = 0; }

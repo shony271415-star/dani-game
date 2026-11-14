@@ -132,7 +132,11 @@
 
   /* ---------- interface ---------- */
   const UI = {
-    logo: `<circle cx="20" cy="20" r="13" fill="#fffaf3" ${st(2.6)}/><circle cx="20" cy="20" r="9.5" fill="#d6ecfb"/><path d="M29.5 29.5L42 42" stroke="${INK}" stroke-width="6" stroke-linecap="round"/><path d="M29.5 29.5L42 42" stroke="#a88be0" stroke-width="3" stroke-linecap="round"/><path d="M20 27c-5-3.5-8-6-8-9.2C12 15.6 13.7 14 15.8 14c1.8 0 3.2 1 4.2 2.4 1-1.4 2.4-2.4 4.2-2.4 2.1 0 3.8 1.6 3.8 3.8 0 3.2-3 5.7-8 9.2Z" fill="#f4a3b5" ${st(1.6)}/><path d="M13 13c2-2 4-3 7-3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>`,
+    logo: `<path d="M31 31L43.5 43.5" stroke="#1c1822" stroke-width="8.5" stroke-linecap="round"/><path d="M31 31L43.5 43.5" stroke="#5c3d2b" stroke-width="5.5" stroke-linecap="round"/><path d="M33 33l9 9" stroke="#8a5d3f" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M28.6 28.6l3.4 3.4" stroke="#1c1822" stroke-width="7.5"/><path d="M28.6 28.6l3.4 3.4" stroke="#e2b04a" stroke-width="5"/>
+      <circle cx="19" cy="19" r="15.2" fill="#1c1822"/><circle cx="19" cy="19" r="13.6" fill="#d9a441"/><circle cx="19" cy="19" r="11.4" fill="#dcebf2"/>
+      <g fill="none" stroke="#b5243a" stroke-width="1.35" stroke-linecap="round"><path d="M13 22.5c0-4 2.7-7 6-7s6 3 6 7"/><path d="M15.3 23.5c0-3 1.7-5 3.7-5s3.7 2 3.7 5v1.8"/><path d="M17.6 24.6c0-1.6.6-2.8 1.4-2.8s1.4 1.2 1.4 2.8v3"/><path d="M11.4 19.6c.9-4.2 4-7 7.6-7 3.8 0 6.8 2.8 7.6 6.8"/><path d="M14 14c1.4-1 3.1-1.6 5-1.6 1.6 0 3.1.4 4.4 1.2"/><path d="M13.6 26c.6.9 1.2 1.6 2 2.2"/></g>
+      <path d="M10.6 15.2a9.6 9.6 0 0 1 6.4-4.8" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".85"/>`,
     bulb: `<path d="M24 5a13 13 0 0 0-8 23c2 2 3 4 3 6h10c0-2 1-4 3-6a13 13 0 0 0-8-23Z" fill="#fde07a" ${st()}/><path d="M19 38h10M20 42h8" ${st()}/><path d="M21 28c-1-4 1-6 3-6s4 2 3 6" fill="none" stroke="#e3b33f" stroke-width="1.6"/>`,
     knife: `<path d="M8 40L32 16c4-4 8-5 10-3s1 6-3 10L15 47Z" fill="#e3dfea" ${st()}/><path d="M8 40l7 7" ${st(2.6)}/><path d="M3 45l5-5 7 7-5 5Z" fill="#9a5f34" ${st()}/>`,
     siren: `<path d="M12 36V24a12 12 0 0 1 24 0v12Z" fill="#e8615a" ${st()}/><rect x="8" y="36" width="32" height="6" rx="2" fill="#6b5f86" ${st()}/><path d="M18 24a6 6 0 0 1 6-6" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M5 18l4 2M43 18l-4 2M24 4v5M10 8l3 4M38 8l-3 4" ${st()}/>`,
@@ -140,7 +144,7 @@
     phone: `<rect x="13" y="4" width="22" height="40" rx="4" fill="#a88be0" ${st()}/><rect x="16" y="9" width="16" height="27" rx="1" fill="#d6ecfb"/><circle cx="24" cy="40" r="1.6" fill="#fff"/><path d="M24 14v12M19 21l5 5 5-5" fill="none" ${st(2)}/>`,
     star: `<path d="M24 4l6 13 14 1.5-10.5 9.5 3 14L24 35l-12.5 7 3-14L4 18.5 18 17Z" fill="#f6c85f" ${st()}/>`,
     starOff: `<path d="M24 4l6 13 14 1.5-10.5 9.5 3 14L24 35l-12.5 7 3-14L4 18.5 18 17Z" fill="#e3dfea" ${st()}/>`,
-    calendar: `<rect x="5" y="9" width="38" height="34" rx="5" fill="#fffaf3" ${st()}/><path d="M5 18h38" ${st()}/><path d="M5 14a5 5 0 0 1 5-5h28a5 5 0 0 1 5 5v4H5Z" fill="#f4a3b5" ${st()}/><path d="M15 5v8M33 5v8" ${st(2.6)}/><path d="M24 36c-4-3-7-5-7-8 0-2 1.5-3.5 3.5-3.5 1.6 0 2.8.9 3.5 2 .7-1.1 1.9-2 3.5-2 2 0 3.5 1.5 3.5 3.5 0 3-3 5-7 8Z" fill="#e8615a" ${st(1.4)}/>`,
+    calendar: `<rect x="5" y="9" width="38" height="34" rx="4" fill="#efe4cf" ${st()}/><path d="M5 18h38" ${st()}/><path d="M5 13a4 4 0 0 1 4-4h30a4 4 0 0 1 4 4v5H5Z" fill="#b5243a" ${st()}/><path d="M15 5v8M33 5v8" ${st(2.6)}/><path d="M18 25l12 12M30 25L18 37" stroke="#b5243a" stroke-width="3.6" stroke-linecap="round"/>`,
     cap: `<path d="M2 18l22-10 22 10-22 10Z" fill="#6b5f86" ${st()}/><path d="M12 23v10c4 4 20 4 24 0V23" fill="#8b7fa6" ${st()}/><path d="M42 20v12" ${st()}/><circle cx="42" cy="34" r="2.4" fill="#f6c85f" ${st(1.4)}/>`,
     lock: `<rect x="9" y="21" width="30" height="23" rx="4" fill="#f6c85f" ${st()}/><path d="M15 21v-6a9 9 0 0 1 18 0v6" fill="none" ${st(2.6)}/><circle cx="24" cy="31" r="3" fill="${INK}"/><path d="M24 33v5" ${st(2.4)}/>`,
     flame: `<path d="M24 4c8 8 13 14 13 22a13 13 0 0 1-26 0c0-5 3-9 6-12 0 5 2 8 6 8-3-6-1-13 1-18Z" fill="#f59e42" ${st()}/><path d="M24 24c3 3 6 6 6 10a6 6 0 0 1-12 0c0-3 3-6 6-10Z" fill="#fde07a"/>`,
@@ -152,10 +156,10 @@
     undo: `<path d="M18 10L8 20l10 10" fill="none" ${st(3.6)}/><path d="M9 20h17a12 12 0 0 1 0 24h-6" fill="none" ${st(3.6)}/>`,
     hand: `<circle cx="24" cy="15" r="8" fill="#f1c19a" ${st()}/><path d="M10 44c0-10 6-16 14-16s14 6 14 16Z" fill="#a88be0" ${st()}/>`,
     wave: `<path d="M14 26V12a3 3 0 0 1 6 0v10V8a3 3 0 0 1 6 0v14V10a3 3 0 0 1 6 0v14-8a3 3 0 0 1 6 0v12c0 10-6 16-14 16-6 0-10-3-13-8l-5-9a3 3 0 0 1 5-3Z" fill="#f1c19a" ${st()}/>`,
-    coin: `<circle cx="24" cy="24" r="19" fill="#f6c85f" ${st()}/><circle cx="24" cy="24" r="13.5" fill="none" stroke="#e3a92b" stroke-width="2.4"/><path d="M24 31c-4.6-3.2-7.2-5.4-7.2-8.2 0-2 1.5-3.4 3.4-3.4 1.6 0 2.9.9 3.8 2.2.9-1.3 2.2-2.2 3.8-2.2 1.9 0 3.4 1.4 3.4 3.4 0 2.8-2.6 5-7.2 8.2Z" fill="#fff3c4" ${st(1.4)}/>`,
+    coin: `<circle cx="24" cy="24" r="19" fill="#e2b04a" ${st()}/><circle cx="24" cy="24" r="13.5" fill="none" stroke="#b9862c" stroke-width="2.4"/><path d="M24 15.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8Z" fill="#fff1cc" ${st(1.3)}/>`,
     trophy: `<path d="M14 6h20v12a10 10 0 0 1-20 0Z" fill="#f6c85f" ${st()}/><path d="M14 9H7v3a7 7 0 0 0 7 7M34 9h7v3a7 7 0 0 1-7 7" fill="none" ${st()}/><path d="M21 28h6v7h-6Z" fill="#e3a92b" ${st()}/><rect x="14" y="35" width="20" height="8" rx="2" fill="#a88be0" ${st()}/><path d="M19 12l2 0M20 11v2" stroke="#fff" stroke-width="2" stroke-linecap="round"/>`,
     trophyOff: `<path d="M14 6h20v12a10 10 0 0 1-20 0Z" fill="#e3dfea" ${st()}/><path d="M14 9H7v3a7 7 0 0 0 7 7M34 9h7v3a7 7 0 0 1-7 7" fill="none" ${st()}/><path d="M21 28h6v7h-6Z" fill="#d2ccdc" ${st()}/><rect x="14" y="35" width="20" height="8" rx="2" fill="#d2ccdc" ${st()}/>`,
-    gift: `<rect x="6" y="20" width="36" height="23" rx="3" fill="#f4a3b5" ${st()}/><rect x="4" y="14" width="40" height="8" rx="2" fill="#f7bccb" ${st()}/><path d="M24 14v29" stroke="#a88be0" stroke-width="5"/><path d="M24 14v29" ${st(1.2)}/><path d="M24 14c-4-8-13-8-11-2 1 3 7 2 11 2Zm0 0c4-8 13-8 11-2-1 3-7 2-11 2Z" fill="#a88be0" ${st()}/>`,
+    gift: `<rect x="6" y="20" width="36" height="23" rx="3" fill="#b5243a" ${st()}/><rect x="4" y="14" width="40" height="8" rx="2" fill="#cf3a4f" ${st()}/><path d="M24 14v29" stroke="#e2b04a" stroke-width="5"/><path d="M24 14v29" ${st(1.2)}/><path d="M24 14c-4-8-13-8-11-2 1 3 7 2 11 2Zm0 0c4-8 13-8 11-2-1 3-7 2-11 2Z" fill="#e2b04a" ${st()}/>`,
     play: `<circle cx="24" cy="24" r="20" fill="#9ee6c9" ${st()}/><path d="M19 14l14 10-14 10Z" fill="#fff" ${st()}/>`,
     sound: `<path d="M6 18h8l10-8v28l-10-8H6Z" fill="#a88be0" ${st()}/><path d="M31 17c3 4 3 10 0 14M36 12c6 7 6 17 0 24" fill="none" ${st(2.6)}/>`,
     mute: `<path d="M6 18h8l10-8v28l-10-8H6Z" fill="#d2ccdc" ${st()}/><path d="M31 18l11 12M42 18L31 30" ${st(2.8)}/>`,
@@ -163,6 +167,23 @@
     map: `<path d="M5 10l12-4 14 5 12-4v31l-12 4-14-5-12 4Z" fill="#fff3c4" ${st()}/><path d="M17 6v31M31 11v31" ${st(1.6)}/><path d="M10 30c4-6 8 2 12-4s8-2 12-8" fill="none" stroke="#e8615a" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/><path d="M36 15l3 3m0-3l-3 3" stroke="#e8615a" stroke-width="2.4" stroke-linecap="round"/>`,
     sparkle: `<path d="M24 3c2 12 5 15 18 18-13 3-16 6-18 18-2-12-5-15-18-18C19 18 22 15 24 3Z" fill="#f6c85f" ${st(1.6)}/>`,
   };
+
+
+  function appIcon(pad = 0) {
+    const k = 1 - pad * 2, o = 256 * pad * 2;
+    let grid = '';
+    for (let i = 1; i < 6; i++) grid += `<path d="M${i * 85} -40V560M-40 ${i * 85}H560" stroke="#e2b04a" stroke-opacity=".10" stroke-width="3"/>`;
+    return `<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="bg" cx="50%" cy="40%" r="70%"><stop offset="0" stop-color="#43243f"/><stop offset=".55" stop-color="#22172c"/><stop offset="1" stop-color="#0e0b14"/></radialGradient>
+      <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ff4d5e" stop-opacity=".45"/><stop offset="1" stop-color="#ff4d5e" stop-opacity="0"/></radialGradient></defs>
+      <rect width="512" height="512" fill="url(#bg)"/>
+      <g transform="rotate(-8 256 256)">${grid}</g>
+      <g transform="translate(${o / 2 + 30 * k} ${o / 2 + 30 * k}) scale(${k})">
+        <circle cx="200" cy="200" r="190" fill="url(#glow)"/>
+        <g transform="scale(9.4)" filter="drop-shadow(0 .4px .6px rgba(0,0,0,.5))">${UI.logo}</g>
+      </g>
+    </svg>`;
+  }
 
   /* ---------- characters ---------- */
   const SKIN = ['#fde2c8', '#f6cfa8', '#e8b48a', '#c98d62', '#a96f47', '#7e5236'];
@@ -200,7 +221,7 @@
       ? `<path d="M24 28l4 4M28 28l-4 4M36 28l4 4M40 28l-4 4" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>`
       : `<ellipse cx="26" cy="30" rx="1.9" ry="2.4" fill="${INK}"/><ellipse cx="38" cy="30" rx="1.9" ry="2.4" fill="${INK}"/><circle cx="26.7" cy="29.2" r=".7" fill="#fff"/><circle cx="38.7" cy="29.2" r=".7" fill="#fff"/>`;
     const mouth = dead ? `<path d="M28 38c2-1 6-1 8 0" fill="none" ${st(1.6)}/>` : `<path d="M28 36.5c2 2.4 6 2.4 8 0" fill="none" ${st(1.6)}/>`;
-    const blush = dead ? '' : `<ellipse cx="22.5" cy="35" rx="2.6" ry="1.6" fill="#f4a3b5" opacity=".75"/><ellipse cx="41.5" cy="35" rx="2.6" ry="1.6" fill="#f4a3b5" opacity=".75"/>`;
+    const blush = '';
     const gl = glasses ? `<circle cx="26" cy="30" r="4.6" fill="none" ${st(1.5)}/><circle cx="38" cy="30" r="4.6" fill="none" ${st(1.5)}/><path d="M30.6 30h2.8" ${st(1.5)}/>` : '';
     const bd = beard ? `<path d="M20 31c1 9 6 13 12 13s11-4 12-13c-2 3-5 4-7 4h-10c-2 0-5-1-7-4Z" fill="${hair}" ${st(1.4)}/><path d="M28 37c2 1.6 6 1.6 8 0" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>` : '';
     const ear = f && !glasses && ((h >>> 17) % 2) ? `<circle cx="18.5" cy="36" r="1.6" fill="#f6c85f" ${st(1)}/><circle cx="45.5" cy="36" r="1.6" fill="#f6c85f" ${st(1)}/>` : '';
@@ -233,6 +254,7 @@
     theme: (id) => svg(THEMES[id] || THEMES.mansion),
     ui: (name) => svg(UI[name] || ''),
     avatar,
+    appIcon,
     floor: (themeId, z) => (FLOORS[themeId] || FLOORS.mansion)[z % 8],
   };
   root.MysteryArt = API;
