@@ -31,14 +31,58 @@
   }
   const g = (p, m, f) => (p.g === 'm' ? m : f);
 
+  /* ---------- פרופיל ---------- */
+  const RANKS = [[0, 'בלש מתלמד', 'בלשית מתלמדת'], [3, 'חוקר זוטר', 'חוקרת זוטרה'], [10, 'בלש בכיר', 'בלשית בכירה'],
+    [25, 'מפקח', 'מפקחת'], [50, 'אגדת המשטרה', 'אגדת המשטרה']];
+  function totalSolved() { return ['easy', 'medium', 'hard'].reduce((n, d) => n + prog(d).solved, 0); }
+  function rankName() {
+    const t = totalSolved(), f = store.profile && store.profile.g === 'f';
+    let r = RANKS[0];
+    for (const x of RANKS) if (t >= x[0]) r = x;
+    return f ? r[2] : r[1];
+  }
+  function askProfile() {
+    const cur = store.profile || {};
+    modal(`<div class="big">🕵️</div><h2>מי חוקר היום?</h2>
+      <p>השם וההתקדמות נשמרים במכשיר הזה.</p>
+      <input class="name-in" id="name-in" maxlength="16" placeholder="השם שלך" autocomplete="off">
+      <div class="row"><button class="primary" data-act="f">אני בלשית 🕵️‍♀️</button><button class="primary" data-act="m">אני בלש 🕵️‍♂️</button></div>`,
+    {
+      f: () => saveProfile('f'), m: () => saveProfile('m'),
+    }, true);
+    $('name-in').value = cur.name || '';
+  }
+  function saveProfile(gender) {
+    const name = $('name-in').value.trim();
+    if (!name) { $('name-in').focus(); $('modal-body').classList.remove('shake'); void $('modal-body').offsetWidth; $('modal-body').classList.add('shake'); return; }
+    store.profile = { name, g: gender };
+    save();
+    closeModal();
+    showHome();
+  }
+  function renderGreet() {
+    const el = $('greet');
+    el.innerHTML = '';
+    if (!store.profile) { el.textContent = 'הקישו כאן כדי להזדהות'; return; }
+    const b = document.createElement('b');
+    b.textContent = `שלום, ${store.profile.name}! 👋`;
+    const s = document.createElement('div');
+    const t = totalSolved();
+    s.textContent = `דרגה: ${rankName()} · ${t === 1 ? 'תיק אחד פוענח' : t ? t + ' תיקים פוענחו' : 'עוד לא פוענח אף תיק'}`;
+    const sm = document.createElement('small');
+    sm.textContent = 'הקשה כאן מחליפה שם';
+    el.append(b, s, sm);
+  }
+
   /* ---------- מסך פתיחה ---------- */
   function showHome() {
     stopTimer();
     $('home').classList.add('active');
     $('game').classList.remove('active');
+    renderGreet();
     for (const d of ['easy', 'medium', 'hard']) {
       const p = prog(d);
-      $('badge-' + d).textContent = p.solved ? `${p.solved} פוענחו` : 'חדש!';
+      $('badge-' + d).textContent = p.solved === 1 ? 'פוענח 1' : p.solved ? `${p.solved} פוענחו` : 'חדש!';
     }
   }
 
@@ -329,15 +373,16 @@
   $('howto-game').addEventListener('click', showHowto);
 
   /* ---------- חלונות ---------- */
-  let modalActions = {};
-  function modal(html, actions) {
+  let modalActions = {}, modalSticky = false;
+  function modal(html, actions, sticky) {
     $('modal-body').innerHTML = html;
     modalActions = actions || {};
+    modalSticky = !!sticky;
     $('modal').classList.add('show');
   }
   function closeModal() { $('modal').classList.remove('show'); }
   $('modal').addEventListener('click', (e) => {
-    if (e.target === $('modal')) { closeModal(); return; }
+    if (e.target === $('modal')) { if (!modalSticky) closeModal(); return; }
     const btn = e.target.closest('[data-act]');
     if (!btn) return;
     const act = btn.dataset.act;
@@ -406,6 +451,35 @@
     });
   }
 
+  $('greet').addEventListener('click', askProfile);
+
+  /* ---------- התקנה כאפליקציה ---------- */
+  let installEvent = null;
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvent = e; $('install-btn').hidden = false; });
+  window.addEventListener('appinstalled', () => { $('install-btn').hidden = true; });
+  if (!standalone && isIOS) $('install-btn').hidden = false;
+  $('install-btn').addEventListener('click', () => {
+    if (installEvent) { installEvent.prompt(); installEvent = null; return; }
+    modal(`<div class="big">📲</div><h2>התקנה באייפון</h2>
+      <ol class="steps">
+        <li>פתחו את הדף ב־<b>Safari</b>.</li>
+        <li>הקישו על כפתור <b>השיתוף</b> (ריבוע עם חץ למעלה).</li>
+        <li>בחרו <b>"הוסף למסך הבית"</b>.</li>
+        <li>מעכשיו פותחים את המשחק מהאייקון במסך הבית.</li>
+      </ol>
+      <p><small>כדאי להתקין לפני שמתחילים לשחק: באייפון ההתקדמות של האפליקציה נשמרת בנפרד מזו של Safari.</small></p>
+      <div class="row"><button class="primary" data-act="close">הבנתי</button></div>`);
+  });
+
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+  // מבקשים מהדפדפן לא למחוק את ההתקדמות כשנגמר המקום
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+
   document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
   showHome();
+  if (!store.profile) askProfile();
 })();
