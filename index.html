@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#2b2340">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>תעלומה במשבצת</title>
+<style>
+  :root {
+    --ink: #2b2340;
+    --paper: #fdf3e6;
+    --card: #fffaf2;
+    --accent: #c0392b;
+    --ok: #2e8b57;
+    --muted: #7a6f86;
+    --wall: #2b2340;
+    --win: #7fc4f0;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: "Assistant", "Rubik", "Segoe UI", Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  .screen { display: none; min-height: 100%; }
+  .screen.active { display: block; }
+
+  /* ---------- מסך פתיחה ---------- */
+  #home {
+    background: radial-gradient(circle at 50% 0%, #4a3d6b, #2b2340 70%);
+    color: #fff;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  #home .logo { font-size: 72px; margin-top: 10px; }
+  #home h1 { font-size: 38px; margin: 6px 0 4px; letter-spacing: 1px; }
+  #home .tag { opacity: .85; font-size: 18px; margin-bottom: 30px; }
+  .diff-btn {
+    display: flex; align-items: center; justify-content: space-between;
+    width: min(360px, 100%); margin: 12px auto; padding: 16px 20px;
+    border: none; border-radius: 16px; font-size: 20px; font-weight: 700;
+    color: var(--ink); background: #fdf3e6; box-shadow: 0 4px 0 rgba(0,0,0,.3);
+  }
+  .diff-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.3); }
+  .diff-btn small { font-weight: 400; color: var(--muted); font-size: 14px; display: block; }
+  .diff-btn .badge { background: var(--ink); color: #fff; border-radius: 10px; padding: 4px 10px; font-size: 14px; }
+  .link-btn { background: none; border: 2px solid rgba(255,255,255,.5); color: #fff; padding: 10px 22px; border-radius: 30px; font-size: 16px; margin-top: 22px; }
+
+  /* ---------- מסך משחק ---------- */
+  #game { padding-bottom: 30px; }
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--ink); color: #fff; padding: 10px 14px; position: sticky; top: 0; z-index: 5;
+  }
+  .topbar button { background: none; border: none; color: #fff; font-size: 22px; padding: 4px 8px; }
+  .topbar .title { text-align: center; line-height: 1.15; }
+  .topbar .title b { font-size: 17px; }
+  .topbar .title div { font-size: 12px; opacity: .75; }
+  .intro { text-align: center; font-style: italic; color: var(--muted); margin: 10px 16px 6px; font-size: 15px; }
+
+  .board-wrap { display: flex; justify-content: center; padding: 8px 10px 4px; }
+  .board {
+    direction: ltr;
+    display: grid;
+    width: min(94vw, 460px);
+    aspect-ratio: 1;
+    border: 4px solid var(--wall);
+    border-radius: 4px;
+    background: var(--wall);
+    position: relative;
+    box-shadow: 0 6px 18px rgba(43,35,64,.25);
+  }
+  .cell {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    border-style: solid; border-color: rgba(43,35,64,.15);
+    border-width: 0.5px;
+    overflow: visible;
+    cursor: pointer;
+  }
+  .cell.wall-n { border-top: 2px solid var(--wall); }
+  .cell.wall-s { border-bottom: 2px solid var(--wall); }
+  .cell.wall-e { border-right: 2px solid var(--wall); }
+  .cell.wall-w { border-left: 2px solid var(--wall); }
+  .cell.dim::after { content: ""; position: absolute; inset: 0; background: rgba(43,35,64,.18); pointer-events: none; }
+  .cell.carpet { background-image: repeating-linear-gradient(45deg, rgba(150,60,60,.18) 0 6px, rgba(255,255,255,.25) 6px 12px) !important; }
+  .cell.carpet::before { content: ""; position: absolute; inset: 12%; border: 2px dashed rgba(140,50,50,.45); border-radius: 4px; pointer-events: none; }
+  .obj { font-size: calc(min(94vw, 460px) / var(--n) * 0.55); line-height: 1; pointer-events: none; transition: all .15s; }
+  .cell.has-token .obj { position: absolute; font-size: calc(min(94vw, 460px) / var(--n) * 0.28); top: 2px; left: 3px; opacity: .8; }
+  .table-obj {
+    width: 70%; height: 55%; background: linear-gradient(#8b5e3c, #6b4428); border-radius: 6px;
+    box-shadow: 0 3px 0 #4a2e1a; pointer-events: none;
+  }
+  .cell.has-token .table-obj { display: none; }
+  .bed-obj { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+  .win { position: absolute; background: var(--win); border: 1px solid #fff; pointer-events: none; z-index: 2; }
+  .win.n { top: -5px; left: 18%; right: 18%; height: 6px; }
+  .win.s { bottom: -5px; left: 18%; right: 18%; height: 6px; }
+  .win.w { left: -5px; top: 18%; bottom: 18%; width: 6px; }
+  .win.e { right: -5px; top: 18%; bottom: 18%; width: 6px; }
+  .room-label {
+    position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; background: rgba(255,255,255,.85); border: 1px solid var(--wall);
+    padding: 0 5px; border-radius: 8px; white-space: nowrap; pointer-events: none; z-index: 3; direction: rtl;
+  }
+  .token {
+    width: 78%; height: 78%; border-radius: 50%;
+    background: #fff; border: 3px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: calc(min(94vw, 460px) / var(--n) * 0.46);
+    position: relative; z-index: 4; animation: pop .18s ease-out;
+    box-shadow: 0 2px 4px rgba(0,0,0,.25);
+  }
+  .token.victim { border-color: var(--accent); background: #fde4e1; }
+  .token.victim::after { content: "✕"; position: absolute; color: var(--accent); font-size: 70%; font-weight: 900; opacity: .75; }
+  .token.conflict { border-color: #e74c3c; box-shadow: 0 0 0 3px #e74c3c88; }
+  .token.wrong { border-color: #e67e22; }
+  .token.locked { border-color: var(--ok); }
+  .xmark { position: absolute; color: #c0392b; font-weight: 900; font-size: calc(min(94vw, 460px) / var(--n) * 0.42); opacity: .65; pointer-events: none; z-index: 3; }
+  @keyframes pop { from { transform: scale(.4); } to { transform: scale(1); } }
+
+  .tools { display: flex; justify-content: center; gap: 8px; margin: 12px 8px 4px; flex-wrap: wrap; }
+  .tool {
+    border: 2px solid var(--ink); background: var(--card); color: var(--ink);
+    border-radius: 12px; padding: 8px 12px; font-size: 15px; font-weight: 700;
+  }
+  .tool.on { background: var(--ink); color: #fff; }
+  .hint-line { text-align: center; font-size: 14px; color: var(--muted); min-height: 20px; margin: 4px 12px; }
+
+  .suspects { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; padding: 8px 12px; max-width: 720px; margin: 0 auto; }
+  .suspect {
+    background: var(--card); border: 2px solid #e2d6c4; border-radius: 14px;
+    padding: 8px 10px; display: flex; gap: 8px; align-items: flex-start; text-align: right;
+    transition: transform .1s, border-color .1s; position: relative;
+  }
+  .suspect.sel { border-color: var(--ink); transform: scale(1.03); box-shadow: 0 4px 12px rgba(43,35,64,.25); }
+  .suspect.placed { opacity: .55; }
+  .suspect.placed::after { content: "✓"; position: absolute; top: 4px; left: 8px; color: var(--ok); font-weight: 900; }
+  .suspect .face {
+    flex: 0 0 auto; width: 46px; height: 46px; border-radius: 10px; background: #f3e3c8;
+    display: flex; align-items: center; justify-content: center; font-size: 30px; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  }
+  .suspect.is-victim { background: #fdeceb; border-color: #f2b8b2; }
+  .suspect.is-victim .face { filter: grayscale(.7); }
+  .suspect .nm { font-weight: 800; font-size: 16px; }
+  .suspect .cl { font-size: 13.5px; line-height: 1.35; }
+  .suspect .cl b { color: #8e2f22; }
+
+  .legend { max-width: 720px; margin: 14px auto 0; padding: 0 14px; font-size: 13px; color: var(--muted); }
+  .legend summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+  .legend ul { margin: 6px 0; padding-inline-start: 18px; }
+
+  /* ---------- חלונות קופצים ---------- */
+  .modal-bg { position: fixed; inset: 0; background: rgba(20,15,35,.6); display: none; align-items: center; justify-content: center; z-index: 20; padding: 16px; }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: var(--card); border-radius: 20px; padding: 22px 20px; max-width: 440px; width: 100%;
+    max-height: 90vh; overflow: auto; text-align: center; animation: pop .2s ease-out;
+  }
+  .modal h2 { margin: 4px 0 10px; }
+  .modal p { line-height: 1.5; }
+  .modal .big { font-size: 56px; }
+  .modal .row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+  .primary { background: var(--ink); color: #fff; border: none; border-radius: 12px; padding: 12px 22px; font-size: 17px; font-weight: 700; }
+  .secondary { background: none; color: var(--ink); border: 2px solid var(--ink); border-radius: 12px; padding: 10px 20px; font-size: 16px; font-weight: 700; }
+  .accuse-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; margin-top: 12px; }
+  .accuse-grid button { background: #fff; border: 2px solid #e2d6c4; border-radius: 14px; padding: 10px 4px; font-size: 15px; font-weight: 700; }
+  .accuse-grid button span { display: block; font-size: 34px; }
+  .accuse-grid button.nope { opacity: .35; text-decoration: line-through; }
+  .howto { text-align: right; font-size: 15px; }
+  .howto li { margin-bottom: 6px; }
+  .shake { animation: shake .35s; }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+</style>
+</head>
+<body>
+
+<section id="home" class="screen active">
+  <div class="logo">🕵️</div>
+  <h1>תעלומה במשבצת</h1>
+  <div class="tag">סודוקו פוגש תעלומת רצח</div>
+  <button class="diff-btn" data-diff="easy"><span>🔎 בלש מתחיל<small>לוח 4×4 · 3 חשודים</small></span><span class="badge" id="badge-easy"></span></button>
+  <button class="diff-btn" data-diff="medium"><span>🕵️ בלש ותיק<small>לוח 5×5 · 4 חשודים</small></span><span class="badge" id="badge-medium"></span></button>
+  <button class="diff-btn" data-diff="hard"><span>🎩 מפקח ראשי<small>לוח 6×6 · 5 חשודים</small></span><span class="badge" id="badge-hard"></span></button>
+  <button class="link-btn" id="howto-home">איך משחקים?</button>
+</section>
+
+<section id="game" class="screen">
+  <div class="topbar">
+    <button id="back" aria-label="חזרה">→</button>
+    <div class="title"><b id="case-title"></b><div id="case-sub"></div></div>
+    <button id="howto-game" aria-label="עזרה">?</button>
+  </div>
+  <div class="intro" id="intro"></div>
+  <div class="board-wrap"><div class="board" id="board"></div></div>
+  <div class="tools">
+    <button class="tool on" id="mode-place">👤 הצבה</button>
+    <button class="tool" id="mode-x">✕ סימון</button>
+    <button class="tool" id="undo">↶ בטל</button>
+    <button class="tool" id="hint">💡 רמז</button>
+    <button class="tool" id="reset">🗑️ נקה</button>
+  </div>
+  <div class="hint-line" id="status"></div>
+  <div class="suspects" id="suspects"></div>
+  <details class="legend">
+    <summary>📖 מילון הבלש</summary>
+    <ul>
+      <li><b>ליד</b> חפץ — במשבצת צמודה (למעלה, למטה, ימינה או שמאלה), באותו חדר.</li>
+      <li><b>בפינה</b> — משבצת שבה נפגשים שני קירות של החדר.</li>
+      <li><b>לא צמוד לקיר</b> — אף צד של המשבצת אינו קיר.</li>
+      <li><b>מול חלון</b> — משבצת שהחלון (הפס הכחול) נמצא על הדופן שלה.</li>
+      <li>אפשר לעמוד על <b>רצפה ריקה</b>, <b>כיסא</b> 🪑, <b>מיטה</b> 🛏️ או <b>שטיח</b>.</li>
+      <li><b>אי אפשר</b> לעמוד על שולחן, טלוויזיה 📺 או עציץ 🪴.</li>
+    </ul>
+  </details>
+</section>
+
+<div class="modal-bg" id="modal"><div class="modal" id="modal-body"></div></div>
+
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
