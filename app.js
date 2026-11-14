@@ -21,13 +21,68 @@
   /* ---------- skin packs sold in the coin shop ---------- */
   const PACKS = [
     { id: 'classic', name: 'Classic Detectives', price: 0, rarity: 'Basic', desc: 'The original cast.', emoji: null },
-    { id: 'pets', name: 'Pet Detectives', price: 150, rarity: 'Common', desc: 'Cats, dogs, foxes, owls and more. Paws off the evidence!', emoji: ['🐱', '🐶', '🦊', '🐰', '🐻', '🐼', '🦉', '🐸', '🐯', '🐨'] },
-    { id: 'gangsters', name: 'Noir Gangsters', price: 300, rarity: 'Rare', desc: 'Fedoras, trench coats and very dark sunglasses.', emoji: ['🕴️', '🤵', '🤵‍♀️', '🧔‍♂️', '👩‍🦰', '🧑‍💼', '👨‍💼', '👩‍💼'] },
-    { id: 'monsters', name: 'Monster Mash', price: 500, rarity: 'Rare', desc: 'Vampires, mummies, ghosts and one very polite werewolf.', emoji: ['🧛', '🧟', '👻', '🧙', '🧌', '🐺', '🎃', '💀', '🧞'] },
-    { id: 'royals', name: 'Royal Court', price: 800, rarity: 'Epic', desc: 'Crowns, jewels and ermine, in a shimmering gold frame.', emoji: ['🤴', '👸', '🫅', '👑', '🦄', '💎'] },
-    { id: 'space', name: 'Space Crew', price: 1200, rarity: 'Epic', desc: 'Astronauts and aliens, framed by the stars.', emoji: ['👩‍🚀', '🧑‍🚀', '👨‍🚀', '👽', '🤖', '👾', '🛸'] },
-    { id: 'neon', name: 'Neon Legends', price: 2000, rarity: 'Legendary', desc: 'Glowing neon characters in a pulsing frame. The finest skins in town.', emoji: ['🌟', '💫', '⚡', '🔮', '🌈', '🪩', '✨'] },
+    { id: 'pets', name: 'Pet Detectives', price: 300, rarity: 'Common', desc: 'Cats, dogs, foxes, owls and more. Paws off the evidence!', emoji: ['🐱', '🐶', '🦊', '🐰', '🐻', '🐼', '🦉', '🐸', '🐯', '🐨'] },
+    { id: 'gangsters', name: 'Noir Gangsters', price: 600, rarity: 'Rare', desc: 'Fedoras, trench coats and very dark sunglasses.', emoji: ['🕴️', '🤵', '🤵‍♀️', '🧔‍♂️', '👩‍🦰', '🧑‍💼', '👨‍💼', '👩‍💼'] },
+    { id: 'monsters', name: 'Monster Mash', price: 1000, rarity: 'Rare', desc: 'Vampires, mummies, ghosts and one very polite werewolf.', emoji: ['🧛', '🧟', '👻', '🧙', '🧌', '🐺', '🎃', '💀', '🧞'] },
+    { id: 'royals', name: 'Royal Court', price: 1600, rarity: 'Epic', desc: 'Crowns, jewels and ermine, in a shimmering gold frame.', emoji: ['🤴', '👸', '🫅', '👑', '🦄', '💎'] },
+    { id: 'space', name: 'Space Crew', price: 2500, rarity: 'Epic', desc: 'Astronauts and aliens, framed by the stars.', emoji: ['👩‍🚀', '🧑‍🚀', '👨‍🚀', '👽', '🤖', '👾', '🛸'] },
+    { id: 'neon', name: 'Neon Legends', price: 4000, rarity: 'Legendary', desc: 'Glowing neon characters in a pulsing frame.', emoji: ['🌟', '💫', '⚡', '🔮', '🌈', '🪩', '✨'] },
+    { id: 'masquerade', name: 'Masquerade Ball', iap: 'skin_masquerade', usd: '$1.99', rarity: 'Premium', desc: 'Venetian masks, feathers and velvet. Comes with a gilded frame.', emoji: ['🎭', '🦚', '🪶', '💃', '🕺', '🎩'] },
+    { id: 'cyber', name: 'Cyber Agents', iap: 'skin_cyber', usd: '$2.99', rarity: 'Premium', desc: 'Glowing visors and live scan lines. The flashiest look in the game.', emoji: ['🦾', '🤖', '🕶️', '👾', '💿', '🛰️'] },
   ];
+  /* ---------- real-money products, sold through Google Play Billing ---------- */
+  const COIN_PACKS = [
+    { iap: 'coins_500', coins: 500, usd: '$0.99' },
+    { iap: 'coins_1200', coins: 1200, usd: '$1.99', tag: 'Popular' },
+    { iap: 'coins_3000', coins: 3000, usd: '$3.99', tag: 'Best value' },
+    { iap: 'coins_7500', coins: 7500, usd: '$7.99' },
+  ];
+  const IAP = {
+    service: null, prices: {},
+    ids: () => [...COIN_PACKS.map((c) => c.iap), ...PACKS.filter((x) => x.iap).map((x) => x.iap)],
+    price(id, fallback) { return this.prices[id] || fallback; },
+    async init() {
+      // only exists when the game runs as the Google Play app (Trusted Web Activity with Play Billing on)
+      if (!('getDigitalGoodsService' in window)) return;
+      try {
+        this.service = await window.getDigitalGoodsService('https://play.google.com/billing');
+        const details = await this.service.getDetails(this.ids());
+        for (const d of details) this.prices[d.itemId] = new Intl.NumberFormat(undefined, { style: 'currency', currency: d.price.currency }).format(d.price.value);
+        // give back anything bought before (new phone, reinstall) or not finished last time
+        for (const pur of await this.service.listPurchases()) await this.grant(pur.itemId, pur.purchaseToken, true);
+      } catch (e) { this.service = null; }
+    },
+    async grant(id, token, restoring) {
+      const coinPack = COIN_PACKS.find((c) => c.iap === id), skin = PACKS.find((x) => x.iap === id);
+      store.owned = store.owned || ['classic'];
+      if (coinPack) {
+        store.coins = coins() + coinPack.coins;
+        try { await this.service.consume(token); } catch (e) { /* will be retried by listPurchases next launch */ }
+      }
+      if (skin && !store.owned.includes(skin.id)) { store.owned.push(skin.id); if (!restoring) store.skin = skin.id; }
+      store.paid = true;
+      save(); renderCoins(); applySkin();
+      return coinPack ? `+${coinPack.coins} coins` : skin ? `${skin.name} unlocked` : '';
+    },
+    async buy(id) {
+      if (!this.service) {
+        modal(`<div class="big">${ic('phone', '📲')}</div><h2>Available in the app</h2>
+          <p>Purchases with real money work in the Google Play version of Mystery Grid.</p>
+          <div class="row"><button class="primary" data-act="close">OK</button></div>`);
+        return;
+      }
+      try {
+        const req = new PaymentRequest([{ supportedMethods: 'https://play.google.com/billing', data: { sku: id } }],
+          { total: { label: 'Total', amount: { currency: 'USD', value: '0' } } });
+        const res = await req.show();
+        const msg = await this.grant(id, res.details.purchaseToken, false);
+        await res.complete('success');
+        sfx('unlock'); confetti();
+        toast(`<span class="ti">${ic('gift', '🎁')}</span><span><b>Thank you!</b><small>${msg}</small></span>`);
+        showShop();
+      } catch (e) { /* cancelled or failed: nothing was charged */ }
+    },
+  };
   const PACK = Object.fromEntries(PACKS.map((x) => [x.id, x]));
   const skinId = () => (store && PACK[store.skin] ? store.skin : 'classic');
   const nameHash = (s) => { let h = 7; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
@@ -389,10 +444,11 @@
       el.id = 'shop-card';
       $('daily').insertAdjacentElement('afterend', el);
     }
-    const owned = (store.owned || ['classic']).length, next = PACKS.find((x) => !(store.owned || ['classic']).includes(x.id));
+    const have = store.owned || ['classic'], owned = have.length;
+    const next = PACKS.find((x) => !x.iap && !have.includes(x.id)) || PACKS.find((x) => !have.includes(x.id));
     el.innerHTML = `<button class="shop-card" id="shop-card-btn">
         <span class="sc-faces">${SHOP_PEOPLE.slice(0, 3).map((p) => `<span class="pf skin-${next ? next.id : skinId()}">${face(p, next ? next.id : skinId())}</span>`).join('')}</span>
-        <span class="sc-tx"><b>Detective Shop</b><small>${next ? `New look: ${next.name} · ${next.price} coins` : 'You own every pack!'} · ${owned}/${PACKS.length} owned</small></span>
+        <span class="sc-tx"><b>Detective Shop</b><small>${next ? `New look: ${next.name} · ${next.iap ? IAP.price(next.iap, next.usd) : next.price.toLocaleString('en') + ' coins'}` : 'You own every pack!'} · ${owned}/${PACKS.length} owned</small></span>
         <span class="badge">Open</span>
       </button>`;
     $('shop-card-btn').addEventListener('click', showShop);
@@ -441,19 +497,22 @@
   ];
   function showShop() {
     store.owned = store.owned || ['classic'];
+    const coinCards = COIN_PACKS.map((c) => `<button class="coin-pack" data-act="iap" data-id="${c.iap}">
+        ${c.tag ? `<span class="cp-tag">${c.tag}</span>` : ''}<span class="cp-ic">${coinIc()}</span><b>${c.coins.toLocaleString('en')}</b><span class="cp-price">${IAP.price(c.iap, c.usd)}</span></button>`).join('');
     const cards = PACKS.map((x) => {
-      const owned = store.owned.includes(x.id), on = skinId() === x.id, short = x.price - coins();
+      const owned = store.owned.includes(x.id), on = skinId() === x.id, short = (x.price || 0) - coins();
       const btn = on ? '<button class="secondary" disabled>Equipped ✓</button>'
         : owned ? `<button class="primary" data-act="equip" data-id="${x.id}">Equip</button>`
-        : short > 0 ? `<button class="secondary" disabled>${coinIc()} ${x.price} · need ${short} more</button>`
-        : `<button class="primary" data-act="buy" data-id="${x.id}">Buy for ${coinIc()} ${x.price}</button>`;
+        : x.iap ? `<button class="primary premium-btn" data-act="iap" data-id="${x.iap}">Buy for ${IAP.price(x.iap, x.usd)}</button>`
+        : short > 0 ? `<button class="secondary" disabled>${coinIc()} ${x.price.toLocaleString('en')} · need ${short.toLocaleString('en')} more</button>`
+        : `<button class="primary" data-act="buy" data-id="${x.id}">Buy for ${coinIc()} ${x.price.toLocaleString('en')}</button>`;
       return `<div class="pack rar-${x.rarity.toLowerCase()}${on ? ' on' : ''}">
         <div class="pk-top"><b>${x.name}</b><span class="rar">${x.rarity}</span></div>
         <div class="pk-faces">${SHOP_PEOPLE.map((p) => `<span class="pf skin-${x.id}">${face(p, x.id)}</span>`).join('')}</div>
         <small>${x.desc}</small>${btn}</div>`;
     }).join('');
     modal(`<h2>${ic('coin', '🪙')} Detective Shop</h2><p>You have ${coinIc()} <b>${coins()}</b> coins. New looks for every suspect and victim.</p>
-      <div class="shop-list">${cards}</div>
+      <div class="shop-list"><div class="shop-h">Get coins</div><div class="coin-packs">${coinCards}</div><div class="shop-h">Skin packs</div>${cards}</div>
       <div class="row"><button class="secondary" data-act="close">Close</button></div>`, {
       buy: (b) => {
         const x = PACK[b.dataset.id];
@@ -464,6 +523,7 @@
         toast(`<span class="ti">${ic('gift', '🎁')}</span><span><b>${x.name} unlocked!</b><small>Equipped on every suspect.</small></span>`);
       },
       equip: (b) => { store.skin = b.dataset.id; save(); applySkin(); sfx('coin'); showShop(); },
+      iap: (b) => IAP.buy(b.dataset.id),
     });
   }
 
@@ -1159,6 +1219,7 @@
   document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
   window.addEventListener('resize', () => { if (S) $('play-area').style.top = $('topbar').offsetHeight + 'px'; });
   applySkin();
+  IAP.init().then(() => { if ($('home').classList.contains('active')) renderShopCard(); });
   showHome();
   if (!store.profile) askProfile();
   else if (location.hash === '#daily') startDaily();

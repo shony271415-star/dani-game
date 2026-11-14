@@ -77,3 +77,28 @@ Tips:
 2. Choose **Package for stores → Android → Generate**. Keep the suggested package ID or set one like `io.github.shony271415.mysterygrid`.
 3. Download the zip. It contains the `.aab` file (upload this to Google Play), a **signing key** (keep it safe: you need it for every update) and an `assetlinks.json` file.
 4. **Remove the browser bar (optional, recommended):** Android only trusts the app fully when `assetlinks.json` is published at `https://shony271415-star.github.io/.well-known/assetlinks.json`. That address belongs to a repository named exactly `shony271415-star.github.io`. Create it on GitHub, then the file can be added there. Without it the game still works, but it shows a small address bar at the top.
+
+---
+
+## In-app purchases (real money)
+The game already contains the purchase code (Google Play Billing through the Digital Goods API). It switches on by itself when the game runs as the Google Play app, and shows prices in the player's local currency. To make it live:
+
+1. **Payments profile:** Play Console → Settings → Payments profile (a merchant account, 18+; Google pays out monthly).
+2. **Create the products:** Play Console → your app → Monetize → Products → **In-app products** → Create. Use exactly these IDs:
+
+| Product ID | What the player gets | Suggested price |
+|---|---|---|
+| `coins_500` | 500 coins | $0.99 |
+| `coins_1200` | 1,200 coins | $1.99 |
+| `coins_3000` | 3,000 coins | $3.99 |
+| `coins_7500` | 7,500 coins | $7.99 |
+| `skin_masquerade` | Masquerade Ball skin pack | $1.99 |
+| `skin_cyber` | Cyber Agents skin pack | $2.99 |
+
+3. **Package with billing on:** when packaging on PWABuilder, turn on the Google Play Billing option in the Android settings, so the app can talk to Play Billing.
+4. **Test before going live:** Play Console → Settings → License testing: add your Gmail. Purchases made with that account in the testing track are free test purchases.
+
+Notes:
+- Coins are consumable (they can be bought again). Skin packs are bought once and come back automatically on a new phone.
+- Purchases are checked on the device only. For a small game this is normal; a server check can be added later if cheating ever matters.
+- Purchases on iPhone need a native build with Apple's in-app purchase system, which is a separate project.

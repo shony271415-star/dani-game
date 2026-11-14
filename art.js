@@ -334,6 +334,48 @@
     return SVG64(`<circle cx="32" cy="32" r="32" fill="#0b0a18"/><g filter="url(#${id})"><path d="M10 64c0-11 9-17 22-17s22 6 22 17" ${s}/><path d="M32 47v8" ${s}/><ellipse cx="32" cy="32" rx="12.5" ry="13.5" ${s}/>${hair}${eyes}${d ? `<path d="M28 39.5c2-1.2 6-1.2 8 0" ${s}/>` : `<path d="M28 38c2 2.4 6 2.4 8 0" ${s}/>`}</g>`, glow);
   }
 
+  // Masquerade Ball (premium): venetian masks with feathers, on velvet
+  function masqueradeAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter), f = p.g === 'f';
+    const skin = SKIN[h % SKIN.length], hair = ['#2b1a24', '#6b3a2a', '#e3b65c', '#1c1822', '#8a4f7d'][(h >>> 4) % 5];
+    const mask = ['#f0c35f', '#1c1822', '#f5f0ea', '#b5243a'][(h >>> 6) % 4], trim = mask === '#f0c35f' ? '#b9862c' : '#f0c35f';
+    const feather = p.color;
+    const bg = `<defs><radialGradient id="mq${h}" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#6a1f45"/><stop offset="1" stop-color="#22071a"/></radialGradient></defs><circle cx="32" cy="32" r="32" fill="url(#mq${h})"/>
+      <circle cx="9" cy="14" r="1.2" fill="#f0c35f"/><circle cx="55" cy="11" r="1" fill="#f0c35f"/><circle cx="52" cy="40" r=".9" fill="#f0c35f"/><circle cx="11" cy="44" r="1" fill="#f0c35f"/>`;
+    const back = f ? `<path d="M17 32c-2-12 5-19 15-19s17 7 15 19c0 7-2 11-5 14H22c-3-3-5-7-5-14Z" fill="${hair}" ${st(1.3)}/>` : '';
+    const body = `<path d="M10 64c0-11 9-17 22-17s22 6 22 17Z" fill="#1c1822" ${st(1.6)}/><path d="M26 47l6 8 6-8" fill="#f5f0ea" ${st(1.2)}/><path d="M29 50l3 4 3-4" fill="${feather}"/>`;
+    const face = `<ellipse cx="32" cy="32" rx="12.5" ry="13.5" fill="${skin}" ${st(1.6)}/>`;
+    const fringe = f ? `<path d="M19.5 28c1-8 6-12 12.5-12s11.5 4 12.5 12c-5-4-9-6-14-5-3 1-6 3-11 5Z" fill="${hair}" ${st(1.2)}/>` : `<path d="M19 27c0-8 6-12 13-12s13 4 13 12c-3-3-7-5-13-5s-10 2-13 5Z" fill="${hair}" ${st(1.3)}/>`;
+    const maskSvg = `<path d="M16 29c4-4 10-4 16-1 6-3 12-3 16 1-1 5-5 8-9 8-3 0-5-2-7-4-2 2-4 4-7 4-4 0-8-3-9-8Z" fill="${mask}" ${st(1.4)}/>
+      <path d="M17 29.5c4-3 9-3 14-.6M33 28.9c5-2.4 10-2.4 14 .6" fill="none" stroke="${trim}" stroke-width="1.2"/>
+      ${d ? `<path d="M22.5 29.5l4 4M26.5 29.5l-4 4M37.5 29.5l4 4M41.5 29.5l-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>`
+        : `<ellipse cx="24.5" cy="31.5" rx="3.6" ry="2.2" fill="#1c1822"/><ellipse cx="39.5" cy="31.5" rx="3.6" ry="2.2" fill="#1c1822"/><circle cx="25.3" cy="31" r="1" fill="#fff"/><circle cx="40.3" cy="31" r="1" fill="#fff"/>`}
+      <path d="M44 27c3-6 7-9 12-10-2 4-5 7-9 9 3-1 6-1 9 0-3 2-7 3-11 2" fill="${feather}" ${st(1.1)}/><path d="M45 26.5c3-4 6-6 9-7" fill="none" stroke="#fff" stroke-width=".8" opacity=".7"/>
+      <circle cx="44" cy="28" r="1.8" fill="#f0c35f" ${st(.8)}/>`;
+    const mouth = d ? `<path d="M28.5 40c2-1 5-1 7 0" fill="none" ${st(1.5)}/>` : f ? `<path d="M29 39c2 1.6 4 1.6 6 0-1 2.2-5 2.2-6 0Z" fill="#b5243a" ${st(1)}/>` : `<path d="M28.5 39c2 2 5 2 7 0" fill="none" ${st(1.5)}/>`;
+    return SVG64(`${bg}${back}${body}${face}${fringe}${maskSvg}${mouth}`);
+  }
+
+  // Cyber Agents (premium): glowing visors, circuits and a moving scan line
+  function cyberAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter), f = p.g === 'f';
+    const c = d ? '#ff3b5c' : ['#3bf0ff', '#ff4fd8', '#9dff4a', '#ffb300'][h % 4];
+    const skin = ['#d9c4b8', '#b89a8a', '#8e6f60', '#c8b0d8'][(h >>> 3) % 4], hair = ['#1c1822', '#f0f0f0', c][(h >>> 5) % 3];
+    let grid = '';
+    for (let i = 8; i < 64; i += 8) grid += `<path d="M${i} 0V64M0 ${i}H64" stroke="${c}" stroke-opacity=".12" stroke-width=".6"/>`;
+    const bg = `<circle cx="32" cy="32" r="32" fill="#070912"/>${grid}`;
+    const body = `<path d="M10 64c0-11 9-17 22-17s22 6 22 17Z" fill="#1d2233" ${st(1.4)}/><path d="M16 56l8-4h16l8 4M32 47v17" fill="none" stroke="${c}" stroke-width="1.4" opacity=".9"/><circle cx="32" cy="57" r="2" fill="${c}"/>`;
+    const hairSvg = f ? `<path d="M19 30c-1-10 5-16 13-16s14 5 14 13c-6-2-12-6-15-9-2 5-7 9-12 12Z" fill="${hair}" ${st(1.3)}/><path d="M44 26c3 5 3 12 1 18" fill="none" stroke="${hair}" stroke-width="4" stroke-linecap="round"/>`
+      : `<path d="M20 26c0-8 5-12 12-12 8 0 12 4 13 10-7-3-15-3-25 2Z" fill="${hair}" ${st(1.3)}/><path d="M20 26v-4" stroke="${INK}"/>`;
+    const face = `<ellipse cx="32" cy="32" rx="12.5" ry="13.5" fill="${skin}" ${st(1.6)}/><path d="M21 38l3-2h3M43 38l-3-2h-3" fill="none" stroke="${c}" stroke-width=".9" opacity=".8"/>`;
+    const visor = `<path d="M18 27h28c1 0 1 1 1 2v3c0 2-1 3-3 3H20c-2 0-3-1-3-3v-3c0-1 0-2 1-2Z" fill="#0b0f1e" stroke="${c}" stroke-width="1.6"/>
+      <path d="M20 31h24" stroke="${c}" stroke-width="2.4" stroke-linecap="round" opacity=".9"><animate attributeName="opacity" values=".35;1;.35" dur="1.6s" repeatCount="indefinite"/></path>
+      ${d ? `<path d="M24 28.5l3 4M27 28.5l-3 4M37 28.5l3 4M40 28.5l-3 4" stroke="${c}" stroke-width="1.6" stroke-linecap="round"/>` : ''}`;
+    const mouth = d ? `<path d="M28.5 40.5c2-1 5-1 7 0" fill="none" ${st(1.5)}/>` : `<path d="M28.5 39.5h7" ${st(1.5)}/>`;
+    const scan = `<rect x="0" y="0" width="64" height="3" fill="${c}" opacity=".18"><animate attributeName="y" values="-4;64" dur="2.4s" repeatCount="indefinite"/></rect>`;
+    return SVG64(`${bg}${body}${face}${hairSvg}${visor}${mouth}${scan}`);
+  }
+
   const SKINS = {
     classic: { name: 'Classic Detectives', price: 0, rarity: 'Basic', desc: 'The original cast.', draw: (p) => avatar(p), emoji: null },
     pets: { name: 'Pet Detectives', price: 150, rarity: 'Common', desc: 'Cats, dogs, foxes, owls and more. Paws off the evidence!', draw: petAvatar, emoji: ['🐱', '🐶', '🦊', '🐰', '🐻', '🐼', '🦉', '🐸', '🐯', '🐨'] },
@@ -342,6 +384,8 @@
     royals: { name: 'Royal Court', price: 800, rarity: 'Epic', desc: 'Crowns, jewels and ermine. Comes with a golden frame.', draw: royalAvatar, emoji: ['🤴', '👸', '🫅', '👑', '🦄', '💎'] },
     space: { name: 'Space Crew', price: 1200, rarity: 'Epic', desc: 'Astronauts and aliens, framed by the stars.', draw: spaceAvatar, emoji: ['👩‍🚀', '🧑‍🚀', '👨‍🚀', '👽', '🤖', '👾', '🛸'] },
     neon: { name: 'Neon Legends', price: 2000, rarity: 'Legendary', desc: 'Glowing neon characters with a pulsing frame. The finest skins in town.', draw: neonAvatar, emoji: ['🌟', '💫', '⚡', '🔮', '🌈', '🪩', '✨'] },
+    masquerade: { name: 'Masquerade Ball', price: 0, rarity: 'Premium', desc: 'Venetian masks and feathers.', draw: masqueradeAvatar },
+    cyber: { name: 'Cyber Agents', price: 0, rarity: 'Premium', desc: 'Glowing visors and scan lines.', draw: cyberAvatar },
   };
 
   /* floor finish for each area: wood, tiles, grass, metal, deck... */

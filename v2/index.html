@@ -233,6 +233,23 @@
   .skin-space .face, .skin-neon .face { background: #0b0a18 !important; }
   .skin-neon .token.art, .skin-space .token.art { background: #0b0a18; }
 
+
+  .shop-h { font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; opacity: .65; margin: 4px 2px 0; }
+  .coin-packs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .coin-pack { position: relative; border: 2px solid #f0c35f; background: #fff8e1; border-radius: 12px; padding: 14px 2px 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--ink); }
+  .coin-pack .cp-ic { font-size: 22px; } .coin-pack .cp-ic svg { width: 26px; height: 26px; }
+  .coin-pack b { font-size: 15px; } .coin-pack .cp-price { font-size: 12px; font-weight: 800; background: #3f9d6a; color: #fff; border-radius: 8px; padding: 1px 6px; }
+  .cp-tag { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: #e8615a; color: #fff; font-size: 9px; font-weight: 800; border-radius: 6px; padding: 1px 5px; white-space: nowrap; }
+  .rar-premium .rar { background: linear-gradient(90deg, #b9862c, #f0c35f, #b9862c); color: #2b1a0a; }
+  .rar-premium { border-color: transparent; background: linear-gradient(#fffaf0, #fffaf0) padding-box, conic-gradient(from 0deg, #f0c35f, #ff4fd8, #3bf0ff, #f0c35f) border-box; }
+  .premium-btn { background: linear-gradient(135deg, #f0c35f, #d9922b) !important; color: #2b1a0a !important; }
+  .skin-masquerade .face, .skin-masquerade .token, .pf.skin-masquerade, .skin-masquerade .af { animation: masq 3s ease-in-out infinite; }
+  @keyframes masq { 0%, 100% { box-shadow: 0 0 0 2px #f0c35f, 0 0 12px #c2367a; } 50% { box-shadow: 0 0 0 2px #ffd98a, 0 0 20px #f0c35f; } }
+  .skin-cyber .face, .skin-cyber .token, .pf.skin-cyber, .skin-cyber .af { animation: glitch 2.2s steps(1) infinite; }
+  @keyframes glitch { 0%, 100% { box-shadow: 0 0 0 2px #3bf0ff, 0 0 14px #3bf0ff; } 33% { box-shadow: -2px 0 0 2px #ff4fd8, 2px 0 12px #3bf0ff; } 66% { box-shadow: 2px 0 0 2px #9dff4a, -2px 0 14px #ff4fd8; } }
+  .skin-masquerade .face, .skin-cyber .face { background: #120814 !important; }
+  .skin-cyber .token.art, .skin-masquerade .token.art { background: #070912; }
+
   /* ---------- accusation panel under the board ---------- */
   .accuse { margin: 6px 8px 0; padding: 8px 10px 10px; border-radius: 14px; background: var(--card); color: var(--ink); text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,.18); font-size: 14px; line-height: 1.35; }
   .accuse[hidden] { display: none; }
@@ -519,6 +536,9 @@
   body.noir .shop-card .badge { background: var(--gold); color: var(--ink); border-radius: 4px; font-family: "Oswald", sans-serif; letter-spacing: 1px; text-transform: uppercase; }
   body.noir .shop-card .pf { border-color: var(--manila); border-radius: 3px; }
   body.noir .cp-shop { background: var(--gold); color: var(--ink); border-radius: 3px; font-family: "Oswald", sans-serif; }
+  body.noir .coin-pack { background: #fff4d6; border-color: var(--gold); border-radius: 6px; font-family: "Oswald", sans-serif; }
+  body.noir .shop-h { font-family: "Oswald", sans-serif; color: var(--ink); }
+  body.noir .rar-premium { background: linear-gradient(#fff8ea, #fff8ea) padding-box, conic-gradient(from 0deg, #f0c35f, #ff4fd8, #3bf0ff, #f0c35f) border-box; }
 </style>
 </head>
 <body class="art noir">
