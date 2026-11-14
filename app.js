@@ -318,9 +318,31 @@
     }
     return s;
   }
+  let storageOk = true;
   function save() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (e) { /* storage full or private mode */ }
+    store.rev = Date.now();
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); storageOk = true; } catch (e) { storageOk = false; }
   }
+  // Another window (or the installed app) may have saved newer progress: adopt it before the player does anything,
+  // so an old window left open in the background can never overwrite it.
+  function refreshFromDisk() {
+    let disk = null;
+    try { disk = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { return false; }
+    if (!disk || !(disk.rev > (store.rev || 0))) return false;
+    Object.keys(store).forEach((k) => delete store[k]);
+    Object.assign(store, disk);
+    return true;
+  }
+  function onStoreChanged() {
+    if (!refreshFromDisk()) return;
+    applySkin(); renderCoins();
+    if ($('home').classList.contains('active')) showHome();
+    else if ($('map').classList.contains('active')) showMap();
+  }
+  window.addEventListener('storage', (e) => { if (e.key === STORE_KEY) onStoreChanged(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) onStoreChanged(); });
+  window.addEventListener('focus', onStoreChanged);
+  window.addEventListener('pageshow', onStoreChanged);
   function prog(slot) {
     const diff = slot;
     if (!store[diff]) store[diff] = { caseNum: 1, solved: 0, best: null, cur: null, next: null };
@@ -434,6 +456,8 @@
     const got = Object.keys(store.ach || {}).length;
     $('ach-btn').innerHTML = `${ic('trophy', '🏆')} Trophies ${got}/${ACH.length}`;
     $('shop-btn').innerHTML = `${ic('coin', '🛍️')} Shop`;
+    $('backup-btn').innerHTML = `${ic('lock', '💾')} Save progress`;
+    renderStorageNote();
     setTimeout(maybeDailyBonus, 350);
     $('diffs').innerHTML = DIFFS.map((d) => {
       const p = prog(d.key);
@@ -461,6 +485,21 @@
     $('map-btn').addEventListener('click', showMap);
   }
 
+  function renderStorageNote() {
+    let el = $('storage-note');
+    if (!el) { el = document.createElement('div'); el.id = 'storage-note'; $('greet').insertAdjacentElement('afterend', el); }
+    const installed = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    let msg = '';
+    if (!storageOk) msg = `<b>This browser is not saving your progress</b> (private mode or storage blocked). Open the game in your normal browser, or use <button class="mini-link" data-note="backup">Save progress</button>.`;
+    else if (!installed && totalSolved() >= 2) msg = ios
+      ? `Playing in Safari? iPhone can erase a website's saved progress after a week away. <button class="mini-link" data-note="install">Add to Home Screen</button> to keep it safe, or <button class="mini-link" data-note="backup">save a backup code</button>.`
+      : `Your progress is saved in this browser only. <button class="mini-link" data-note="backup">Save a backup code</button> to keep it safe.`;
+    el.className = msg ? 'storage-note' : '';
+    el.innerHTML = msg;
+    el.querySelectorAll('[data-note]').forEach((b) => b.addEventListener('click', () => (b.dataset.note === 'backup' ? showBackup() : $('install-btn').click())));
+  }
+
   function renderShopCard() {
     let el = $('shop-card');
     if (!el) {
@@ -476,6 +515,47 @@
         <span class="badge">Open</span>
       </button>`;
     $('shop-card-btn').addEventListener('click', showShop);
+  }
+
+  /* ---------- backup code: move progress to another phone or browser ---------- */
+  const BACKUP_KEYS = ['profile', 'coins', 'owned', 'skin', 'journey', 'jStars', 'easy', 'medium', 'hard', 'expert', 'extreme', 'daily', 'dailyLog', 'ach', 'trophies',
+    'themesSolved', 'friends', 'bonusDay', 'bonusStreak', 'pid', 'sound', 'seenHowto', 'tutorialDone', 'paid', 'engine'];
+  function backupCode() {
+    const o = {};
+    BACKUP_KEYS.forEach((k) => { if (store[k] !== undefined) o[k] = store[k]; });
+    // in-progress boards are not worth carrying over
+    ['journey', 'easy', 'medium', 'hard', 'expert', 'extreme', 'daily'].forEach((k) => { if (o[k]) o[k] = { ...o[k], cur: null, next: null }; });
+    return 'MG1.' + b64e(o);
+  }
+  function restoreCode(code) {
+    const m = String(code).trim().match(/MG1\.([A-Za-z0-9_-]+)/), o = m && b64d(m[1]);
+    if (!o || typeof o !== 'object' || !o.profile) return false;
+    // never lose progress: keep whichever side is further along
+    const mine = prog('journey').caseNum, theirs = (o.journey && o.journey.caseNum) || 1;
+    if (theirs < mine && !confirm(`This backup is on level ${theirs}, but you are on level ${mine}. Replace your progress anyway?`)) return null;
+    Object.keys(store).forEach((k) => delete store[k]);
+    Object.assign(store, o, { engine: E.VERSION });
+    save(); applySkin();
+    return true;
+  }
+  function showBackup() {
+    const code = backupCode();
+    modal(`<div class="big">${ic('lock', '💾')}</div><h2>Save your progress</h2>
+      <p><small>Your progress lives on this phone. If you switch phones, reinstall, or open the game in a different browser, use this code to bring it back.</small></p>
+      <textarea class="name-in share-box" id="backup-box" readonly>${code}</textarea>
+      <div class="row"><button class="primary" data-act="copy">Copy code</button><button class="secondary" data-act="send">Send to myself</button></div>
+      <p class="restore-h"><b>Restore from a code</b></p>
+      <textarea class="name-in share-box" id="restore-box" placeholder="Paste a code that starts with MG1."></textarea>
+      <div class="row"><button class="secondary" data-act="restore">Restore</button><button class="secondary" data-act="close">Close</button></div>
+      <p id="bk-msg" class="acc-msg"></p>`, {
+      copy: async (b) => { try { await navigator.clipboard.writeText(code); b.textContent = 'Copied ✓'; } catch (e) { $('backup-box').select(); b.textContent = 'Select & copy ↑'; } },
+      send: () => share('My Mystery Grid progress backup (paste it in Settings → Save progress → Restore):', code),
+      restore: () => {
+        const r = restoreCode($('restore-box').value);
+        if (r === true) { closeModal(); showHome(); toast(`<span class="ti">${ic('check', '✓')}</span><span><b>Progress restored!</b><small>Level ${prog('journey').caseNum}, ${coins()} coins.</small></span>`); }
+        else if (r === false) { $('bk-msg').textContent = 'That code does not look right. Copy the whole thing, starting with MG1.'; shake($('modal-body')); }
+      },
+    });
   }
 
   /* ---------- the journey map ---------- */
@@ -1192,6 +1272,7 @@
   $('tut-btn').addEventListener('click', startTutorial);
   $('ach-btn').addEventListener('click', showTrophies);
   $('shop-btn').addEventListener('click', showShop);
+  $('backup-btn').addEventListener('click', showBackup);
   $('map-back').addEventListener('click', () => { $('map').classList.remove('active'); showHome(); });
   $('map-friends').addEventListener('click', showFriends);
   window.addEventListener('hashchange', handleLink);
