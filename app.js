@@ -69,6 +69,104 @@
     { text: 'Everyone is in place! Victor was found in the <b>Bedroom</b>. Who else was in the Bedroom? That person is the murderer!' },
   ];
 
+  /* ---------- journey: one endless path of levels that slowly gets harder ---------- */
+  const JOURNEY_SEED = 2000000;
+  function journeyDiff(n) {
+    if (n <= 3) return 'easy';
+    if (n <= 10) return 'medium';
+    if (n <= 25) return n % 5 === 0 ? 'expert' : 'hard';
+    if (n > 50 && n % 5 === 0) return 'extreme';
+    return n % 4 === 0 ? 'hard' : 'expert';
+  }
+  const isBoss = (n) => n > 10 && n % 5 === 0;
+  const TIERS = [[4, 'Detective'], [11, 'Inspector'], [26, 'Expert'], [51, 'Extreme bosses']];
+
+  /* ---------- coins ---------- */
+  const COIN_BASE = { easy: 10, medium: 15, hard: 20, expert: 30, extreme: 50 };
+  const COST = { clue: 20, check: 10, reveal: 50 };
+  const BONUS = [10, 15, 20, 25, 30, 40, 60];
+  const coinIc = () => ic('coin', '🪙');
+
+  /* ---------- achievements ---------- */
+  const ACH = [
+    { id: 'first', name: 'First Case', desc: 'Solve your first case', test: () => totalSolved() >= 1 },
+    { id: 'ten', name: 'Seasoned Sleuth', desc: 'Solve 10 cases', test: () => totalSolved() >= 10 },
+    { id: 'fifty', name: 'Case Cracker', desc: 'Solve 50 cases', test: () => totalSolved() >= 50 },
+    { id: 'week', name: 'Week of Crime', desc: 'Keep a 7-day daily streak', test: () => dailyStreak() >= 7 },
+    { id: 'month', name: 'Monthly Mastermind', desc: 'Keep a 30-day daily streak', test: () => dailyStreak() >= 30 },
+    { id: 'clean', name: 'No Peeking', desc: 'Solve an Inspector case or harder without any help', test: (c) => c && c.clean && ['hard', 'expert', 'extreme'].includes(c.diff) },
+    { id: 'expert', name: 'Expert Witness', desc: 'Solve an Expert case', test: (c) => c && c.diff === 'expert' },
+    { id: 'extreme', name: 'Extreme Measures', desc: 'Solve an Extreme case', test: (c) => c && c.diff === 'extreme' },
+    { id: 'speedy', name: 'Speed Sleuth', desc: 'Solve a Rookie case in under a minute', test: (c) => c && c.diff === 'easy' && c.time < 60 },
+    { id: 'globe', name: 'Globetrotter', desc: 'Solve a case in all 9 scenes', test: () => (store.themesSolved || []).length >= 9 },
+    { id: 'level25', name: 'Halfway Hero', desc: 'Reach level 25 on the journey', test: () => prog('journey').caseNum > 25 },
+    { id: 'rich', name: 'Treasure Hunter', desc: 'Hold 500 coins at once', test: () => (store.coins || 0) >= 500 },
+  ];
+
+  /* ---------- sound, vibration, confetti ---------- */
+  let audio = null;
+  function sfx(kind) {
+    if (store.sound === false) return;
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const notes = {
+        place: [[660, 0, 0.07], [990, 0.05, 0.08]], tick: [[1400, 0, 0.03]], wrong: [[190, 0, 0.16]],
+        coin: [[1320, 0, 0.07], [1760, 0.07, 0.12]], win: [[523, 0, 0.12], [659, 0.1, 0.12], [784, 0.2, 0.12], [1047, 0.3, 0.3]],
+        unlock: [[784, 0, 0.1], [1047, 0.1, 0.1], [1319, 0.2, 0.22]],
+      }[kind] || [];
+      const t0 = audio.currentTime;
+      for (const [f, at, dur] of notes) {
+        const o = audio.createOscillator(), g = audio.createGain();
+        o.type = kind === 'wrong' ? 'square' : 'sine';
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t0 + at);
+        g.gain.exponentialRampToValueAtTime(kind === 'tick' ? 0.04 : 0.13, t0 + at + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + at + dur);
+        o.connect(g).connect(audio.destination);
+        o.start(t0 + at); o.stop(t0 + at + dur + 0.02);
+      }
+    } catch (e) { /* no audio available */ }
+    if (navigator.vibrate) navigator.vibrate(kind === 'wrong' ? 40 : kind === 'win' ? [30, 50, 30] : kind === 'tick' ? 0 : 12);
+  }
+  function confetti() {
+    const cv = document.createElement('canvas');
+    cv.className = 'confetti';
+    cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio;
+    document.body.appendChild(cv);
+    const ctx = cv.getContext('2d'), cols = ['#f6c85f', '#f4a3b5', '#8fd3f4', '#9ee6c9', '#a88be0', '#e8615a'];
+    const parts = Array.from({ length: 140 }, () => ({
+      x: cv.width / 2 + (Math.random() - 0.5) * cv.width * 0.3, y: cv.height * 0.35,
+      vx: (Math.random() - 0.5) * 22 * devicePixelRatio, vy: (-Math.random() * 20 - 6) * devicePixelRatio,
+      s: (5 + Math.random() * 7) * devicePixelRatio, r: Math.random() * 6, c: cols[Math.floor(Math.random() * cols.length)],
+    }));
+    let f = 0;
+    (function step() {
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      for (const p of parts) {
+        p.vy += 0.55 * devicePixelRatio; p.x += p.vx; p.y += p.vy; p.vx *= 0.99; p.r += 0.15;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); ctx.restore();
+      }
+      if (++f < 110) requestAnimationFrame(step); else cv.remove();
+    })();
+  }
+  let toastQ = [], toastOn = false;
+  function toast(html) {
+    toastQ.push(html);
+    if (toastOn) return;
+    const next = () => {
+      const h = toastQ.shift();
+      if (!h) { toastOn = false; return; }
+      toastOn = true;
+      const el = document.createElement('div');
+      el.className = 'toast'; el.innerHTML = h;
+      document.body.appendChild(el);
+      sfx('unlock');
+      setTimeout(() => el.classList.add('out'), 2600);
+      setTimeout(() => { el.remove(); next(); }, 3000);
+    };
+    next();
+  }
+
   let store = load();
   let S = null;
   let timer = null;
@@ -125,17 +223,31 @@
       setTimeout(() => cb(E.generate(seed, diff)), 30);
     }
   }
-  function prefetchNext(diff, caseNum) {
-    const p = prog(diff);
-    if (p.next && p.next.caseNum === caseNum + 1) return;
-    buildCase(diff, caseNum + 1, (puzzle) => {
-      prog(diff).next = { caseNum: caseNum + 1, puzzle };
+  function prefetchNext(slot, caseNum) {
+    const p = prog(slot), n = caseNum + 1;
+    if (p.next && p.next.caseNum === n) return;
+    const journey = slot === 'journey';
+    buildCase(journey ? journeyDiff(n) : slot, n, (puzzle) => {
+      prog(slot).next = { caseNum: n, puzzle };
       save();
-    });
+    }, journey ? JOURNEY_SEED + n : undefined);
   }
 
   /* ---------- profile ---------- */
-  function totalSolved() { return DIFFS.reduce((n, d) => n + prog(d.key).solved, 0); }
+  function totalSolved() { return DIFFS.reduce((n, d) => n + prog(d.key).solved, 0) + prog('journey').solved + Object.keys(store.dailyLog || {}).length; }
+  function coins() { if (typeof store.coins !== 'number') store.coins = 100; return store.coins; }
+  function addCoins(n) { coins(); store.coins += n; save(); renderCoins(); }
+  function renderCoins() { const el = $('coins-pill'); if (el) el.innerHTML = `${coinIc()} <b>${coins()}</b>`; }
+  function checkAchievements(ctx) {
+    store.ach = store.ach || {};
+    for (const x of ACH) {
+      if (store.ach[x.id] || !x.test(ctx)) continue;
+      store.ach[x.id] = today().num;
+      store.coins = coins() + 50;
+      toast(`<span class="ti">${ic('medal', '🏅')}</span><span><b>${x.name}</b><small>${x.desc} · +50 ${ART ? 'coins' : '🪙'}</small></span>`);
+    }
+    save(); renderCoins();
+  }
   function rankName() {
     const t = totalSolved();
     let r = RANKS[0][1];
@@ -175,7 +287,13 @@
     $('home').classList.add('active');
     $('game').classList.remove('active');
     renderGreet();
+    renderCoins();
+    renderJourney();
     renderDaily();
+    $('sound-btn').innerHTML = `${ic(store.sound === false ? 'mute' : 'sound', store.sound === false ? '🔇' : '🔊')} Sound`;
+    const got = Object.keys(store.ach || {}).length;
+    $('ach-btn').innerHTML = `${ic('trophy', '🏆')} Trophies ${got}/${ACH.length}`;
+    setTimeout(maybeDailyBonus, 350);
     $('diffs').innerHTML = DIFFS.map((d) => {
       const p = prog(d.key);
       const badge = p.cur ? 'In progress' : p.solved ? `${p.solved} solved` : 'New!';
@@ -183,6 +301,70 @@
         <span>${ART ? `<span class="ic dic">${ART.ui(d.art)}</span>${d.name}` : d.label}<small>${d.sub}</small></span><span class="badge">${badge}</span></button>`;
     }).join('');
     $('diffs').querySelectorAll('.diff-btn').forEach((b) => b.addEventListener('click', () => startGame(b.dataset.diff)));
+  }
+
+  function renderJourney() {
+    const p = prog('journey'), n = p.caseNum, diff = journeyDiff(n), d = DIFF[diff];
+    const tier = TIERS.find(([lv]) => lv > n);
+    const prev = [...TIERS].reverse().find(([lv]) => lv <= n);
+    const from = prev ? prev[0] : 1, pct = tier ? Math.round(((n - from) / (tier[0] - from)) * 100) : 100;
+    const going = p.cur && p.cur.caseNum === n;
+    $('journey').innerHTML = `<button class="play-card${isBoss(n) ? ' boss' : ''}" id="play-btn">
+        <span class="pc-ic">${ic('play', '▶️')}</span>
+        <span class="pc-tx"><b>${going ? 'Continue' : 'Play'}</b><small>Level ${n} · ${d.name}${isBoss(n) ? ' · BOSS' : ''}</small></span>
+        <span class="lvl-badge">${n}</span>
+      </button>
+      <div class="journey-bar"><div style="width:${pct}%"></div></div>
+      <div class="streak">${tier ? `${tier[0] - n} level${tier[0] - n === 1 ? '' : 's'} to ${tier[1]}` : 'Boss levels every 5 · how far can you go?'}</div>`;
+    $('play-btn').addEventListener('click', startJourney);
+  }
+
+  function maybeDailyBonus() {
+    if (!store.profile || $('modal').classList.contains('show') || !$('home').classList.contains('active')) return;
+    const t = today().num;
+    if (store.bonusDay === t) return;
+    const streak = store.bonusDay === t - 1 ? (store.bonusStreak || 0) + 1 : 1;
+    const idx = (streak - 1) % 7, reward = BONUS[idx];
+    const days = BONUS.map((c, k) => `<div class="bday${k < idx ? ' got' : ''}${k === idx ? ' now' : ''}"><small>Day ${k + 1}</small>${k < idx ? ic('check', '✓') : coinIc()}<b>${c}</b></div>`).join('');
+    modal(`<div class="big">${ic('gift', '🎁')}</div><h2>Daily gift!</h2>
+      <p>Come back every day for a bigger gift.</p><div class="bonus-row">${days}</div>
+      <div class="row"><button class="primary" data-act="take">Collect +${reward} ${ART ? 'coins' : '🪙'}</button></div>`, {
+      take: () => {
+        store.bonusDay = t; store.bonusStreak = streak;
+        addCoins(reward); sfx('coin'); closeModal();
+        checkAchievements();
+      },
+    }, true);
+  }
+
+  function showCalendar() {
+    const now = new Date(), y = now.getFullYear(), m = now.getMonth(), t = today().num, log = dailyLog();
+    const first = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate();
+    const dn = (d) => Math.floor(Date.UTC(y, m, d) / 86400000);
+    let cellsHtml = ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((x) => `<div class="cal-h">${x}</div>`).join('') + '<div></div>'.repeat(first);
+    let solved = 0;
+    for (let d = 1; d <= days; d++) {
+      const k = dn(d), done = !!log[k];
+      if (done) solved++;
+      cellsHtml += `<div class="cal-d${done ? ' done' : ''}${k === t ? ' today' : ''}${k > t ? ' future' : ''}">${done ? ic('star', '⭐') : ''}<span>${d}</span></div>`;
+    }
+    const monthName = now.toLocaleString('en', { month: 'long' });
+    const won = (store.trophies || {})[`${y}-${m + 1}`];
+    modal(`<h2>${monthName} cases</h2><div class="cal">${cellsHtml}</div>
+      <p><b>${solved}</b> of ${days} days solved.</p>
+      <p class="cal-tro">${ic(won ? 'trophy' : 'trophyOff', '🏆')} ${won ? `You won the ${monthName} trophy!` : `Solve every daily case this month to win the ${monthName} trophy.`}</p>
+      <div class="row"><button class="primary" data-act="close">Close</button></div>`);
+  }
+
+  function showTrophies() {
+    store.ach = store.ach || {};
+    const list = ACH.map((x) => `<div class="ach${store.ach[x.id] ? ' got' : ''}">${ic(store.ach[x.id] ? 'medal' : 'trophyOff', store.ach[x.id] ? '🏅' : '🔒')}<div><b>${x.name}</b><small>${x.desc}</small></div></div>`).join('');
+    const months = Object.keys(store.trophies || {});
+    modal(`<div class="big">${ic('trophy', '🏆')}</div><h2>Trophy room</h2>
+      <div class="ach-list">${list}</div>
+      ${months.length ? `<p><b>Monthly trophies:</b> ${months.map((k) => new Date(k.split('-')[0], k.split('-')[1] - 1, 1).toLocaleString('en', { month: 'short', year: 'numeric' })).join(', ')}</p>` : ''}
+      <p><small>Each trophy is worth 50 coins.</small></p>
+      <div class="row"><button class="primary" data-act="close">Close</button></div>`);
   }
 
   function renderDaily() {
@@ -194,8 +376,9 @@
         <span class="dc-tx"><b>Daily Case</b><small>${WEEKDAYS[t.weekday]} · ${d.name} · ${d.sub.split(' · ')[0]}</small></span>
         <span class="badge">${status}</span>
       </button>
-      <div class="streak">${streak ? `${ic('flame', '🔥')} ${streak}-day streak${done ? '' : ', solve today to keep it!'}` : 'A new case every day. Same one for everyone!'}</div>`;
+      <div class="streak">${streak ? `${ic('flame', '🔥')} ${streak}-day streak${done ? '' : ', solve today to keep it!'}` : 'A new case every day. Same one for everyone!'} · <button class="mini-link" id="cal-btn">Calendar</button></div>`;
     $('daily-btn').addEventListener('click', startDaily);
+    $('cal-btn').addEventListener('click', showCalendar);
   }
 
   function offerTutorial() {
@@ -213,6 +396,16 @@
     $('loading-text').textContent = 'Opening today\'s case file…';
     $('loading').classList.add('show');
     buildCase(diff, t.num, go, 1000000 + t.num);
+  }
+
+  function startJourney() {
+    const p = prog('journey'), n = p.caseNum, diff = journeyDiff(n);
+    const go = (puzzle) => { $('loading').classList.remove('show'); begin(diff, n, puzzle, 'journey'); };
+    if (p.cur && p.cur.caseNum === n && p.cur.puzzle) return go(p.cur.puzzle);
+    if (p.next && p.next.caseNum === n && p.next.puzzle) { const pz = p.next.puzzle; p.next = null; return go(pz); }
+    $('loading-text').textContent = isBoss(n) ? 'Building a boss level…' : 'Building the crime scene…';
+    $('loading').classList.add('show');
+    buildCase(diff, n, go, JOURNEY_SEED + n);
   }
 
   function startTutorial() {
@@ -250,7 +443,7 @@
     persist();
     $('home').classList.remove('active');
     $('game').classList.add('active');
-    const label = slot === 'daily' ? `Daily Case: ${puzzle.title}` : slot === 'tutorial' ? puzzle.title : `Case #${caseNum}: ${puzzle.title}`;
+    const label = slot === 'daily' ? `Daily Case: ${puzzle.title}` : slot === 'tutorial' ? puzzle.title : slot === 'journey' ? `Level ${caseNum}: ${puzzle.title}` : `Case #${caseNum}: ${puzzle.title}`;
     $('case-title').innerHTML = (ART ? `<span class="tic">${ART.theme(puzzle.theme.id)}</span>` : puzzle.theme.icon + ' ') + esc(label);
     $('intro').textContent = puzzle.intro;
     $('game').classList.toggle('tut', slot === 'tutorial');
@@ -260,7 +453,7 @@
     window.scrollTo(0, 0);
     requestAnimationFrame(() => { $('play-area').style.top = $('topbar').offsetHeight + 'px'; });
     startTimer();
-    if (slot === diff) prefetchNext(diff, caseNum);
+    if (slot !== 'daily' && slot !== 'tutorial') prefetchNext(slot, caseNum);
     if (slot === 'tutorial') renderCoach();
     else if (!store.seenHowto && !store.tutorialDone) { store.seenHowto = true; save(); showHowto(); }
     checkDone(true);
@@ -295,12 +488,12 @@
   }
   function stopTimer() { if (timer) clearInterval(timer); timer = null; }
   function updateSub() {
-    const kind = S.slot === 'daily' ? `Daily · ${DIFF[S.diff].name}` : S.slot === 'tutorial' ? 'Tutorial' : DIFF[S.diff].name;
+    const kind = S.slot === 'daily' ? `Daily · ${DIFF[S.diff].name}` : S.slot === 'tutorial' ? 'Tutorial' : S.slot === 'journey' ? `Level ${S.caseNum} · ${DIFF[S.diff].name}${isBoss(S.caseNum) ? ' · Boss' : ''}` : DIFF[S.diff].name;
     $('case-sub').textContent = `${S.P.theme.name} · ${kind} · ${ART ? '' : '⏱ '}${fmtTime(S.elapsed)}`;
   }
 
   function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
-  function setStatus(msg, bad) { $('status').textContent = plain(msg); if (bad) shake($('status')); }
+  function setStatus(msg, bad) { $('status').textContent = plain(msg); if (bad) { shake($('status')); sfx('wrong'); } }
 
   function setMode(m) {
     S.mode = m;
@@ -338,6 +531,7 @@
       const k = list.indexOf(S.sel);
       if (k >= 0) list.splice(k, 1); else { list.push(S.sel); list.sort((x, y) => x - y); }
       if (list.length) S.draft[i] = list; else delete S.draft[i];
+      sfx('tick');
       render(); persist();
       return;
     }
@@ -347,7 +541,7 @@
       if (S.sel < 0) { setStatus(`First tap ${P.people[step.expect.p].name}'s card below 👇`, true); return; }
       if (S.sel !== step.expect.p) { setStatus(`Let's place ${P.people[step.expect.p].name} first.`, true); S.sel = -1; render(); return; }
       if (i !== step.expect.cell) { setStatus('Not quite. Read the clue again 🙂', true); return; }
-      S.place[S.sel] = i; S.sel = -1; S.tut++;
+      S.place[S.sel] = i; S.sel = -1; S.tut++; sfx('place');
       setStatus('');
       renderCoach(); render(); checkDone(false);
       return;
@@ -356,7 +550,7 @@
       if (E.isBlocked(P.obj[i])) { setStatus(`Nobody can stand on ${E.OBJECTS[P.obj[i]].name === 'TV' ? 'the TV' : 'the ' + E.OBJECTS[P.obj[i]].name}!`, true); return; }
       snapshot();
       if (occ >= 0) S.place[occ] = -1;
-      S.place[S.sel] = i; S.xs.delete(i);
+      S.place[S.sel] = i; S.xs.delete(i); sfx('place');
       clearDrafts(S.sel);
       S.sel = -1;
       setStatus('Pick a suspect below, then tap a square.');
@@ -579,19 +773,26 @@
   $('hint').addEventListener('click', () => {
     if (S.solvedGrid) return;
     if (S.tut >= 0) { setStatus('Follow the hints in the box above 🙂'); return; }
+    const price = (k) => `<span class="price">${coinIc()} ${COST[k]}</span>`;
     modal(`<div class="big">${ic('bulb', '💡')}</div><h2>Need a hand, detective?</h2>
-      <p>Pick how much help you want:</p>
+      <p>You have ${coinIc()} <b>${coins()}</b> coins.</p>
       <div class="help-list">
-        <button class="primary" data-act="clue">${ic('note', '🧾')} Give me an extra clue<small>A fact about the whole scene. Nobody's spot is revealed.</small></button>
-        <button class="secondary" data-act="check">${ic('check', '✔️')} Check my placements<small>Tells you if someone on the board is in the wrong spot.</small></button>
-        <button class="secondary" data-act="reveal">${ic('eye', '👁️')} Reveal one suspect<small>The last resort.</small></button>
+        <button class="primary" data-act="clue">${ic('note', '🧾')} Give me an extra clue ${price('clue')}<small>A fact about the whole scene. Nobody's spot is revealed.</small></button>
+        <button class="secondary" data-act="check">${ic('check', '✔️')} Check my placements ${price('check')}<small>Tells you if someone on the board is in the wrong spot.</small></button>
+        <button class="secondary" data-act="reveal">${ic('eye', '👁️')} Reveal one suspect ${price('reveal')}<small>The last resort.</small></button>
       </div>
       <div class="row"><button class="secondary" data-act="close">Never mind</button></div>`, {
-      clue: () => { closeModal(); giveExtraClue(); },
-      check: () => { closeModal(); checkPlacements(); },
-      reveal: () => { closeModal(); revealOne(); },
+      clue: () => { closeModal(); if (pay('clue')) giveExtraClue(); },
+      check: () => { closeModal(); if (pay('check')) checkPlacements(); },
+      reveal: () => { closeModal(); if (pay('reveal')) revealOne(); },
     });
   });
+
+  function pay(kind) {
+    if (coins() < COST[kind]) { setStatus(`Not enough coins (${COST[kind]} needed). Solve cases and collect your daily gift to earn more!`, true); return false; }
+    store.coins -= COST[kind]; save(); sfx('coin');
+    return true;
+  }
 
   function knownForHints() {
     // what the player already got right is taken into account, so the clue helps from where they are
@@ -651,6 +852,8 @@
   $('howto-game').addEventListener('click', showHowto);
   $('greet').addEventListener('click', askProfile);
   $('tut-btn').addEventListener('click', startTutorial);
+  $('ach-btn').addEventListener('click', showTrophies);
+  $('sound-btn').addEventListener('click', () => { store.sound = store.sound === false; save(); showHome(); if (store.sound) sfx('coin'); });
 
   /* ---------- modals ---------- */
   let modalActions = {}, modalSticky = false;
@@ -723,17 +926,25 @@
           <li><b>Draft</b>: pencil in every square where a suspect <i>might</i> be.</li>
           <li><b>Mark</b>: cross out squares nobody can use.</li>
           <li><b>Help</b>: an extra clue when you're stuck.</li></ul></div>
-        <div class="row"><button class="primary" data-act="first">Play my first case</button><button class="secondary" data-act="home">Menu</button></div>`, {
-        first: () => { closeModal(); startGame('easy'); },
+        <div class="row"><button class="primary" data-act="first">Play level 1</button><button class="secondary" data-act="home">Menu</button></div>`, {
+        first: () => { closeModal(); startJourney(); },
         home: () => { closeModal(); showHome(); },
       });
       return;
     }
     const nStars = !S.hints && !S.helps && !S.wrongAccuse.length ? 3 : !S.hints ? 2 : 1;
+    const earned = (COIN_BASE[S.diff] + (nStars === 3 ? 10 : nStars === 2 ? 5 : 0)) * (S.slot === 'daily' ? 2 : 1);
+    store.coins = coins() + earned;
+    store.themesSolved = [...new Set([...(store.themesSolved || []), P.theme.id])];
     let isBest = false, dailyTxt = '';
     if (S.slot === 'daily') {
       dailyLog()[S.caseNum] = { t: S.elapsed, stars: nStars };
       pg.cur = null;
+      // a full month of daily cases wins that month's trophy
+      const d = new Date(), y = d.getFullYear(), mo = d.getMonth(), last = new Date(y, mo + 1, 0).getDate();
+      let all = true;
+      for (let k = 1; k <= last; k++) if (!dailyLog()[Math.floor(Date.UTC(y, mo, k) / 86400000)]) { all = false; break; }
+      if (all) { store.trophies = store.trophies || {}; store.trophies[`${y}-${mo + 1}`] = true; }
       const n = dailyStreak();
       dailyTxt = `<br>${ic('flame', '🔥')} ${n}-day streak! Come back tomorrow for a new case.`;
     } else {
@@ -742,15 +953,26 @@
       if (isBest) pg.best = S.elapsed;
     }
     save();
+    sfx('win'); confetti();
+    const levelTxt = S.slot === 'journey' ? `<div class="lvl-done">Level ${S.caseNum} complete!</div>` : '';
     const helpTxt = [S.helps ? `🧾 ${S.helps} clue${S.helps > 1 ? 's' : ''}/check${S.helps > 1 ? 's' : ''}` : '', S.hints ? `👁️ ${S.hints} reveal${S.hints > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ');
     modal(`<div class="big">${ART ? `<span class="ic win-face">${face(m)}</span><span class="ic">${ART.ui('siren')}</span>` : m.emoji + '🚔'}</div><h2>Case closed!</h2>
       <p><b>${esc(m.name)}</b> was alone with ${esc(v.name)} in the ${esc(zone)}.<br>${pr(m, 'He', 'She')}'s on the way to jail. ${ic('lock', '🔒')}</p>
-      <p class="stars-row" style="font-size:28px;margin:6px 0">${stars(nStars)}</p>
+      ${levelTxt}<p class="stars-row" style="font-size:28px;margin:6px 0">${stars(nStars)}</p>
+      <p class="earned">${coinIc()} +<b id="earned">0</b> coins</p>
       <p>${ART ? '' : '⏱ '}${fmtTime(S.elapsed)}${helpTxt ? ' · ' + plain(helpTxt) : ''}${isBest ? '<br>New personal best!' : ''}${dailyTxt}</p>
-      <div class="row">${S.slot === 'daily' ? '' : '<button class="primary" data-act="next">Next case →</button>'}<button class="${S.slot === 'daily' ? 'primary' : 'secondary'}" data-act="home">Menu</button></div>`, {
-      next: () => { closeModal(); startGame(S.diff); },
+      <div class="row">${S.slot === 'daily' ? '' : `<button class="primary" data-act="next">${S.slot === 'journey' ? `Level ${S.caseNum + 1} →` : 'Next case →'}</button>`}<button class="${S.slot === 'daily' ? 'primary' : 'secondary'}" data-act="home">Menu</button></div>`, {
+      next: () => { closeModal(); if (S.slot === 'journey') startJourney(); else startGame(S.diff); },
       home: () => { closeModal(); showHome(); },
     });
+    // count the coins up, then hand out any new trophies
+    let shown = 0;
+    const tick = setInterval(() => {
+      shown = Math.min(earned, shown + Math.ceil(earned / 18));
+      const el = $('earned'); if (el) el.textContent = shown;
+      if (shown >= earned) { clearInterval(tick); sfx('coin'); }
+    }, 45);
+    checkAchievements({ diff: S.diff, clean: !S.hints && !S.helps, time: S.elapsed });
   }
 
   /* ---------- install as an app ---------- */

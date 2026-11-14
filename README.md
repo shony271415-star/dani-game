@@ -27,6 +27,14 @@ Suspects are named in alphabetical order (A, B, C…). Expert and Extreme puzzle
 - **Daily Case**: one case per day, the same for everyone (seeded by the date), harder towards the weekend, with a streak counter.
 - **Tutorial**: a hand-made 4×4 case that walks a beginner through the logic step by step.
 
+## Coming back every day
+- **Journey**: one big Play button, numbered levels that slowly get harder, boss levels every 5.
+- **Coins**: earned by solving (double for the daily case), spent on help.
+- **Daily gift**: grows over a 7-day streak.
+- **Daily calendar**: a trophy for solving every daily case of a month.
+- **Trophies**: 12 achievements, 50 coins each.
+- **Feel**: sounds, vibration, confetti, coin count-up (sound can be turned off).
+
 ## Tools
 - **Place**: pick a suspect, tap a square.
 - **Draft**: pencil in every square where a suspect *might* be (small colored letters), erase as you rule them out.
