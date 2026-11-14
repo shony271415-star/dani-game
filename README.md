@@ -19,6 +19,12 @@ Sudoku meets murder mystery. Place every suspect on the crime scene using their 
 
 Suspects are named in alphabetical order (A, B, C…). Expert and Extreme puzzles are graded by a logic solver: they can't be finished by simple elimination and need "what if this person were here?" reasoning.
 
+## Tools
+- **Place**: pick a suspect, tap a square.
+- **Draft**: pencil in every square where a suspect *might* be (small colored letters), erase as you rule them out.
+- **Mark**: cross out squares nobody can use.
+- **Help**: an extra clue about the whole scene ("only one suspect sat on a chair", "every room had someone in it"), chosen to be useful at your current point; or check your placements; or, as a last resort, reveal a suspect.
+
 ## Scenes
 Mansion, ship, forest, space station, museum, night train, circus, castle and ski lodge, each with its own areas and objects.
 

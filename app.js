@@ -145,13 +145,14 @@
     const p = prog(diff);
     S = {
       diff, caseNum, P: puzzle,
-      place: new Array(puzzle.N).fill(-1), xs: new Set(),
+      place: new Array(puzzle.N).fill(-1), xs: new Set(), draft: {},
       sel: -1, mode: 'place', history: [],
-      elapsed: 0, hints: 0, solvedGrid: false, wrongAccuse: [],
+      elapsed: 0, hints: 0, helps: 0, extra: [], solvedGrid: false, wrongAccuse: [],
     };
     if (p.cur && p.cur.caseNum === caseNum) {
       S.place = p.cur.place || S.place; S.xs = new Set(p.cur.xs || []); S.elapsed = p.cur.elapsed || 0;
       S.hints = p.cur.hints || 0; S.wrongAccuse = p.cur.wrongAccuse || [];
+      S.draft = p.cur.draft || {}; S.helps = p.cur.helps || 0; S.extra = p.cur.extra || [];
     }
     persist();
     $('home').classList.remove('active');
@@ -173,7 +174,7 @@
     if (!S) return;
     prog(S.diff).cur = {
       caseNum: S.caseNum, puzzle: S.P, place: S.place, xs: [...S.xs], elapsed: S.elapsed,
-      hints: S.hints, wrongAccuse: S.wrongAccuse,
+      hints: S.hints, wrongAccuse: S.wrongAccuse, draft: S.draft, helps: S.helps, extra: S.extra,
     };
     save();
   }
@@ -198,13 +199,15 @@
     S.mode = m;
     $('mode-place').classList.toggle('on', m === 'place');
     $('mode-x').classList.toggle('on', m === 'x');
+    $('mode-draft').classList.toggle('on', m === 'draft');
     if (m === 'x') { S.sel = -1; setStatus('Mark mode: tap a square to cross it out ✕'); }
+    else if (m === 'draft') setStatus(S.sel >= 0 ? `Draft: tap every square where ${S.P.people[S.sel].name} might be.` : 'Draft mode: pick a suspect, then tap all the squares where they might be.');
     else setStatus('Pick a suspect below, then tap a square.');
     render();
   }
 
   function snapshot() {
-    S.history.push({ place: S.place.slice(), xs: [...S.xs] });
+    S.history.push({ place: S.place.slice(), xs: [...S.xs], draft: JSON.parse(JSON.stringify(S.draft)) });
     if (S.history.length > 300) S.history.shift();
   }
   const whoAt = (cell) => S.place.indexOf(cell);
@@ -219,11 +222,25 @@
       render(); persist();
       return;
     }
+    if (S.mode === 'draft') {
+      if (S.sel < 0) { setStatus('Pick a suspect first, then tap the squares where they might be 👇', true); return; }
+      if (E.isBlocked(P.obj[i])) { setStatus('Nobody can stand there!', true); return; }
+      if (occ >= 0) return;
+      snapshot();
+      const list = S.draft[i] || [];
+      const k = list.indexOf(S.sel);
+      if (k >= 0) list.splice(k, 1); else { list.push(S.sel); list.sort((x, y) => x - y); }
+      if (list.length) S.draft[i] = list; else delete S.draft[i];
+      render(); persist();
+      return;
+    }
     if (S.sel >= 0) {
       if (E.isBlocked(P.obj[i])) { setStatus(`Nobody can stand on ${E.OBJECTS[P.obj[i]].name === 'TV' ? 'the TV' : 'the ' + E.OBJECTS[P.obj[i]].name}!`, true); return; }
       snapshot();
       if (occ >= 0) S.place[occ] = -1;
-      S.place[S.sel] = i; S.xs.delete(i); S.sel = -1;
+      S.place[S.sel] = i; S.xs.delete(i);
+      clearDrafts(S.sel);
+      S.sel = -1;
       setStatus('Pick a suspect below, then tap a square.');
       render(); persist(); checkDone(false);
       return;
@@ -238,11 +255,18 @@
     setStatus('First pick a suspect from the list below 👇', true);
   }
 
+  function clearDrafts(p) {
+    for (const c of Object.keys(S.draft)) {
+      S.draft[c] = S.draft[c].filter((q) => q !== p);
+      if (!S.draft[c].length) delete S.draft[c];
+    }
+  }
+
   function onSuspect(p) {
     if (S.solvedGrid) return;
     if (S.mode === 'x') setMode('place');
     S.sel = S.sel === p ? -1 : p;
-    if (S.sel >= 0) setStatus(`Where was ${S.P.people[p].name}? Tap a square.`);
+    if (S.sel >= 0) setStatus(S.mode === 'draft' ? `Draft: tap every square where ${S.P.people[p].name} might be. Tap again to erase.` : `Where was ${S.P.people[p].name}? Tap a square.`);
     render();
   }
 
@@ -332,6 +356,9 @@
       const who = whoAt(i);
       if (who >= 0) cell.classList.add('has-token');
       if (S.sel >= 0 && (usedR.has(Math.floor(i / N)) || usedC.has(i % N) || E.isBlocked(o))) cell.classList.add('dim');
+      const drafts = who < 0 ? S.draft[i] || [] : [];
+      if (drafts.length) cell.classList.add('has-draft');
+      if (S.mode === 'draft' && S.sel >= 0 && drafts.includes(S.sel)) cell.classList.add('draft-sel');
       if (def && def.css === 'table') { const t = document.createElement('div'); t.className = 'table-obj'; cell.appendChild(t); }
       else if (def && def.e) { const em = document.createElement('div'); em.className = 'obj'; em.textContent = def.e; cell.appendChild(em); }
       ['n', 's', 'e', 'w'].forEach((s) => {
@@ -349,12 +376,29 @@
         if (big) { t.textContent = person.letter; t.style.background = person.color; }
         else t.textContent = person.emoji;
         cell.appendChild(t);
-      } else if (S.xs.has(i)) {
-        const x = document.createElement('div'); x.className = 'xmark'; x.textContent = '✕'; cell.appendChild(x);
+      } else {
+        if (S.xs.has(i)) { const x = document.createElement('div'); x.className = 'xmark'; x.textContent = '✕'; cell.appendChild(x); }
+        if (drafts.length) {
+          const d = document.createElement('div');
+          d.className = 'drafts';
+          const per = Math.max(2, Math.ceil(Math.sqrt(drafts.length))); // always small, so drafts never look like placements
+          d.style.gridTemplateColumns = `repeat(${per}, 1fr)`;
+          d.style.setProperty('--per', per);
+          for (const q of drafts) {
+            const sp = document.createElement('span');
+            sp.textContent = P.people[q].letter; sp.style.color = P.people[q].color;
+            d.appendChild(sp);
+          }
+          cell.appendChild(d);
+        }
       }
       cell.addEventListener('click', () => onCell(i));
       board.appendChild(cell);
     }
+
+    const notes = $('extra');
+    notes.hidden = !S.extra.length;
+    notes.innerHTML = '<b>🧾 Extra clues from headquarters</b>' + S.extra.map((x) => `<div>• ${rich(x.text)}</div>`).join('');
 
     const list = $('suspects');
     list.innerHTML = '';
@@ -394,21 +438,75 @@
   /* ---------- tools ---------- */
   $('mode-place').addEventListener('click', () => setMode('place'));
   $('mode-x').addEventListener('click', () => setMode('x'));
+  $('mode-draft').addEventListener('click', () => setMode('draft'));
   $('undo').addEventListener('click', () => {
     if (S.solvedGrid || !S.history.length) return;
     const h = S.history.pop();
-    S.place = h.place; S.xs = new Set(h.xs); S.sel = -1;
+    S.place = h.place; S.xs = new Set(h.xs); S.draft = h.draft || {};
     render(); persist();
   });
   $('reset').addEventListener('click', () => {
     if (S.solvedGrid) return;
-    modal(`<div class="big">🗑️</div><h2>Clear the board?</h2><p>All placements and marks will be erased.</p>
+    modal(`<div class="big">🗑️</div><h2>Clear the board?</h2><p>All placements, drafts and ✕ marks will be erased. Extra clues stay.</p>
       <div class="row"><button class="primary" data-act="yes">Yes, clear</button><button class="secondary" data-act="close">Cancel</button></div>`, {
-      yes: () => { snapshot(); S.place.fill(-1); S.xs.clear(); S.sel = -1; render(); persist(); closeModal(); },
+      yes: () => { snapshot(); S.place.fill(-1); S.xs.clear(); S.draft = {}; S.sel = -1; render(); persist(); closeModal(); },
     });
   });
   $('hint').addEventListener('click', () => {
     if (S.solvedGrid) return;
+    modal(`<div class="big">💡</div><h2>Need a hand, detective?</h2>
+      <p>Pick how much help you want:</p>
+      <div class="help-list">
+        <button class="primary" data-act="clue">🧾 Give me an extra clue<small>A fact about the whole scene. Nobody's spot is revealed.</small></button>
+        <button class="secondary" data-act="check">✔️ Check my placements<small>Tells you if someone on the board is in the wrong spot.</small></button>
+        <button class="secondary" data-act="reveal">👁️ Reveal one suspect<small>The last resort.</small></button>
+      </div>
+      <div class="row"><button class="secondary" data-act="close">Never mind</button></div>`, {
+      clue: () => { closeModal(); giveExtraClue(); },
+      check: () => { closeModal(); checkPlacements(); },
+      reveal: () => { closeModal(); revealOne(); },
+    });
+  });
+
+  function knownForHints() {
+    // what the player already got right is taken into account, so the clue helps from where they are
+    const P = S.P, fixed = {};
+    S.place.forEach((x, p) => { if (x >= 0 && x === P.solution[p] && !P.people[p].isVictim) fixed[p] = x; });
+    const crossed = [...S.xs].filter((c) => !P.solution.includes(c));
+    return { fixed, crossed };
+  }
+
+  function giveExtraClue() {
+    const P = S.P;
+    const have = new Set(S.extra.map((x) => x.id));
+    const facts = E.sceneFacts(P, knownForHints())
+      .filter((f) => !have.has(f.id) && !(f.dup && have.has(f.dup)))
+      .sort((x, y) => y.score - x.score);
+    if (!facts.length) { setStatus('Headquarters has no more extra clues for this case. Try another kind of help.', true); return; }
+    const top = facts[0].score;
+    const pool = facts.filter((f) => f.score >= top * 0.8);
+    const f = pool[Math.floor(Math.random() * pool.length)];
+    S.extra.push({ id: f.id, text: f.text });
+    S.helps++;
+    setStatus('🧾 New clue added above the suspects.');
+    render(); persist();
+    const el = $('extra');
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function checkPlacements() {
+    const P = S.P;
+    const placed = S.place.map((x, p) => [x, p]).filter(([x]) => x >= 0);
+    if (!placed.length) { setStatus('Place somebody on the board first, then I can check.', true); return; }
+    S.helps++;
+    const wrong = placed.filter(([x, p]) => x !== P.solution[p]);
+    if (!wrong.length) setStatus(`✅ So far so good: all ${placed.length} placed ${placed.length === 1 ? 'person is' : 'people are'} in the right spot.`);
+    else setStatus(`🔴 ${wrong.length === 1 ? P.people[wrong[0][1]].name + ' is' : wrong.length + ' people are'} in the wrong spot.`, true);
+    persist();
+  }
+
+  function revealOne() {
     const P = S.P;
     let p = S.place.findIndex((x, q) => x >= 0 && x !== P.solution[q]);
     const wasWrong = p >= 0;
@@ -418,11 +516,11 @@
     snapshot();
     const target = P.solution[p], occ = whoAt(target);
     if (occ >= 0) S.place[occ] = -1;
-    S.place[p] = target; S.xs.delete(target); S.sel = -1; S.hints++;
+    S.place[p] = target; S.xs.delete(target); clearDrafts(p); S.sel = -1; S.hints++;
     const person = P.people[p];
-    setStatus(wasWrong ? `💡 ${person.name} was in the wrong place. Fixed it.` : `💡 Placed ${person.name} in the right spot.`);
+    setStatus(wasWrong ? `👁️ ${person.name} was in the wrong place. Fixed it.` : `👁️ Placed ${person.name} in the right spot.`);
     render(); persist(); checkDone(false);
-  });
+  }
   $('back').addEventListener('click', () => { persist(); showHome(); });
   $('howto-home').addEventListener('click', showHowto);
   $('howto-game').addEventListener('click', showHowto);
@@ -455,7 +553,8 @@
         <li>Some objects can be stood on (chairs, beds, rugs…), others can't (tables, plants…). Check the dictionary under the suspects.</li>
         <li>The victim (<b>V</b>) is in the <b>last remaining square</b>.</li>
       </ul>
-      <p><b>How to play:</b> tap a suspect card, then a square. Tap a placed suspect to pick them up again. Use <b>✕ Mark</b> to cross out squares you've ruled out.</p>
+      <p><b>How to play:</b> tap a suspect card, then a square. Tap a placed suspect to pick them up again. Use <b>✏️ Draft</b> to pencil in every square where a suspect <i>might</i> be, and <b>✕ Mark</b> to cross out squares nobody can use.</p>
+      <p><b>Stuck?</b> 💡 gives you an extra clue about the whole scene, checks your board, or (last resort) reveals a suspect.</p>
       <p>Each scene is different: a mansion, a ship, a forest, a space station and more.</p>
       </div>
       <div class="row"><button class="primary" data-act="close">Let's investigate!</button></div>`);
@@ -487,14 +586,15 @@
     const m = P.people[P.murderer], v = P.people[P.victim];
     const zone = P.zones[P.zoneOf[P.solution[P.victim]]].name;
     pg.solved++; pg.caseNum++; pg.cur = null;
-    const isBest = !S.hints && (pg.best == null || S.elapsed < pg.best);
+    const isBest = !S.hints && !S.helps && (pg.best == null || S.elapsed < pg.best);
     if (isBest) pg.best = S.elapsed;
     save(); stopTimer();
-    const stars = !S.hints && !S.wrongAccuse.length ? '⭐⭐⭐' : S.hints <= 1 ? '⭐⭐' : '⭐';
+    const stars = !S.hints && !S.helps && !S.wrongAccuse.length ? '⭐⭐⭐' : !S.hints ? '⭐⭐' : '⭐';
+    const helpTxt = [S.helps ? `🧾 ${S.helps} clue${S.helps > 1 ? 's' : ''}/check${S.helps > 1 ? 's' : ''}` : '', S.hints ? `👁️ ${S.hints} reveal${S.hints > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ');
     modal(`<div class="big">${m.emoji}🚔</div><h2>Case closed!</h2>
       <p><b>${esc(m.name)}</b> was alone with ${esc(v.name)} in the ${esc(zone)}.<br>${pr(m, 'He', 'She')}'s on the way to jail. 🔒</p>
       <p style="font-size:28px;margin:6px 0">${stars}</p>
-      <p>⏱ ${fmtTime(S.elapsed)}${S.hints ? ` · 💡 ${S.hints} hint${S.hints > 1 ? 's' : ''}` : ''}${isBest ? '<br>🏆 New personal best!' : ''}</p>
+      <p>⏱ ${fmtTime(S.elapsed)}${helpTxt ? ' · ' + helpTxt : ''}${isBest ? '<br>🏆 New personal best!' : ''}</p>
       <div class="row"><button class="primary" data-act="next">Next case →</button><button class="secondary" data-act="home">Menu</button></div>`, {
       next: () => { closeModal(); startGame(S.diff); },
       home: () => { closeModal(); showHome(); },
