@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mystery Grid promo</title>
+<style>
+  @font-face { font-family: "Fredoka"; font-weight: 600; src: url(../fonts/fredoka-latin-600-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Fredoka"; font-weight: 500; src: url(../fonts/fredoka-latin-500-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Quicksand"; font-weight: 700; src: url(../fonts/quicksand-latin-700-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Pacifico"; src: url(../fonts/pacifico-latin-400-normal.woff2) format("woff2"); }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; }
+  body { background: radial-gradient(circle at 50% 18%, #8a6cc9, #4a3b63 70%); font-family: "Quicksand", sans-serif; font-weight: 700; color: #3d3250; position: relative; }
+  .layer { position: absolute; inset: 0; }
+  #cap { position: absolute; left: 70px; right: 70px; top: 150px; height: 200px; display: flex; align-items: center; justify-content: center; text-align: center;
+    font-family: "Fredoka"; font-weight: 600; font-size: 58px; line-height: 1.15; color: #fff; text-shadow: 0 4px 0 rgba(0,0,0,.25); }
+  #cap b { color: #ffd166; }
+  #boardwrap { position: absolute; left: 50%; top: 370px; transform-origin: 50% 0; }
+  .board { display: grid; position: relative; background: #fff; border: 12px solid #2e2442; border-radius: 28px; box-shadow: 0 24px 50px rgba(0,0,0,.35); }
+  .cell { position: relative; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(74,59,99,.1); }
+  .cell.wn { border-top: 6px solid #2e2442; } .cell.ws { border-bottom: 6px solid #2e2442; } .cell.we { border-right: 6px solid #2e2442; } .cell.ww { border-left: 6px solid #2e2442; }
+  .obj { width: 76%; height: 76%; display: flex; } .obj svg { width: 100%; height: 100%; filter: drop-shadow(0 3px 0 rgba(61,50,80,.18)); }
+  .cell.rug { background-image: radial-gradient(circle, rgba(255,255,255,.55) 2px, transparent 3px), repeating-linear-gradient(45deg, rgba(232,97,90,.22) 0 12px, rgba(255,255,255,.25) 12px 24px) !important; background-size: 18px 18px, auto !important; }
+  .cell.rug::before { content: ""; position: absolute; inset: 10%; border: 4px solid rgba(232,97,90,.55); border-radius: 12px; }
+  .edge { position: absolute; border: 4px solid #2e2442; border-radius: 6px; box-shadow: inset 0 0 0 3px rgba(255,255,255,.75); z-index: 2; }
+  .edge.n { top: -16px; left: 20%; right: 20%; height: 18px; } .edge.s { bottom: -16px; left: 20%; right: 20%; height: 18px; }
+  .edge.w { left: -16px; top: 20%; bottom: 20%; width: 18px; } .edge.e { right: -16px; top: 20%; bottom: 20%; width: 18px; }
+  .zl { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,.93); border: 3px solid #2e2442; border-radius: 20px; padding: 0 12px;
+    font-family: "Fredoka"; font-weight: 500; white-space: nowrap; z-index: 4; line-height: 1.35; }
+  .tok { position: absolute; inset: 7%; border-radius: 50%; background: #fff; border: 7px solid; overflow: hidden; z-index: 5; box-shadow: 0 6px 12px rgba(0,0,0,.25); }
+  .tok svg { width: 100%; height: 100%; }
+  .tok.letter { display: flex; align-items: center; justify-content: center; color: #fff; font-family: "Fredoka"; font-weight: 600; border-color: #fff; }
+  .hl { position: absolute; inset: 0; box-shadow: inset 0 0 0 10px #ffb703; z-index: 6; border-radius: 4px; }
+  .zoneglow { position: absolute; inset: 0; background: rgba(255,92,92,.28); z-index: 3; }
+  #cards { position: absolute; left: 60px; right: 60px; top: 1200px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .card { background: #fffdf8; border-radius: 28px; padding: 18px 20px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 10px 0 rgba(0,0,0,.18); }
+  .card.victim { background: #ffe9ee; }
+  .face { flex: 0 0 auto; width: 92px; height: 92px; border-radius: 20px; background: #f6ecff; position: relative; }
+  .face svg { width: 100%; height: 100%; }
+  .face .lt { position: absolute; right: -10px; bottom: -10px; width: 42px; height: 42px; border-radius: 50%; color: #fff; border: 4px solid #fff; display: flex; align-items: center; justify-content: center; font-family: "Fredoka"; font-weight: 600; font-size: 24px; }
+  .nm { font-family: "Fredoka"; font-weight: 600; font-size: 38px; }
+  .cl { font-size: 30px; line-height: 1.25; } .cl b { color: #c0392b; }
+  .rip { font-family: "Pacifico"; color: #c0392b; font-size: 28px; }
+  #over { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #fff; z-index: 20; }
+  #over .big { font-family: "Fredoka"; font-weight: 600; font-size: 104px; line-height: 1.05; text-shadow: 0 6px 0 rgba(0,0,0,.25); padding: 0 60px; }
+  #over .sub { font-family: "Quicksand"; font-size: 48px; margin-top: 30px; opacity: .95; }
+  #over .ic svg { width: 300px; height: 300px; }
+  #over .ring { width: 300px; height: 300px; border-radius: 50%; border: 18px solid #ffd166; display: flex; align-items: center; justify-content: center; font-family: "Fredoka"; font-weight: 600; font-size: 160px; margin-top: 40px; background: rgba(46,36,66,.55); }
+  #dim { position: absolute; inset: 0; background: rgba(46,36,66,.82); z-index: 19; }
+  #brand { position: absolute; left: 0; right: 0; top: 1720px; text-align: center; color: rgba(255,255,255,.85); font-family: "Fredoka"; font-weight: 600; font-size: 40px; display: flex; align-items: center; justify-content: center; gap: 14px; z-index: 30; }
+  #brand svg { width: 54px; height: 54px; }
+  #timer { position: absolute; right: 70px; top: 190px; width: 140px; height: 140px; border-radius: 50%; border: 12px solid #ffd166; color: #fff; font-family: "Fredoka"; font-weight: 600; font-size: 70px; display: flex; align-items: center; justify-content: center; background: rgba(46,36,66,.4); z-index: 10; opacity: 0; }
+  .facerow { display: flex; gap: 28px; margin-top: 50px; }
+  .facerow .f { width: 150px; text-align: center; font-family: "Fredoka"; font-size: 34px; }
+  .facerow .f div { width: 150px; height: 150px; border-radius: 34px; background: #fffdf8; overflow: hidden; margin-bottom: 8px; position: relative; }
+  .facerow .f div svg { width: 100%; height: 100%; }
+  /* floors (same as the illustrated edition, scaled for video) */
+  .fl-wood { background-image: repeating-linear-gradient(0deg, transparent 0 calc(33.3% - 2px), rgba(110,60,20,.14) calc(33.3% - 2px) 33.3%), linear-gradient(90deg, transparent 49%, rgba(110,60,20,.08) 49% 51%, transparent 51%); }
+  .fl-deck { background-image: repeating-linear-gradient(90deg, transparent 0 calc(25% - 2px), rgba(90,60,30,.16) calc(25% - 2px) 25%); }
+  .fl-tile { background-image: linear-gradient(rgba(255,255,255,.5) 3px, transparent 3px), linear-gradient(90deg, rgba(255,255,255,.5) 3px, transparent 3px); background-size: 50% 50%; }
+  .fl-check { background-image: conic-gradient(rgba(255,255,255,.4) 25%, transparent 0 50%, rgba(255,255,255,.4) 0 75%, transparent 0); background-size: 50% 50%; }
+  .fl-grass { background-image: radial-gradient(rgba(60,130,60,.22) 2.6px, transparent 3.4px), radial-gradient(rgba(255,255,255,.35) 2px, transparent 2.8px); background-size: 18px 18px, 26px 26px; background-position: 0 0, 8px 12px; }
+  .fl-dirt { background-image: radial-gradient(rgba(130,85,40,.2) 3px, transparent 4px); background-size: 22px 22px; }
+  .fl-stone { background-image: linear-gradient(rgba(74,59,99,.14) 3px, transparent 3px), linear-gradient(90deg, rgba(74,59,99,.12) 3px, transparent 3px); background-size: 50% 33.3%, 50% 66.6%; }
+  .fl-metal { background-image: radial-gradient(rgba(74,59,99,.3) 2.4px, transparent 3.2px), linear-gradient(rgba(255,255,255,.4) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,.4) 2px, transparent 2px); background-size: 50% 50%, 50% 50%, 50% 50%; background-position: 8px 8px, 0 0, 0 0; }
+  .fl-marble { background-image: linear-gradient(135deg, rgba(255,255,255,.55), transparent 45%, rgba(255,255,255,.35) 70%, transparent 85%); }
+  .fl-carpet { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.16) 0 6px, transparent 6px 16px); }
+  .fl-snow { background-image: radial-gradient(#fff 2.8px, transparent 3.6px); background-size: 20px 20px; }
+</style>
+</head>
+<body>
+<div id="cap"></div>
+<div id="timer"></div>
+<div id="boardwrap"></div>
+<div id="cards"></div>
+<div id="dim"></div>
+<div id="over"></div>
+<div id="brand"></div>
+<script src="../../engine.js"></script>
+<script src="../../art.js"></script>
+<script>
+'use strict';
+const E = window.MysteryEngine, A = window.MysteryArt;
+const $ = (id) => document.getElementById(id);
+const esc = (t) => String(t).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const rich = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const ease = (x) => { x = clamp(x); return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2; };
+const pop = (x) => { x = clamp(x); const c = 1.70158; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const span = (t, a, b) => clamp((t - a) / (b - a)); // progress of t between a and b
+
+function tutorialPuzzle() {
+  return E.finishCustom({
+    N: 4,
+    theme: { id: 'mansion', name: 'The Mansion', area: 'room', edge: 'window', edgeColor: '#7fc4f0' },
+    zones: [{ name: 'Living Room', color: '#cfe0f3' }, { name: 'Kitchen', color: '#fbefc4' }, { name: 'Bedroom', color: '#e6d5ef' }],
+    zoneOf: [0, 0, 1, 1, 0, 0, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1],
+    obj: ['tv', null, 'table', null, 'plant', 'chair', null, null, null, 'rug', null, null, 'bed', 'bed', null, 'plant'],
+    edges: ['3n', '8w'],
+    people: [
+      { letter: 'A', name: 'Ava', g: 'f', color: '#e74c3c', clues: ['She was **sitting on a chair**.'] },
+      { letter: 'B', name: 'Ben', g: 'm', color: '#2980b9', clues: ['He was **lying on a bed**.'] },
+      { letter: 'C', name: 'Chloe', g: 'f', color: '#27ae60', clues: ['She was in the **Kitchen**, **by a window**.'] },
+      { letter: 'V', name: 'Victor', g: 'm', color: '#7f1d1d', isVictim: true, clues: [] },
+    ],
+    solution: [5, 12, 3, 10], murderer: 1, victim: 3,
+  });
+}
+
+/* ---------- building blocks ---------- */
+let P, cells = [], toks = [], hls = [], glows = [], cardEls = [];
+function buildBoard(size) {
+  const N = P.N, cs = size / N;
+  const wrap = $('boardwrap');
+  wrap.style.marginLeft = -(size + 24) / 2 + 'px';
+  const b = document.createElement('div');
+  b.className = 'board';
+  b.style.width = b.style.height = size + 24 + 'px';
+  b.style.gridTemplateColumns = b.style.gridTemplateRows = `repeat(${N}, 1fr)`;
+  const edges = new Set(P.edges);
+  // a label per zone on its lowest, emptiest square
+  const label = {};
+  P.zones.forEach((z, zi) => {
+    let best = -1, score = -1e9;
+    P.zoneOf.forEach((zz, i) => { if (zz !== zi) return; const s = Math.floor(i / N) * 10 - (P.obj[i] ? 3 : 0) - Math.abs(i % N - (N - 1) / 2); if (s > score) { score = s; best = i; } });
+    label[best] = zi;
+  });
+  for (let i = 0; i < N * N; i++) {
+    const c = document.createElement('div');
+    const w = P.walls[i], r = Math.floor(i / N), col = i % N;
+    c.className = 'cell fl-' + A.floor(P.theme.id, P.zoneOf[i]);
+    if (w.n && r > 0) c.classList.add('wn'); if (w.s && r < N - 1) c.classList.add('ws');
+    if (w.w && col > 0) c.classList.add('ww'); if (w.e && col < N - 1) c.classList.add('we');
+    c.style.backgroundColor = P.zones[P.zoneOf[i]].color;
+    const o = P.obj[i];
+    if (o === 'rug') c.classList.add('rug');
+    else if (o) c.innerHTML = `<div class="obj">${A.icon(o)}</div>`;
+    for (const s of ['n', 's', 'e', 'w']) if (edges.has(i + s)) c.insertAdjacentHTML('beforeend', `<div class="edge ${s}" style="background:${P.theme.edgeColor}"></div>`);
+    if (i in label && size / N > 70) c.insertAdjacentHTML('beforeend', `<div class="zl" style="font-size:${Math.min(34, cs * 0.17)}px">${esc(P.zones[label[i]].name)}</div>`);
+    const g = document.createElement('div'); g.className = 'zoneglow'; g.style.opacity = 0; c.appendChild(g); glows[i] = g;
+    const h = document.createElement('div'); h.className = 'hl'; h.style.opacity = 0; c.appendChild(h); hls[i] = h;
+    b.appendChild(c); cells[i] = c;
+  }
+  P.people.forEach((person, p) => {
+    const t = document.createElement('div');
+    const letters = N > 6;
+    t.className = 'tok' + (letters ? ' letter' : '');
+    if (letters) { t.textContent = person.letter; t.style.background = person.color; t.style.fontSize = cs * 0.45 + 'px'; t.style.borderWidth = '4px'; }
+    else { t.innerHTML = A.avatar(person); t.style.borderColor = person.isVictim ? '#c0392b' : person.color; }
+    t.style.opacity = 0;
+    cells[P.solution[p]].appendChild(t);
+    toks[p] = t;
+  });
+  wrap.appendChild(b);
+}
+function buildCards(scale) {
+  const box = $('cards');
+  P.people.forEach((person) => {
+    const d = document.createElement('div');
+    d.className = 'card' + (person.isVictim ? ' victim' : '');
+    const clues = person.isVictim ? '<div><b>The victim.</b> Found in the last free square.</div>' : person.clues.map((c) => `<div>${rich(c)}</div>`).join('');
+    d.innerHTML = `<div class="face">${A.avatar(person)}<span class="lt" style="background:${person.color}">${person.letter}</span></div>
+      <div><div class="nm">${esc(person.name)}${person.isVictim ? ' <span class="rip">rip</span>' : ''}</div><div class="cl">${clues}</div></div>`;
+    if (scale) d.style.zoom = scale;
+    box.appendChild(d); cardEls.push(d);
+  });
+}
+const brand = () => { $('brand').innerHTML = `${A.ui('logo')}<span>Mystery Grid</span>`; };
+function endCard(x, lines) {
+  const o = $('over');
+  $('dim').style.opacity = ease(x) * 0.95;
+  o.style.opacity = ease(x);
+  o.innerHTML = `<div class="ic" style="transform:scale(${0.6 + 0.4 * pop(x)})">${A.ui('logo')}</div>
+    <div class="big">Mystery Grid</div><div class="sub">${lines.join('<br>')}</div>`;
+}
+const setCap = (html, x) => { const c = $('cap'); c.innerHTML = html ? `<div>${html}</div>` : ''; c.style.opacity = ease(x); c.style.transform = `translateY(${(1 - ease(x)) * 30}px)`; };
+
+/* ---------- the three videos ---------- */
+const VIDEOS = {
+  // 1: easy case, countdown, worked solution, reveal
+  1: {
+    duration: 25,
+    setup() { P = tutorialPuzzle(); buildBoard(760); buildCards(); brand(); },
+    render(t) {
+      const o = $('over'), dim = $('dim');
+      // hook
+      if (t < 2.8) {
+        const x = span(t, 0, 0.6), out = span(t, 2.3, 2.8);
+        dim.style.opacity = 0.9 * (1 - out); o.style.opacity = 1 - out;
+        o.innerHTML = `<div class="ic" style="transform:scale(${pop(x)}) rotate(${(1 - x) * -20}deg)">${A.ui('knife')}</div>
+          <div class="big" style="transform:scale(${0.8 + 0.2 * pop(span(t, 0.3, 0.9))})">Can you solve this murder?</div>
+          <div class="sub" style="opacity:${ease(span(t, 1, 1.5))}">4 people · 1 victim · 1 killer</div>`;
+      } else if (t >= 9.2 && t < 12.8) {
+        const k = 3 - Math.floor((t - 9.6) / 1.05);
+        const x = span(t, 9.2, 9.6), out = span(t, 12.4, 12.8);
+        dim.style.opacity = 0.75 * ease(x) * (1 - out); o.style.opacity = ease(x) * (1 - out);
+        o.innerHTML = `<div class="big">Pause &amp; try!</div><div class="sub">Who did it?</div><div class="ring">${t < 9.6 ? 3 : Math.max(1, k)}</div>`;
+      } else if (t >= 22) {
+        endCard(span(t, 22, 22.6), ['A new murder every day', 'Rookie → Extreme', '<b style="color:#ffd166">Free · link in bio</b>']);
+      } else { dim.style.opacity = 0; o.style.opacity = 0; }
+
+      const bx = pop(span(t, 2.6, 3.3));
+      $('boardwrap').style.transform = `scale(${0.6 + 0.4 * bx})`; $('boardwrap').style.opacity = ease(span(t, 2.6, 3.0));
+      cardEls.forEach((c, k) => { const x = span(t, 3.4 + k * 0.45, 3.9 + k * 0.45); c.style.opacity = ease(x); c.style.transform = `translateY(${(1 - ease(x)) * 80}px)`; });
+
+      // captions
+      if (t >= 3 && t < 6) setCap('Everyone was in a <b>different row</b> and a <b>different column</b>.', span(t, 3, 3.4) * (1 - span(t, 5.7, 6)));
+      else if (t >= 6 && t < 9.2) setCap('The killer was <b>alone with the victim</b> in the same room.', span(t, 6, 6.4) * (1 - span(t, 8.9, 9.2)));
+      const steps = [
+        [12.9, 0, 'Only <b>ONE chair</b> → Ava'],
+        [14.6, 1, 'A bed… but Ava owns that column → <b>Ben</b>'],
+        [16.3, 2, 'Kitchen + window → <b>Chloe</b>'],
+        [18.0, 3, 'Last free square → <b>Victor</b>'],
+      ];
+      for (const [s, p, txt] of steps) if (t >= s && t < s + 1.7) setCap(txt, span(t, s, s + 0.3) * (1 - span(t, s + 1.45, s + 1.7)));
+      if (t >= 19.7 && t < 22) setCap('Ben was <b>alone</b> with Victor…<br><b style="font-size:84px">BEN DID IT!</b>', span(t, 19.7, 20.1));
+      if (t < 3 || (t >= 12.6 && t < 12.9)) setCap('', 0);
+
+      // tokens + highlights
+      steps.forEach(([s, p]) => {
+        const cell = P.solution[p];
+        hls[cell].style.opacity = t >= s && t < s + 1.6 ? 0.5 + 0.5 * Math.sin((t - s) * 9) : 0;
+        const x = span(t, s + 0.5, s + 0.9);
+        toks[p].style.opacity = x > 0 ? 1 : 0;
+        toks[p].style.transform = `scale(${pop(x)})`;
+      });
+      // reveal: bedroom glows, Ben pulses
+      const rv = t >= 19.6 && t < 22;
+      P.zoneOf.forEach((z, i) => { glows[i].style.opacity = rv && z === 2 ? 0.6 + 0.4 * Math.sin(t * 6) : 0; });
+      if (rv) toks[1].style.transform = `scale(${1 + 0.12 * Math.sin((t - 19.6) * 10)})`;
+    },
+  },
+  // 2: medium case, 10 second timer, comment your answer
+  2: {
+    duration: 24,
+    setup() {
+      P = E.generate(9500003, 'medium');
+      buildBoard(700); buildCards(0.86); brand();
+      $('cards').style.top = '1140px';
+    },
+    render(t) {
+      const o = $('over'), dim = $('dim');
+      if (t < 2.8) {
+        const out = span(t, 2.3, 2.8);
+        dim.style.opacity = 0.9 * (1 - out); o.style.opacity = 1 - out;
+        o.innerHTML = `<div class="ic" style="transform:scale(${pop(span(t, 0, 0.6))})">${A.ui('logo')}</div>
+          <div class="big">Think you're a detective?</div><div class="sub" style="opacity:${ease(span(t, 1, 1.5))}">Prove it. ${P.N - 1} suspects, 1 killer.</div>`;
+      } else if (t >= 17.5 && t < 21) {
+        const x = span(t, 17.5, 18);
+        dim.style.opacity = 0.85 * ease(x); o.style.opacity = ease(x);
+        o.innerHTML = `<div class="big">Who did it?</div>
+          <div class="facerow">${P.people.filter((p) => !p.isVictim).map((p, k) => `<div class="f" style="transform:scale(${pop(span(t, 18 + k * 0.15, 18.4 + k * 0.15))})"><div>${A.avatar(p)}</div>${p.letter} · ${esc(p.name)}</div>`).join('')}</div>
+          <div class="sub" style="opacity:${ease(span(t, 18.8, 19.3))}">Comment your answer!</div>`;
+      } else if (t >= 21) {
+        endCard(span(t, 21, 21.6), ['A new case every day', 'Free · link in bio']);
+      } else { dim.style.opacity = 0; o.style.opacity = 0; }
+      $('boardwrap').style.transform = `scale(${0.6 + 0.4 * pop(span(t, 2.6, 3.3))})`; $('boardwrap').style.opacity = ease(span(t, 2.6, 3));
+      cardEls.forEach((c, k) => { const x = span(t, 3.3 + k * 0.35, 3.8 + k * 0.35); c.style.opacity = ease(x); c.style.transform = `translateY(${(1 - ease(x)) * 80}px)`; });
+      if (t >= 3 && t < 7.2) setCap('Different <b>row</b> &amp; <b>column</b> for everyone.<br>Killer = <b>alone with the victim</b>.', span(t, 3, 3.4) * (1 - span(t, 6.9, 7.2)));
+      else if (t >= 7.2 && t < 17.5) setCap('You have <b>10 seconds</b>…', span(t, 7.2, 7.5));
+      else setCap('', 0);
+      const tm = $('timer');
+      tm.style.opacity = t >= 7.4 && t < 17.5 ? 1 : 0;
+      tm.textContent = Math.max(1, 10 - Math.floor(t - 7.5));
+      tm.style.transform = `scale(${1 + 0.08 * Math.max(0, Math.sin((t - 7.5) * Math.PI * 2))})`;
+    },
+  },
+  // 3: extreme teaser
+  3: {
+    duration: 22,
+    setup() {
+      P = E.generate(9600002, 'extreme');
+      buildBoard(900); buildCards(0.78); brand();
+      const view = document.createElement('div');
+      view.style.cssText = 'position:absolute;left:0;right:0;top:1290px;height:330px;overflow:hidden';
+      document.body.appendChild(view);
+      const cards = $('cards'); cards.style.top = '10px'; view.appendChild(cards);
+    },
+    render(t) {
+      const o = $('over'), dim = $('dim');
+      if (t < 3) {
+        const out = span(t, 2.5, 3);
+        dim.style.opacity = 0.92 * (1 - out); o.style.opacity = 1 - out;
+        o.innerHTML = `<div class="ic" style="transform:scale(${pop(span(t, 0, 0.6))}) rotate(${Math.sin(t * 8) * 6}deg)">${A.ui('knife')}</div>
+          <div class="big" style="color:#ff6b6b">LEVEL: EXTREME</div><div class="sub" style="opacity:${ease(span(t, 1, 1.5))}">10×10 · 9 suspects · 1 killer</div>`;
+      } else if (t >= 18.5) {
+        endCard(span(t, 18.5, 19.1), ['From 4×4 Rookie to 10×10 Extreme', 'New case every day', 'Free · link in bio']);
+      } else { dim.style.opacity = 0; o.style.opacity = 0; }
+      $('boardwrap').style.top = '330px';
+      $('boardwrap').style.transform = `scale(${0.5 + 0.5 * pop(span(t, 2.8, 3.6))})`; $('boardwrap').style.opacity = ease(span(t, 2.8, 3.2));
+      // clue cards scroll by under the board
+      const sc = ease(span(t, 6, 16));
+      const travel = Math.max(0, $('cards').offsetHeight - 310);
+      $('cards').style.transform = `translateY(${-sc * travel}px)`;
+      cardEls.forEach((c, k) => { const x = span(t, 3.6 + k * 0.2, 4.1 + k * 0.2); c.style.opacity = ease(x); });
+      if (t >= 3.6 && t < 8) setCap('<b>100 squares.</b> 9 suspects.<br>Every clue matters.', span(t, 3.6, 4) * (1 - span(t, 7.7, 8)));
+      else if (t >= 8 && t < 12.5) setCap('Exactly <b>ONE</b> solution.<br>No guessing. Pure logic.', span(t, 8, 8.4) * (1 - span(t, 12.2, 12.5)));
+      else if (t >= 12.5 && t < 18.5) setCap('Most people quit.<br><b>Would you even try?</b>', span(t, 12.5, 12.9) * (1 - span(t, 18.2, 18.5)));
+      else setCap('', 0);
+      // a few suspects drop in to tease the start of the solve
+      [0, 1, 2].forEach((p, k) => { const x = span(t, 9 + k * 1.1, 9.4 + k * 1.1); toks[p].style.opacity = x > 0 ? 1 : 0; toks[p].style.transform = `scale(${pop(x)})`; });
+      toks.forEach((tk, p) => { if (p > 2) tk.style.opacity = 0; });
+    },
+  },
+};
+
+const V = VIDEOS[+(new URLSearchParams(location.search).get('v') || 1)];
+V.setup();
+window.DURATION = V.duration;
+window.renderAt = (t) => V.render(t);
+window.answer = () => ({ murderer: P.people[P.murderer].letter + ' ' + P.people[P.murderer].name, title: P.title });
+renderAt(0);
+</script>
+</body>
+</html>
