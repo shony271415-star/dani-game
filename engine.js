@@ -93,6 +93,14 @@
         ["Spa Day Disaster", "Face masks, cucumber slices and one very permanent nap."],
         ["Sleepover Scream", "Truth or dare got way too much truth."],
         ["The Wi-Fi Password", "Nobody would share it. Somebody snapped."],
+        ["Murder Most Fancy", "The silverware was polished. The alibis were not."],
+        ["Chandelier Drama", "Something dropped at midnight, and it wasn't the chandelier."],
+        ["Butler's Day Off", "With the butler gone, things got messy fast."],
+        ["Inheritance Games", "Five relatives, one fortune, zero chill."],
+        ["Dinner for Schemers", "Seven courses. One of them was revenge."],
+        ["Wallpaper Witness", "If these walls could talk, they'd want a lawyer."],
+        ["Brunch Gone Bad", "The mimosas were bottomless. So were the lies."],
+        ["The Missing Monocle", "It started with a missing monocle. It ended with a missing guest."],
       ],
     },
     {
@@ -117,6 +125,14 @@
         ["Overboard Drama", "Someone yelled 'man overboard!'. Wrong in every way."],
         ["Love Boat, Hate Crime", "A romantic cruise. Heavy on the cruise, light on the romance."],
         ["Ship Happens", "Nobody planned for this on the brochure."],
+        ["Abandon Ship-tionships", "Old friends, one cruise, too many secrets."],
+        ["Sea You Never", "The goodbye party got a little too final."],
+        ["Deck the Halls", "Someone decked someone, and not in the festive way."],
+        ["Port of Call", "Nobody answered when the ship called. Suspicious."],
+        ["Rough Seas, Rougher Guests", "The waves were wild. The passengers were wilder."],
+        ["Lifeboat Drill", "Everyone found a seat. Almost everyone."],
+        ["Anchors Away", "The anchor dropped. So did the mood."],
+        ["Captain's Dinner", "Fancy suits, fancier lies."],
       ],
     },
     {
@@ -141,6 +157,14 @@
         ["Ghost Story Gone Wrong", "The scariest part of the story turned out to be true."],
         ["Mosquito Bites & Murder", "The bugs weren't the only ones out for blood."],
         ["Leaf Me Alone", "Somebody really wanted some alone time. Forever."],
+        ["Wood You Believe It", "The trees saw everything. Unfortunately, trees can't testify."],
+        ["Pine and Punishment", "Fresh air, fresh crime."],
+        ["Trail of Lies", "Every footprint pointed somewhere different."],
+        ["Owl Be Watching", "The owl asked 'who?' all night. Fair question."],
+        ["Campfire Confessions", "Nobody confessed. Classic campers."],
+        ["Moss Wanted", "Nature is beautiful. Nature is also an excellent hiding spot."],
+        ["Branch Manager", "Someone climbed the corporate ladder. And a tree."],
+        ["Into the Woods", "Six went in for the weekend. You know the rest."],
       ],
     },
     {
@@ -165,6 +189,14 @@
         ["Not Rocket Science", "It's not rocket science. Okay, it's a little bit rocket science."],
         ["Ctrl + Alt + Dead", "The station computer saw everything. It's not talking."],
         ["Lost in Spaghetti", "Pasta night in orbit went horribly, noodly wrong."],
+        ["Space Oddity", "Ground control lost contact. With one crew member."],
+        ["The Martian Alibi", "'I was on Mars' is not an alibi up here."],
+        ["Asteroid Accident?", "It was not an asteroid."],
+        ["Black Hole Mystery", "Clues vanish fast out here. Work quickly."],
+        ["Gravity Check", "Someone forgot the most important rule of space: be nice."],
+        ["Astro-Not", "One astronaut will not be returning to Earth."],
+        ["Rocket Fuel Rivals", "Two engineers, one promotion, zero oxygen to spare."],
+        ["Moon Walk of Shame", "Someone tried to sneak away. On the moon. Bold."],
       ],
     },
     {
@@ -189,6 +221,14 @@
         ["Gift Shop of Horrors", "Exit through the gift shop. If you can."],
         ["Older Than Dirt", "Someone's alibi is older than the vases."],
         ["Sculpt Fiction", "Every statue here has a perfect poker face."],
+        ["Exhibit A", "The newest exhibit wasn't on the floor plan."],
+        ["Fossil Fuel", "Old bones, new trouble."],
+        ["The Louvre Affair", "Not that museum. Same amount of drama."],
+        ["Frame Job", "Someone's being framed. Literally."],
+        ["Relic Wreck", "A priceless relic, a pricey mistake."],
+        ["Statue of Limitations", "The statues aren't talking. Everyone else is lying."],
+        ["Museum After Dark", "The tour ended at five. The mystery started at six."],
+        ["You Break It, You Bought It", "Someone broke something much worse than a vase."],
       ],
     },
     {
@@ -212,6 +252,14 @@
         ["Next Stop: Nobody", "The conductor called the station. One passenger didn't answer."],
         ["Lost My Train of Thought", "Follow it carefully. It goes somewhere dark."],
         ["Tunnel Vision", "The lights went out in the tunnel for exactly ten seconds."],
+        ["Derail of Events", "Things went off track around dinner time."],
+        ["All Aboard the Alibi", "Every passenger has a story. Only some are true."],
+        ["First Class Problems", "Fancy seats. Fancier motives."],
+        ["Overnight Express", "Everyone slept. One person really, really slept."],
+        ["Steam & Scheme", "The engine hissed. So did the passengers."],
+        ["Tracks of My Tears", "Somebody's crying, and somebody's lying."],
+        ["Caboose Clues", "The answer is at the end of the line."],
+        ["Conductor Confusion", "Tickets, please. And alibis."],
       ],
     },
     {
@@ -235,6 +283,14 @@
         ["Send in the Clowns", "They did. That was the problem."],
         ["Clown Town Breakdown", "Nobody was laughing when the music stopped."],
         ["Ring Ring, Who's Dead?", "The ringmaster announced a surprise. It was not on the program."],
+        ["Big Top Mystery", "The tent was huge. The suspect list was bigger."],
+        ["Trapeze Tease", "Someone swung for the fences. And missed."],
+        ["Clowned and Out", "The clown car had one seat too many."],
+        ["Ringmaster Plan", "Everyone wanted to run the show."],
+        ["Cotton Candy Crime", "Sweet treats, sour motives."],
+        ["Lion Around", "Nobody is telling the truth tonight."],
+        ["The Greatest Show", "On Earth? Maybe. Most suspicious? Definitely."],
+        ["Balloon Animal Witness", "The poodle balloon saw it all."],
       ],
     },
     {
@@ -258,6 +314,14 @@
         ["Dungeons & Drama", "Roll for initiative. Then roll for an alibi."],
         ["The Ghost Has an Alibi", "The servants blamed the ghost. The ghost was at book club."],
         ["Heir Today, Gone Tomorrow", "Only one heir could inherit. Now there's one fewer."],
+        ["A Knight to Remember", "The ball was lovely, right up until the scream."],
+        ["Crown Jewels", "The jewels stayed. A guest did not."],
+        ["Tower of Power", "Climbing to the top has a price."],
+        ["Dragon Not Included", "For once, the dragon is innocent."],
+        ["Royal Pain", "Being royalty is hard. Being dead is harder."],
+        ["Jester Joking", "The jester had the last laugh."],
+        ["Moat Ado About Nothing", "A lot of fuss over one tiny murder."],
+        ["Chess Match", "Someone took the queen. Literally."],
       ],
     },
     {
@@ -281,6 +345,14 @@
         ["Avalanche of Lies", "The snow wasn't the only thing piling up."],
         ["The Snowman Saw Everything", "Snowmen don't talk. That's the whole problem."],
         ["Hot Tub Crime Machine", "Bubbles, steam and one very cold case."],
+        ["Downhill From Here", "The vacation was going great, until it wasn't."],
+        ["Black Diamond", "The hardest slope on the mountain is this case."],
+        ["Cold Feet", "Someone's alibi melted fast."],
+        ["Fondue Feud", "Cheese was dipped. Grudges were held."],
+        ["Ski Lift Lies", "Stuck in a lift with a liar. Classic."],
+        ["Apr\u00e8s-Ski Apocalypse", "The party ended early. For one guest, permanently."],
+        ["Frozen Assets", "The will was in the safe. The heir was in trouble."],
+        ["Powder Day", "Fresh snow covers a lot of tracks."],
       ],
     },
   ];
@@ -836,9 +908,7 @@
     const themeIdx = (seed * 4 + Math.floor(seed / 100000) * 2) % THEMES.length;
     let best = null;
     const want = D.attempts || 1;
-    const t0 = Date.now();
     for (let attempt = 0, got = 0; attempt < 400 && got < want; attempt++) {
-      if (best && Date.now() - t0 > 2500) break; // good enough, don't keep the player waiting
       const p = tryGenerate(R, H, diffKey, themeIdx);
       if (!p || p.grade.level > 2) continue;
       got++;
@@ -939,6 +1009,9 @@
     return facts.map(({ id, text, dup }, k) => ({ id, text, dup, score: scores[k] }));
   }
 
+  // the scene a seed will use (same formula as generate)
+  function themeFor(seed) { return THEMES[(seed * 4 + Math.floor(seed / 100000) * 2) % THEMES.length]; }
+
   // turns a hand-made layout (like the tutorial case) into a full puzzle object
   function finishCustom(P) {
     P.walls = computeWalls(P.N, P.zoneOf);
@@ -947,7 +1020,7 @@
     return P;
   }
 
-  const API = { generate, solve, grade, sceneFacts, finishCustom, evalUnary, isBlocked, OBJECTS, THEMES, DIFFICULTY, VERSION };
+  const API = { generate, solve, grade, sceneFacts, finishCustom, themeFor, evalUnary, isBlocked, OBJECTS, THEMES, DIFFICULTY, VERSION };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   else root.MysteryEngine = API;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -17,6 +17,7 @@ Sudoku meets murder mystery. Place every suspect on the crime scene using their 
 | Expert | 8×8 | 7 |
 | Extreme | 10×10 | 9 |
 
+Every level is generated on the fly (deterministically from its number), so the journey never ends. 144 different case titles.
 Suspects are named in alphabetical order (A, B, C…). Expert and Extreme puzzles are graded by a logic solver: they can't be finished by simple elimination and need "what if this person were here?" reasoning.
 
 ## Two editions
@@ -34,6 +35,9 @@ Suspects are named in alphabetical order (A, B, C…). Expert and Extreme puzzle
 - **Daily calendar**: a trophy for solving every daily case of a month.
 - **Trophies**: 12 achievements, 50 coins each.
 - **Coin shop**: skin packs for every suspect and victim, from Pet Detectives (300 coins) to Neon Legends (4,000); two premium packs (Masquerade Ball, Cyber Agents) and coin bundles for real money through Google Play Billing (see `store/GOOGLE-PLAY.md`).
+- **Journey map**: a winding path of numbered levels with stars, boss levels, the scene of each level, and your friends' positions.
+- **Friends**: share a link; friends appear on your map at their level, with their skin. Sharing again updates them.
+- **Duels**: after a case, send a challenge link; the friend gets exactly the same case and sees who was faster.
 - **Feel**: sounds, vibration, confetti, coin count-up (sound can be turned off).
 
 ## Tools
