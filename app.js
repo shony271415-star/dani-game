@@ -973,6 +973,12 @@
     if (S.history.length > 300) S.history.shift();
   }
   const whoAt = (cell) => S.place.indexOf(cell);
+  // squares crossed out automatically: the row and column of everyone already placed
+  function autoXSet() {
+    const N = S.P.N, a = new Set();
+    S.place.forEach((c) => { if (c < 0) return; const r = Math.floor(c / N), k = c % N; for (let t = 0; t < N; t++) { a.add(r * N + t); a.add(t * N + k); } a.delete(c); });
+    return a;
+  }
 
   /* Mark mode: tap a square, or slide a finger across a row/column to cross out everything touched */
   (function setupSwipe() {
@@ -982,12 +988,12 @@
     const apply = (i) => {
       if (i < 0 || i === last) return;
       last = i;
-      if (S.solvedGrid || whoAt(i) >= 0) return;
+      if (S.solvedGrid || whoAt(i) >= 0 || autoXSet().has(i)) return;
       const has = S.xs.has(i);
       if (paint === null) paint = !has;
       if (has === paint) return;
       if (!snapped) { snapshot(); snapped = true; }
-      if (paint) S.xs.add(i); else S.xs.delete(i);
+      if (paint) { S.xs.add(i); delete S.draft[i]; } else S.xs.delete(i);
       const c = board.querySelector(`.cell[data-i="${i}"]`);
       const m = c && c.querySelector('.xmark');
       if (paint && c && !m) { const x = document.createElement('div'); x.className = 'xmark'; x.textContent = '✕'; c.appendChild(x); }
@@ -1009,9 +1015,9 @@
     if (S.solvedGrid) return;
     const P = S.P, occ = whoAt(i);
     if (S.mode === 'x') {
-      if (occ >= 0) return;
+      if (occ >= 0 || autoXSet().has(i)) return;
       snapshot();
-      if (S.xs.has(i)) S.xs.delete(i); else S.xs.add(i);
+      if (S.xs.has(i)) S.xs.delete(i); else { S.xs.add(i); delete S.draft[i]; }
       render(); persist();
       return;
     }
@@ -1019,6 +1025,7 @@
       if (S.sel < 0) { setStatus(tr('Pick a suspect first, then tap the squares where they might be 👇'), true); return; }
       if (E.isBlocked(P.obj[i])) { setStatus(tr('Nobody can stand there!'), true); return; }
       if (occ >= 0) return;
+      if (S.xs.has(i) || autoXSet().has(i)) { setStatus(tr('Nobody can stand there!'), true); return; }
       snapshot();
       const list = S.draft[i] || [];
       const k = list.indexOf(S.sel);
@@ -1139,7 +1146,7 @@
 
   function render() {
     if (!S) return;
-    const P = S.P, N = P.N, big = N > 6;
+    const P = S.P, N = P.N, big = N > 6, autoX = autoXSet();
     const board = $('board');
     board.style.setProperty('--n', N);
     board.style.gridTemplateColumns = `repeat(${N}, 1fr)`;
@@ -1165,7 +1172,8 @@
       if (who >= 0) cell.classList.add('has-token');
       if (S.solvedGrid && P.zoneOf[i] === P.zoneOf[P.solution[P.victim]]) cell.classList.add('vzone');
       if (S.sel >= 0 && (usedR.has(Math.floor(i / N)) || usedC.has(i % N) || E.isBlocked(o))) cell.classList.add('dim');
-      const drafts = who < 0 ? S.draft[i] || [] : [];
+      const crossed = who < 0 && (S.xs.has(i) || autoX.has(i));
+      const drafts = who < 0 && !crossed ? S.draft[i] || [] : [];
       if (drafts.length) cell.classList.add('has-draft');
       if (S.mode === 'draft' && S.sel >= 0 && drafts.includes(S.sel)) cell.classList.add('draft-sel');
       if (ART && o && ART.has(o)) { const em = document.createElement('div'); em.className = 'obj art'; em.innerHTML = ART.icon(o); cell.appendChild(em); }
@@ -1188,7 +1196,7 @@
         else t.textContent = skinEmoji(person);
         cell.appendChild(t);
       } else {
-        if (S.xs.has(i)) { const x = document.createElement('div'); x.className = 'xmark'; x.textContent = '✕'; cell.appendChild(x); }
+        if (crossed) { const x = document.createElement('div'); x.className = 'xmark' + (S.xs.has(i) ? '' : ' auto'); x.textContent = '✕'; cell.appendChild(x); }
         if (drafts.length) {
           const d = document.createElement('div');
           d.className = 'drafts';
