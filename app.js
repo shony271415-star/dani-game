@@ -960,6 +960,7 @@
     S.mode = m;
     $('mode-place').classList.toggle('on', m === 'place');
     $('mode-x').classList.toggle('on', m === 'x');
+    document.body.classList.toggle('mode-x', m === 'x');
     $('mode-draft').classList.toggle('on', m === 'draft');
     if (m === 'x') { S.sel = -1; setStatus(tr('Mark mode: tap a square to cross it out ✕')); }
     else if (m === 'draft') setStatus(S.sel >= 0 ? tr('Draft: tap every square where {0} might be.', S.P.people[S.sel].name) : tr('Draft mode: pick a suspect, then tap all the squares where they might be.'));
@@ -972,6 +973,37 @@
     if (S.history.length > 300) S.history.shift();
   }
   const whoAt = (cell) => S.place.indexOf(cell);
+
+  /* Mark mode: tap a square, or slide a finger across a row/column to cross out everything touched */
+  (function setupSwipe() {
+    const board = $('board');
+    let paint = null, snapped = false, last = -1;
+    const cellAt = (e) => { const el = document.elementFromPoint(e.clientX, e.clientY); const c = el && el.closest && el.closest('.cell'); return c && board.contains(c) ? +c.dataset.i : -1; };
+    const apply = (i) => {
+      if (i < 0 || i === last) return;
+      last = i;
+      if (S.solvedGrid || whoAt(i) >= 0) return;
+      const has = S.xs.has(i);
+      if (paint === null) paint = !has;
+      if (has === paint) return;
+      if (!snapped) { snapshot(); snapped = true; }
+      if (paint) S.xs.add(i); else S.xs.delete(i);
+      const c = board.querySelector(`.cell[data-i="${i}"]`);
+      const m = c && c.querySelector('.xmark');
+      if (paint && c && !m) { const x = document.createElement('div'); x.className = 'xmark'; x.textContent = '✕'; c.appendChild(x); }
+      if (!paint && m) m.remove();
+    };
+    board.addEventListener('pointerdown', (e) => {
+      if (S.mode !== 'x' || S.tut >= 0) return;
+      paint = null; snapped = false; last = -1;
+      board.dataset.swiping = '1';
+      apply(cellAt(e));
+    });
+    board.addEventListener('pointermove', (e) => { if (board.dataset.swiping) apply(cellAt(e)); });
+    const end = () => { if (!board.dataset.swiping) return; delete board.dataset.swiping; if (snapped) { sfx('tick'); render(); persist(); } };
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach((n) => board.addEventListener(n, end));
+    board.addEventListener('touchmove', (e) => { if (board.dataset.swiping) e.preventDefault(); }, { passive: false });
+  })();
 
   function onCell(i) {
     if (S.solvedGrid) return;
@@ -1171,7 +1203,8 @@
           cell.appendChild(d);
         }
       }
-      cell.addEventListener('click', () => onCell(i));
+      cell.dataset.i = i;
+      cell.addEventListener('click', () => { if (S.mode !== 'x') onCell(i); });
       board.appendChild(cell);
     }
 
