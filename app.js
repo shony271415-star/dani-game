@@ -463,7 +463,7 @@
     setTimeout(maybeDailyBonus, 350);
     $('diffs').innerHTML = DIFFS.map((d) => {
       const p = prog(d.key);
-      const badge = p.cur ? tr('In progress') : p.solved ? tr('{0} solved', p.solved) : tr('New!');
+      const badge = (p.cur ? '▶ ' : '') + tr('Level {0}', p.caseNum);
       return `<button class="diff-btn ${d.key === 'extreme' ? 'extreme' : ''}" data-diff="${d.key}">
         <span>${ART ? `<span class="ic dic">${ART.ui(d.art)}</span>${tr(d.name)}` : d.emoji + ' ' + tr(d.name)}<small>${tr(d.sub)}</small></span><span class="badge">${badge}</span></button>`;
     }).join('');
@@ -913,7 +913,7 @@
   function paintCaseHeader() {
     if (!S) return;
     const P = S.P, slot = S.slot, { title, intro } = caseText();
-    const label = slot === 'challenge' && S.challenge ? tr("{0}'s challenge: {1}", S.challenge.n, title) : slot === 'daily' ? tr('Daily Case: {0}', title) : slot === 'tutorial' ? title : slot === 'journey' ? tr('Level {0}: {1}', S.caseNum, title) : tr('Case #{0}: {1}', S.caseNum, title);
+    const label = slot === 'challenge' && S.challenge ? tr("{0}'s challenge: {1}", S.challenge.n, title) : slot === 'daily' ? tr('Daily Case: {0}', title) : slot === 'tutorial' ? title : slot === 'journey' ? tr('Level {0}: {1}', S.caseNum, title) : tr('Level {0}: {1}', S.caseNum, title);
     $('case-title').innerHTML = (ART ? `<span class="tic">${ART.theme(P.theme.id)}</span>` : P.theme.icon + ' ') + esc(label);
     $('intro').textContent = slot === 'challenge' && S.challenge ? tr('⚔ {0} solved this in {1}. Can you beat that?', S.challenge.n, fmtTime(S.challenge.time)) : intro;
     updateSub();
@@ -949,7 +949,7 @@
   function stopTimer() { if (timer) clearInterval(timer); timer = null; }
   function updateSub() {
     const dn = dname(S.diff);
-    const kind = S.slot === 'challenge' ? tr('Challenge') + ' · ' + dn : S.slot === 'daily' ? tr('Daily') + ' · ' + dn : S.slot === 'tutorial' ? tr('Tutorial') : S.slot === 'journey' ? tr('Level {0}', S.caseNum) + ' · ' + dn + (isBoss(S.caseNum) ? ' · ' + tr('Boss') : '') : dn;
+    const kind = S.slot === 'challenge' ? tr('Challenge') + ' · ' + dn : S.slot === 'daily' ? tr('Daily') + ' · ' + dn : S.slot === 'tutorial' ? tr('Tutorial') : S.slot === 'journey' ? tr('Level {0}', S.caseNum) + ' · ' + dn + (isBoss(S.caseNum) ? ' · ' + tr('Boss') : '') : dn + ' · ' + tr('Level {0}', S.caseNum);
     $('case-sub').textContent = `${I.themeName(S.P.theme.name)} · ${kind} · ${ART ? '' : '⏱ '}${fmtTime(S.elapsed)}`;
   }
 
