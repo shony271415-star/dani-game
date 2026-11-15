@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -598,6 +598,52 @@
   body.noir .friend-row { background: #e2d2ae; border-radius: 4px; }
   body.noir .duel { border-radius: 4px; font-family: "Oswald", sans-serif; letter-spacing: .5px; }
   body.noir .theme-dec { filter: saturate(.7); }
+
+  /* ---------- Cyrillic and Hebrew glyphs for the custom fonts ---------- */
+  @font-face { font-family: "Playfair Display"; font-weight: 700; src: url(../tools/fonts/playfair-display-cyrillic-700-normal.woff2) format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: "Playfair Display"; font-weight: 700; src: url(../tools/fonts/frank-ruhl-libre-hebrew-700-normal.woff2) format("woff2"); unicode-range: U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F; }
+  @font-face { font-family: "Playfair Display"; font-weight: 900; src: url(../tools/fonts/playfair-display-cyrillic-900-normal.woff2) format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: "Playfair Display"; font-weight: 900; src: url(../tools/fonts/frank-ruhl-libre-hebrew-900-normal.woff2) format("woff2"); unicode-range: U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F; }
+  @font-face { font-family: "Oswald"; font-weight: 500; src: url(../tools/fonts/oswald-cyrillic-500-normal.woff2) format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: "Oswald"; font-weight: 500; src: url(../tools/fonts/heebo-hebrew-500-normal.woff2) format("woff2"); unicode-range: U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F; }
+  @font-face { font-family: "Oswald"; font-weight: 600; src: url(../tools/fonts/oswald-cyrillic-600-normal.woff2) format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: "Oswald"; font-weight: 600; src: url(../tools/fonts/heebo-hebrew-600-normal.woff2) format("woff2"); unicode-range: U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F; }
+  @font-face { font-family: "Courier Prime"; font-weight: 400; src: url(../tools/fonts/cousine-cyrillic-400-normal.woff2) format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: "Courier Prime"; font-weight: 400; src: url(../tools/fonts/cousine-hebrew-400-normal.woff2) format("woff2"); unicode-range: U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F; }
+  @font-face { font-family: "Courier Prime"; font-weight: 700; src: url(../tools/fonts/cousine-cyrillic-700-normal.woff2) format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: "Courier Prime"; font-weight: 700; src: url(../tools/fonts/cousine-hebrew-700-normal.woff2) format("woff2"); unicode-range: U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F; }
+  @font-face { font-family: "Special Elite"; font-weight: 400; src: url(../tools/fonts/cousine-cyrillic-400-normal.woff2) format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: "Special Elite"; font-weight: 400; src: url(../tools/fonts/cousine-hebrew-400-normal.woff2) format("woff2"); unicode-range: U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F; }
+  @font-face { font-family: "Fredoka"; font-weight: 500; src: url(../tools/fonts/rubik-cyrillic-500-normal.woff2) format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: "Fredoka"; font-weight: 500; src: url(../tools/fonts/rubik-hebrew-500-normal.woff2) format("woff2"); unicode-range: U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F; }
+  @font-face { font-family: "Quicksand"; font-weight: 500; src: url(../tools/fonts/rubik-cyrillic-500-normal.woff2) format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: "Quicksand"; font-weight: 500; src: url(../tools/fonts/rubik-hebrew-500-normal.woff2) format("woff2"); unicode-range: U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F; }
+  @font-face { font-family: "Fredoka"; font-weight: 600; src: url(../tools/fonts/rubik-cyrillic-600-normal.woff2) format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: "Fredoka"; font-weight: 600; src: url(../tools/fonts/rubik-hebrew-600-normal.woff2) format("woff2"); unicode-range: U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F; }
+  @font-face { font-family: "Quicksand"; font-weight: 600; src: url(../tools/fonts/rubik-cyrillic-600-normal.woff2) format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: "Quicksand"; font-weight: 600; src: url(../tools/fonts/rubik-hebrew-600-normal.woff2) format("woff2"); unicode-range: U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F; }
+
+  /* ---------- languages: picker, right-to-left layout ---------- */
+  .lang-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 6px 0 4px; }
+  .lang-btn { border: 2px solid var(--ink); background: var(--card); color: var(--ink); border-radius: 12px; padding: 7px 14px; font-size: 16px; font-weight: 700; }
+  .lang-btn.on { background: var(--ink); color: #fff; }
+  .set-h { font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; opacity: .65; margin: 14px 0 2px; }
+  .code-box { direction: ltr; text-align: left; }
+  /* the board is a picture of a floor plan: it never flips, so "to the left" always means the left of the screen */
+  .board, .map-canvas, .scene-wrap, .drafts { direction: ltr; }
+  body.rtl .zone-label, body.rtl .rip, body.rtl .cl, body.rtl .nm { direction: rtl; }
+  body.rtl .topbar #back, body.rtl .topbar #map-back { transform: scaleX(-1); }
+  body.rtl .suspect.placed::after { right: auto; left: 8px; }
+  body.rtl .price { float: left; }
+  body.rtl .coins-pill { right: auto; left: 14px; }
+  body.rtl .friend-row, body.rtl .ach, body.rtl .pack, body.rtl .coach, body.rtl .help-list button { text-align: right; }
+  body.rtl .streak, body.rtl .greet, body.rtl .storage-note { text-align: center; }
+  body.rtl .storage-note, body.rtl .ios-note, body.rtl .howto, body.rtl .steps { text-align: right; }
+  body.rtl .steps { padding-right: 22px; padding-left: 0; }
+  body.rtl .cp-tag { white-space: nowrap; }
+  body.rtl .toast { text-align: right; }
+  body.lang-he, body.lang-ru { letter-spacing: 0 !important; }
+  body.lang-he .suspect .nm, body.lang-he .diff-btn, body.lang-he .tool, body.lang-he .primary, body.lang-he .secondary, body.lang-he h1, body.lang-he h2, body.lang-he .lvl-badge { text-transform: none; }
 </style>
 </head>
 <body class="art noir">
@@ -605,39 +651,38 @@
 <section id="home" class="screen active">
   <div class="logo" data-ic="logo"></div>
   <h1>Mystery Grid</h1>
-  <div class="tag">Sudoku meets murder mystery</div>
+  <div class="tag" data-t="Sudoku meets murder mystery">Sudoku meets murder mystery</div>
   <div class="coins-pill" id="coins-pill"></div>
   <div class="greet" id="greet"></div>
   <div id="journey"></div>
   <div id="daily"></div>
-  <div class="section-h">Free play</div>
+  <div class="section-h" data-t="Free play">Free play</div>
   <div id="diffs"></div>
   <div class="themes-row" id="themes-row"></div>
   <button class="link-btn" id="shop-btn"></button>
-  <button class="link-btn" id="backup-btn"></button>
+  <button class="link-btn" id="settings-btn"></button>
   <button class="link-btn" id="ach-btn"></button>
-  <button class="link-btn" id="tut-btn" data-ic="cap">Tutorial</button>
-  <button class="link-btn" id="sound-btn"></button>
-  <button class="link-btn" id="howto-home">How to play</button>
-  <button class="link-btn" id="install-btn" hidden data-ic="phone">Install app</button>
+  <button class="link-btn" id="tut-btn" data-ic="cap"><span data-t="Tutorial">Tutorial</span></button>
+  <button class="link-btn" id="howto-home" data-t="How to play">How to play</button>
+  <button class="link-btn" id="install-btn" hidden data-ic="phone"><span data-t="Install app">Install app</span></button>
 </section>
 
 <section id="game" class="screen">
   <div class="topbar" id="topbar">
-    <button id="back" aria-label="Back">←</button>
+    <button id="back" aria-label="Back" data-t-label="Back">←</button>
     <div class="title"><b id="case-title"></b><div id="case-sub"></div></div>
-    <button id="howto-game" aria-label="Help">?</button>
+    <button id="howto-game" aria-label="Help" data-t-label="Help">?</button>
   </div>
   <div class="intro" id="intro"></div>
   <div class="play-area" id="play-area">
     <div class="board-wrap"><div class="board" id="board"></div></div>
     <div class="tools">
-      <button class="tool on" id="mode-place" data-ic="hand">Place</button>
-      <button class="tool" id="mode-draft" data-ic="pencil">Draft</button>
-      <button class="tool" id="mode-x" data-ic="cross">Mark</button>
-      <button class="tool" id="undo" aria-label="Undo" data-ic="undo"></button>
-      <button class="tool" id="hint" data-ic="bulb">Help</button>
-      <button class="tool" id="reset" aria-label="Clear" data-ic="trash"></button>
+      <button class="tool on" id="mode-place" data-ic="hand"><span data-t="Place">Place</span></button>
+      <button class="tool" id="mode-draft" data-ic="pencil"><span data-t="Draft">Draft</span></button>
+      <button class="tool" id="mode-x" data-ic="cross"><span data-t="Mark">Mark</span></button>
+      <button class="tool" id="undo" aria-label="Undo" data-t-label="Undo" data-ic="undo"></button>
+      <button class="tool" id="hint" data-ic="bulb"><span data-t="Help">Help</span></button>
+      <button class="tool" id="reset" aria-label="Clear" data-t-label="Clear" data-ic="trash"></button>
     </div>
     <div class="status" id="status"></div>
     <div class="coach" id="coach" hidden></div>
@@ -649,17 +694,21 @@
 
 <section id="map" class="screen">
   <div class="topbar map-top">
-    <button id="map-back" aria-label="Back">←</button>
-    <div class="title"><b>The Journey</b><div>Every level is a brand-new case</div></div>
+    <button id="map-back" aria-label="Back" data-t-label="Back">←</button>
+    <div class="title"><b data-t="The Journey">The Journey</b><div data-t="Every level is a brand-new case">Every level is a brand-new case</div></div>
     <button id="map-friends" class="mf-btn">Friends</button>
   </div>
   <div class="map-canvas" id="map-canvas"></div>
 </section>
 
 <div class="modal-bg" id="modal"><div class="modal" id="modal-body"></div></div>
-<div id="loading"><div class="spin" data-ic="logo"></div><p id="loading-text">Building the crime scene…</p></div>
+<div id="loading"><div class="spin" data-ic="logo"></div><p id="loading-text" data-t="Building the crime scene…">Building the crime scene…</p></div>
 
 <script src="../engine.js"></script>
+<script src="../i18n.js"></script>
+<script src="../i18n-he.js"></script>
+<script src="../i18n-ru.js"></script>
+<script src="../i18n-es.js"></script>
 <script src="../art.js"></script>
 <script>
   // put the hand-drawn icons into the static parts of the page

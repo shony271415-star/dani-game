@@ -1,7 +1,7 @@
 /* Offline support for the illustrated edition: network first (for updates), cache as fallback */
-const CACHE = 'mystery-grid-art-v11';
+const CACHE = 'mystery-grid-art-v12';
 const FILES = ['./', 'index.html', 'worker.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png',
-  '../engine.js', '../app.js', '../art.js',
+  '../engine.js', '../app.js', '../art.js', '../i18n.js', '../i18n-he.js', '../i18n-ru.js', '../i18n-es.js',
   '../tools/fonts/fredoka-latin-500-normal.woff2', '../tools/fonts/fredoka-latin-600-normal.woff2', '../tools/fonts/quicksand-latin-600-normal.woff2',
   '../tools/fonts/quicksand-latin-700-normal.woff2', '../tools/fonts/pacifico-latin-400-normal.woff2',
   '../tools/fonts/playfair-display-latin-700-normal.woff2', '../tools/fonts/playfair-display-latin-900-normal.woff2', '../tools/fonts/special-elite-latin-400-normal.woff2',

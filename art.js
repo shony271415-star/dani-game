@@ -165,6 +165,7 @@
     mute: `<path d="M6 18h8l10-8v28l-10-8H6Z" fill="#d2ccdc" ${st()}/><path d="M31 18l11 12M42 18L31 30" ${st(2.8)}/>`,
     medal: `<path d="M15 4h8l3 12h-8ZM33 4h-8l-3 12h8Z" fill="#8fd3f4" ${st(1.6)}/><circle cx="24" cy="30" r="13" fill="#f6c85f" ${st()}/><path d="M24 22l2.6 5.2 5.6.6-4.2 3.8 1.2 5.6L24 34.4l-5.2 2.8 1.2-5.6-4.2-3.8 5.6-.6Z" fill="#fff3c4" ${st(1.2)}/>`,
     map: `<path d="M5 10l12-4 14 5 12-4v31l-12 4-14-5-12 4Z" fill="#fff3c4" ${st()}/><path d="M17 6v31M31 11v31" ${st(1.6)}/><path d="M10 30c4-6 8 2 12-4s8-2 12-8" fill="none" stroke="#e8615a" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/><path d="M36 15l3 3m0-3l-3 3" stroke="#e8615a" stroke-width="2.4" stroke-linecap="round"/>`,
+    gear: `<path d="M20 4h8l1.4 5.2 4.2 1.8 4.7-2.8 5.7 5.7-2.8 4.7 1.8 4.2L48 20v8l-5.2 1.4-1.8 4.2 2.8 4.7-5.7 5.7-4.7-2.8-4.2 1.8L28 44h-8l-1.4-5.2-4.2-1.8-4.7 2.8-5.7-5.7 2.8-4.7-1.8-4.2L-.0 28v-8l5.2-1.4 1.8-4.2-2.8-4.7 5.7-5.7 4.7 2.8 4.2-1.8Z" transform="translate(0 0) scale(.96) translate(1 1)" fill="#d9a441" ${st(1.8)}/><circle cx="24" cy="24" r="7.5" fill="#fffaf3" ${st(1.8)}/>`,
     sparkle: `<path d="M24 3c2 12 5 15 18 18-13 3-16 6-18 18-2-12-5-15-18-18C19 18 22 15 24 3Z" fill="#f6c85f" ${st(1.6)}/>`,
   };
 

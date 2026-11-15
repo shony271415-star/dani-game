@@ -946,22 +946,23 @@
     const sol = P.solution.slice(0, victim);
     const facts = [];
     const qty = (k, what) => (k === 0 ? `**No suspect** was ${what}.` : k === victim && k > 1 ? `**Every suspect** was ${what}.` : k === 1 ? `**Only one suspect** was ${what}.` : `**Exactly ${k} suspects** were ${what}.`);
-    const addCount = (id, test, what) => {
+    // d = language-neutral description of the fact, so the app can phrase it in any language
+    const addCount = (id, test, what, d) => {
       const k = sol.filter(test).length;
-      facts.push({ id, kind: 'count', test, k, text: qty(k, what) });
+      facts.push({ id, kind: 'count', test, k, text: qty(k, what), d: { ...d, k, total: victim } });
     };
-    P.zones.forEach((z, zi) => addCount('zone' + zi, (i) => P.zoneOf[i] === zi, `in the **${z.name}**`));
+    P.zones.forEach((z, zi) => addCount('zone' + zi, (i) => P.zoneOf[i] === zi, `in the **${z.name}**`, { w: 'zone', z: zi }));
     const present = [...new Set(P.obj.filter((o) => o && !isBlocked(o)))];
-    for (const o of present) addCount('on-' + o, (i) => P.obj[i] === o, `**${OBJECTS[o].occ}**`);
-    addCount('floor', (i) => !P.obj[i], `standing on the **bare ${T.floor}**`);
-    addCount('corner', (i) => P.facts[i].corner, `**in a corner**`);
-    addCount('edge', (i) => P.facts[i].edge, `**by ${art(T.edge)}**`);
-    addCount('center', (i) => P.facts[i].center, `**${T.center}**`);
+    for (const o of present) addCount('on-' + o, (i) => P.obj[i] === o, `**${OBJECTS[o].occ}**`, { w: 'on', o });
+    addCount('floor', (i) => !P.obj[i], `standing on the **bare ${T.floor}**`, { w: 'floor' });
+    addCount('corner', (i) => P.facts[i].corner, `**in a corner**`, { w: 'corner' });
+    addCount('edge', (i) => P.facts[i].edge, `**by ${art(T.edge)}**`, { w: 'edge' });
+    addCount('center', (i) => P.facts[i].center, `**${T.center}**`, { w: 'center' });
     const occupied = new Set(sol.map((i) => P.zoneOf[i]));
-    if (occupied.size === P.zones.length) facts.push({ id: 'allzones', kind: 'all', text: `**Every ${T.area}** had at least one suspect in it.` });
+    if (occupied.size === P.zones.length) facts.push({ id: 'allzones', kind: 'all', text: `**Every ${T.area}** had at least one suspect in it.`, d: { w: 'allzones' } });
     else if (P.zones.length - occupied.size === 1) {
       const z = [...P.zones.keys()].find((x) => !occupied.has(x));
-      facts.push({ id: 'onlyempty', kind: 'count', test: (i) => P.zoneOf[i] === z, k: 0, text: `The **${P.zones[z].name}** was the **only ${T.area}** with no suspects.`, dup: 'zone' + z });
+      facts.push({ id: 'onlyempty', kind: 'count', test: (i) => P.zoneOf[i] === z, k: 0, text: `The **${P.zones[z].name}** was the **only ${T.area}** with no suspects.`, dup: 'zone' + z, d: { w: 'onlyempty', z } });
     }
 
     // how many (suspect, square) options does a fact rule out, ignoring everything else?
@@ -1006,7 +1007,7 @@
     });
     let scores = deduced ? scoreAll(applyKnown(deduced)) : [];
     if (!scores.length || Math.max(...scores) === 0) scores = scoreAll(applyKnown(raw));
-    return facts.map(({ id, text, dup }, k) => ({ id, text, dup, score: scores[k] }));
+    return facts.map(({ id, text, dup, d }, k) => ({ id, text, dup, d, score: scores[k] }));
   }
 
   // the scene a seed will use (same formula as generate)

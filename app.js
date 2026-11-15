@@ -1,6 +1,8 @@
 (function () {
   'use strict';
   const E = window.MysteryEngine;
+  const I = window.I18N;
+  const tr = I.t, TR = I.T, trp = I.tp;       // translate: tr('English text {0}', arg), TR`English text ${arg}`
   const $ = (id) => document.getElementById(id);
   const STORE_KEY = 'mystery-grid-v1';
 
@@ -12,6 +14,7 @@
     { key: 'extreme', name: 'Extreme', emoji: '💀', art: 'knife', sub: '10×10 grid · 9 suspects · bring coffee', seed: 500000 },
   ];
   DIFFS.forEach((d) => { d.label = d.emoji + ' ' + d.name; });
+  const dname = (key) => tr(DIFF[key].name);
   const DIFF = Object.fromEntries(DIFFS.map((d) => [d.key, d]));
   const RANKS = [[0, 'Rookie'], [3, 'Junior Detective'], [10, 'Detective'], [25, 'Inspector'], [50, 'Chief Inspector'], [100, 'Legend of the Force']];
 
@@ -62,13 +65,13 @@
       if (skin && !store.owned.includes(skin.id)) { store.owned.push(skin.id); if (!restoring) store.skin = skin.id; }
       store.paid = true;
       save(); renderCoins(); applySkin();
-      return coinPack ? `+${coinPack.coins} coins` : skin ? `${skin.name} unlocked` : '';
+      return coinPack ? TR`+${I.num(coinPack.coins)} coins` : skin ? TR`${tr(skin.name)} unlocked` : '';
     },
     async buy(id) {
       if (!this.service) {
-        modal(`<div class="big">${ic('phone', '📲')}</div><h2>Available in the app</h2>
-          <p>Purchases with real money work in the Google Play version of Mystery Grid.</p>
-          <div class="row"><button class="primary" data-act="close">OK</button></div>`);
+        modal(`<div class="big">${ic('phone', '📲')}</div><h2>${tr('Available in the app')}</h2>
+          <p>${tr('Purchases with real money work in the Google Play version of Mystery Grid.')}</p>
+          <div class="row"><button class="primary" data-act="close">${tr('OK')}</button></div>`);
         return;
       }
       try {
@@ -78,7 +81,7 @@
         const msg = await this.grant(id, res.details.purchaseToken, false);
         await res.complete('success');
         sfx('unlock'); confetti();
-        toast(`<span class="ti">${ic('gift', '🎁')}</span><span><b>Thank you!</b><small>${msg}</small></span>`);
+        toast(`<span class="ti">${ic('gift', '🎁')}</span><span><b>${tr('Thank you!')}</b><small>${msg}</small></span>`);
         showShop();
       } catch (e) { /* cancelled or failed: nothing was charged */ }
     },
@@ -100,7 +103,6 @@
 
   /* ---------- daily case: same case for everyone on the same day ---------- */
   const DAILY_DIFF = ['hard', 'medium', 'hard', 'hard', 'expert', 'expert', 'extreme']; // Sunday → Saturday
-  const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   function today() {
     const d = new Date();
     return { num: Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000), weekday: d.getDay() };
@@ -167,9 +169,9 @@
   }
   async function share(text, url) {
     try { if (navigator.share) { await navigator.share({ title: 'Mystery Grid', text, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
-    try { await navigator.clipboard.writeText(`${text} ${url}`); toast(`<span class="ti">${ic('check', '✓')}</span><span><b>Link copied!</b><small>Paste it to your friend in any chat.</small></span>`); return; } catch (e) { /* fall through */ }
-    modal(`<h2>Send this to a friend</h2><textarea class="name-in share-box" readonly>${esc(text + ' ' + url)}</textarea>
-      <div class="row"><button class="primary" data-act="close">Done</button></div>`);
+    try { await navigator.clipboard.writeText(`${text} ${url}`); toast(`<span class="ti">${ic('check', '✓')}</span><span><b>${tr('Link copied!')}</b><small>${tr('Paste it to your friend in any chat.')}</small></span>`); return; } catch (e) { /* fall through */ }
+    modal(`<h2>${tr('Send this to a friend')}</h2><textarea class="name-in share-box" readonly>${esc(text + ' ' + url)}</textarea>
+      <div class="row"><button class="primary" data-act="close">${tr('Done')}</button></div>`);
   }
   function seedOf(slot, diff, caseNum) {
     if (slot === 'journey') return JOURNEY_SEED + caseNum;
@@ -396,14 +398,14 @@
   function totalSolved() { return DIFFS.reduce((n, d) => n + prog(d.key).solved, 0) + prog('journey').solved + Object.keys(store.dailyLog || {}).length; }
   function coins() { if (typeof store.coins !== 'number') store.coins = 100; return store.coins; }
   function addCoins(n) { coins(); store.coins += n; save(); renderCoins(); }
-  function renderCoins() { const el = $('coins-pill'); if (el) el.innerHTML = `${coinIc()} <b>${coins()}</b><span class="cp-shop">SHOP</span>`; }
+  function renderCoins() { const el = $('coins-pill'); if (el) el.innerHTML = `${coinIc()} <b>${I.num(coins())}</b><span class="cp-shop">${tr('SHOP')}</span>`; }
   function checkAchievements(ctx) {
     store.ach = store.ach || {};
     for (const x of ACH) {
       if (store.ach[x.id] || !x.test(ctx)) continue;
       store.ach[x.id] = today().num;
       store.coins = coins() + 50;
-      toast(`<span class="ti">${ic('medal', '🏅')}</span><span><b>${x.name}</b><small>${x.desc} · +50 ${ART ? 'coins' : '🪙'}</small></span>`);
+      toast(`<span class="ti">${ic('medal', '🏅')}</span><span><b>${tr(x.name)}</b><small>${tr(x.desc)} · ${TR`+50 coins`}</small></span>`);
     }
     save(); renderCoins();
   }
@@ -411,14 +413,15 @@
     const t = totalSolved();
     let r = RANKS[0][1];
     for (const [n, name] of RANKS) if (t >= n) r = name;
-    return r;
+    return tr(r);
   }
   function askProfile() {
-    modal(`<div class="big">${ic('logo', '🕵️')}</div><h2>Who's on the case?</h2>
-      <p>Your name and progress are saved on this device.</p>
-      <input class="name-in" id="name-in" maxlength="18" placeholder="Your name" autocomplete="off">
-      <div class="row"><button class="primary" data-act="ok">Let's go</button></div>`,
-    { ok: saveProfile }, true);
+    modal(`<div class="big">${ic('logo', '🕵️')}</div><h2>${tr("Who's on the case?")}</h2>
+      <p>${tr('Your name and progress are saved on this device.')}</p>
+      <input class="name-in" id="name-in" maxlength="18" placeholder="${esc(tr('Your name'))}" autocomplete="off">
+      <div class="lang-row">${langButtons()}</div>
+      <div class="row"><button class="primary" data-act="ok">${tr("Let's go")}</button></div>`,
+    { ok: saveProfile, lang: (b) => { chooseLang(b.dataset.lang); const v = $('name-in').value; askProfile(); $('name-in').value = v; } }, true);
     const cur = store.profile ? store.profile.name : '';
     $('name-in').value = cur || '';
     $('name-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') saveProfile(); });
@@ -434,11 +437,11 @@
   }
   function renderGreet() {
     const el = $('greet');
-    if (!store.profile) { el.innerHTML = '<b>Tap here to sign in</b>'; return; }
+    if (!store.profile) { el.innerHTML = `<b>${tr('Tap here to sign in')}</b>`; return; }
     const t = totalSolved();
-    el.innerHTML = `<b>Hello, ${esc(store.profile.name)}! ${ic('wave', '👋')}</b>
-      <div>Rank: ${rankName()} · ${t === 1 ? '1 case solved' : t ? t + ' cases solved' : 'no cases solved yet'}</div>
-      <small>Tap to change name</small>`;
+    el.innerHTML = `<b>${tr('Hello, {0}!', esc(store.profile.name))} ${ic('wave', '👋')}</b>
+      <div>${tr('Rank: {0}', rankName())} · ${t ? trp(t, '1 case solved', '{0} cases solved') : tr('no cases solved yet')}</div>
+      <small>${tr('Tap to change name')}</small>`;
   }
 
   /* ---------- home ---------- */
@@ -452,18 +455,17 @@
     renderJourney();
     renderDaily();
     renderShopCard();
-    $('sound-btn').innerHTML = `${ic(store.sound === false ? 'mute' : 'sound', store.sound === false ? '🔇' : '🔊')} Sound`;
     const got = Object.keys(store.ach || {}).length;
-    $('ach-btn').innerHTML = `${ic('trophy', '🏆')} Trophies ${got}/${ACH.length}`;
-    $('shop-btn').innerHTML = `${ic('coin', '🛍️')} Shop`;
-    $('backup-btn').innerHTML = `${ic('lock', '💾')} Save progress`;
+    $('ach-btn').innerHTML = `${ic('trophy', '🏆')} ${tr('Trophies')} ${got}/${ACH.length}`;
+    $('shop-btn').innerHTML = `${ic('coin', '🛍️')} ${tr('Shop')}`;
+    $('settings-btn').innerHTML = `${ic('gear', '⚙️')} ${tr('Settings')}`;
     renderStorageNote();
     setTimeout(maybeDailyBonus, 350);
     $('diffs').innerHTML = DIFFS.map((d) => {
       const p = prog(d.key);
-      const badge = p.cur ? 'In progress' : p.solved ? `${p.solved} solved` : 'New!';
+      const badge = p.cur ? tr('In progress') : p.solved ? tr('{0} solved', p.solved) : tr('New!');
       return `<button class="diff-btn ${d.key === 'extreme' ? 'extreme' : ''}" data-diff="${d.key}">
-        <span>${ART ? `<span class="ic dic">${ART.ui(d.art)}</span>${d.name}` : d.label}<small>${d.sub}</small></span><span class="badge">${badge}</span></button>`;
+        <span>${ART ? `<span class="ic dic">${ART.ui(d.art)}</span>${tr(d.name)}` : d.emoji + ' ' + tr(d.name)}<small>${tr(d.sub)}</small></span><span class="badge">${badge}</span></button>`;
     }).join('');
     $('diffs').querySelectorAll('.diff-btn').forEach((b) => b.addEventListener('click', () => startGame(b.dataset.diff)));
   }
@@ -476,11 +478,11 @@
     const going = p.cur && p.cur.caseNum === n;
     $('journey').innerHTML = `<button class="play-card${isBoss(n) ? ' boss' : ''}" id="play-btn">
         <span class="pc-ic">${ic('play', '▶️')}</span>
-        <span class="pc-tx"><b>${going ? 'Continue' : 'Play'}</b><small>Level ${n} · ${d.name}${isBoss(n) ? ' · BOSS' : ''}</small></span>
+        <span class="pc-tx"><b>${going ? tr('Continue') : tr('Play')}</b><small>${tr('Level {0}', n)} · ${tr(d.name)}${isBoss(n) ? ' · ' + tr('BOSS') : ''}</small></span>
         <span class="lvl-badge">${n}</span>
       </button>
       <div class="journey-bar"><div style="width:${pct}%"></div></div>
-      <div class="streak">${tier ? `${tier[0] - n} level${tier[0] - n === 1 ? '' : 's'} to ${tier[1]}` : 'Boss levels every 5 · how far can you go?'} · <button class="mini-link" id="map-btn">Map${(store.friends || []).length ? ` & ${(store.friends || []).length} friend${(store.friends || []).length > 1 ? 's' : ''}` : ''}</button></div>`;
+      <div class="streak">${tier ? trp(tier[0] - n, '1 level to {1}', '{0} levels to {1}', tr(tier[1])) : tr('Boss levels every 5 · how far can you go?')} · <button class="mini-link" id="map-btn">${(store.friends || []).length ? trp((store.friends || []).length, 'Map & 1 friend', 'Map & {0} friends') : tr('Map')}</button></div>`;
     $('play-btn').addEventListener('click', startJourney);
     $('map-btn').addEventListener('click', showMap);
   }
@@ -491,10 +493,11 @@
     const installed = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
     let msg = '';
-    if (!storageOk) msg = `<b>This browser is not saving your progress</b> (private mode or storage blocked). Open the game in your normal browser, or use <button class="mini-link" data-note="backup">Save progress</button>.`;
+    const lnk = (k, label) => `<button class="mini-link" data-note="${k}">${label}</button>`;
+    if (!storageOk) msg = tr('<b>This browser is not saving your progress</b> (private mode or storage blocked). Open the game in your normal browser, or use {0}.', lnk('backup', tr('Save progress')));
     else if (!installed && totalSolved() >= 2) msg = ios
-      ? `Playing in Safari? iPhone can erase a website's saved progress after a week away. <button class="mini-link" data-note="install">Add to Home Screen</button> to keep it safe, or <button class="mini-link" data-note="backup">save a backup code</button>.`
-      : `Your progress is saved in this browser only. <button class="mini-link" data-note="backup">Save a backup code</button> to keep it safe.`;
+      ? tr("Playing in Safari? iPhone can erase a website's saved progress after a week away. {0} to keep it safe, or {1}.", lnk('install', tr('Add to Home Screen')), lnk('backup', tr('save a backup code')))
+      : tr('Your progress is saved in this browser only. {0} to keep it safe.', lnk('backup', tr('Save a backup code')));
     el.className = msg ? 'storage-note' : '';
     el.innerHTML = msg;
     el.querySelectorAll('[data-note]').forEach((b) => b.addEventListener('click', () => (b.dataset.note === 'backup' ? showBackup() : $('install-btn').click())));
@@ -511,10 +514,38 @@
     const next = PACKS.find((x) => !x.iap && !have.includes(x.id)) || PACKS.find((x) => !have.includes(x.id));
     el.innerHTML = `<button class="shop-card" id="shop-card-btn">
         <span class="sc-faces">${SHOP_PEOPLE.slice(0, 3).map((p) => `<span class="pf skin-${next ? next.id : skinId()}">${face(p, next ? next.id : skinId())}</span>`).join('')}</span>
-        <span class="sc-tx"><b>Detective Shop</b><small>${next ? `New look: ${next.name} · ${next.iap ? IAP.price(next.iap, next.usd) : next.price.toLocaleString('en') + ' coins'}` : 'You own every pack!'} · ${owned}/${PACKS.length} owned</small></span>
-        <span class="badge">Open</span>
+        <span class="sc-tx"><b>${tr('Detective Shop')}</b><small>${next ? tr('New look: {0} · {1}', tr(next.name), next.iap ? IAP.price(next.iap, next.usd) : tr('{0} coins', I.num(next.price))) : tr('You own every pack!')} · ${tr('{0}/{1} owned', owned, PACKS.length)}</small></span>
+        <span class="badge">${tr('Open')}</span>
       </button>`;
     $('shop-card-btn').addEventListener('click', showShop);
+  }
+
+  /* ---------- language & settings ---------- */
+  const langButtons = () => I.langs.map((l) => `<button class="lang-btn${I.lang === l.code ? ' on' : ''}" data-act="lang" data-lang="${l.code}" lang="${l.code}">${l.label}</button>`).join('');
+  function chooseLang(code) { store.lang = code; save(); I.setLang(code); }
+  // repaint whatever is on screen in the new language
+  function relocalize() {
+    renderCoins();
+    if ($('home').classList.contains('active')) showHome();
+    else if ($('map').classList.contains('active')) showMap();
+    else if (S) { paintCaseHeader(); buildLegend(); renderCoach(); setMode(S.mode); }
+  }
+  function showSettings() {
+    modal(`<div class="big">${ic('gear', '⚙️')}</div><h2>${tr('Settings')}</h2>
+      <div class="set-h">${tr('Language')}</div><div class="lang-row">${langButtons()}</div>
+      <div class="set-h">${tr('Sound & vibration')}</div>
+      <div class="row"><button class="secondary" data-act="sound">${ic(store.sound === false ? 'mute' : 'sound', store.sound === false ? '🔇' : '🔊')} ${store.sound === false ? tr('Off') : tr('On')}</button></div>
+      <div class="set-h">${tr('Your progress')}</div>
+      <div class="row"><button class="secondary" data-act="backup">${ic('lock', '💾')} ${tr('Save progress')}</button><button class="secondary" data-act="name">${tr('Change name')}</button></div>
+      <div class="row"><button class="secondary" data-act="tut">${ic('cap', '🎓')} ${tr('Tutorial')}</button><button class="secondary" data-act="how">${tr('How to play')}</button></div>
+      <div class="row"><button class="primary" data-act="close">${tr('Close')}</button></div>`, {
+      lang: (b) => { chooseLang(b.dataset.lang); relocalize(); showSettings(); },
+      sound: () => { store.sound = store.sound === false; save(); if (store.sound !== false) sfx('coin'); showSettings(); if ($('home').classList.contains('active')) showHome(); },
+      backup: showBackup,
+      name: () => { closeModal(); askProfile(); },
+      tut: () => { closeModal(); startTutorial(); },
+      how: showHowto,
+    });
   }
 
   /* ---------- backup code: move progress to another phone or browser ---------- */
@@ -532,7 +563,7 @@
     if (!o || typeof o !== 'object' || !o.profile) return false;
     // never lose progress: keep whichever side is further along
     const mine = prog('journey').caseNum, theirs = (o.journey && o.journey.caseNum) || 1;
-    if (theirs < mine && !confirm(`This backup is on level ${theirs}, but you are on level ${mine}. Replace your progress anyway?`)) return null;
+    if (theirs < mine && !confirm(tr('This backup is on level {0}, but you are on level {1}. Replace your progress anyway?', theirs, mine))) return null;
     Object.keys(store).forEach((k) => delete store[k]);
     Object.assign(store, o, { engine: E.VERSION });
     save(); applySkin();
@@ -540,20 +571,20 @@
   }
   function showBackup() {
     const code = backupCode();
-    modal(`<div class="big">${ic('lock', '💾')}</div><h2>Save your progress</h2>
-      <p><small>Your progress lives on this phone. If you switch phones, reinstall, or open the game in a different browser, use this code to bring it back.</small></p>
-      <textarea class="name-in share-box" id="backup-box" readonly>${code}</textarea>
-      <div class="row"><button class="primary" data-act="copy">Copy code</button><button class="secondary" data-act="send">Send to myself</button></div>
-      <p class="restore-h"><b>Restore from a code</b></p>
-      <textarea class="name-in share-box" id="restore-box" placeholder="Paste a code that starts with MG1."></textarea>
-      <div class="row"><button class="secondary" data-act="restore">Restore</button><button class="secondary" data-act="close">Close</button></div>
+    modal(`<div class="big">${ic('lock', '💾')}</div><h2>${tr('Save your progress')}</h2>
+      <p><small>${tr('Your progress lives on this phone. If you switch phones, reinstall, or open the game in a different browser, use this code to bring it back.')}</small></p>
+      <textarea class="name-in share-box code-box" id="backup-box" readonly>${code}</textarea>
+      <div class="row"><button class="primary" data-act="copy">${tr('Copy code')}</button><button class="secondary" data-act="send">${tr('Send to myself')}</button></div>
+      <p class="restore-h"><b>${tr('Restore from a code')}</b></p>
+      <textarea class="name-in share-box code-box" id="restore-box" placeholder="${esc(tr('Paste a code that starts with MG1.'))}"></textarea>
+      <div class="row"><button class="secondary" data-act="restore">${tr('Restore')}</button><button class="secondary" data-act="close">${tr('Close')}</button></div>
       <p id="bk-msg" class="acc-msg"></p>`, {
-      copy: async (b) => { try { await navigator.clipboard.writeText(code); b.textContent = 'Copied ✓'; } catch (e) { $('backup-box').select(); b.textContent = 'Select & copy ↑'; } },
-      send: () => share('My Mystery Grid progress backup (paste it in Settings → Save progress → Restore):', code),
+      copy: async (b) => { try { await navigator.clipboard.writeText(code); b.textContent = tr('Copied ✓'); } catch (e) { $('backup-box').select(); b.textContent = tr('Select & copy ↑'); } },
+      send: () => share(tr('My Mystery Grid progress backup (paste it in Settings → Save progress → Restore):'), code),
       restore: () => {
         const r = restoreCode($('restore-box').value);
-        if (r === true) { closeModal(); showHome(); toast(`<span class="ti">${ic('check', '✓')}</span><span><b>Progress restored!</b><small>Level ${prog('journey').caseNum}, ${coins()} coins.</small></span>`); }
-        else if (r === false) { $('bk-msg').textContent = 'That code does not look right. Copy the whole thing, starting with MG1.'; shake($('modal-body')); }
+        if (r === true) { closeModal(); showHome(); toast(`<span class="ti">${ic('check', '✓')}</span><span><b>${tr('Progress restored!')}</b><small>${tr('Level {0}, {1} coins.', prog('journey').caseNum, coins())}</small></span>`); }
+        else if (r === false) { $('bk-msg').textContent = tr('That code does not look right. Copy the whole thing, starting with MG1.'); shake($('modal-body')); }
       },
     });
   }
@@ -573,7 +604,7 @@
     };
     let html = `<svg class="map-path" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
       <path d="${pathFor(lo, hi)}" class="mp-todo"/>${cur > lo ? `<path d="${pathFor(lo, Math.min(cur, hi))}" class="mp-done"/>` : ''}</svg>`;
-    const me = { name: (store.profile && store.profile.name) || 'You', g: 'f', letter: 'Me', color: '#d9a441', emoji: '🕵️' };
+    const me = { name: (store.profile && store.profile.name) || tr('You'), g: 'f', letter: 'Me', color: '#d9a441', emoji: '🕵️' };
     const friendsAt = {};
     (store.friends || []).forEach((f) => { (friendsAt[Math.min(Math.max(f.l, lo), hi)] = friendsAt[Math.min(Math.max(f.l, lo), hi)] || []).push(f); });
     for (let n = lo; n <= hi; n++) {
@@ -581,12 +612,12 @@
       const th = E.themeFor(JOURNEY_SEED + n);
       const cls = `node${done ? ' done' : now ? ' cur' : ' locked'}${boss ? ' boss' : ''}`;
       const st = done ? `<span class="nstars">${[1, 2, 3].map((k) => `<i class="${k <= (stars[n] || 1) ? 'on' : ''}">★</i>`).join('')}</span>` : '';
-      html += `<button class="${cls}" data-n="${n}" style="left:${x}px;top:${y}px">${boss && !done ? `<span class="nb">BOSS</span>` : ''}<b>${n}</b>${st}</button>`;
+      html += `<button class="${cls}" data-n="${n}" style="left:${x}px;top:${y}px">${boss && !done ? `<span class="nb">${tr('BOSS')}</span>` : ''}<b>${n}</b>${st}</button>`;
       const side = Math.sin(n * 0.9) > 0 ? -1 : 1;
-      html += `<span class="theme-dec" style="left:${x + side * 62}px;top:${y}px" title="${th.name}">${ART ? ART.theme(th.id) : th.icon}</span>`;
+      html += `<span class="theme-dec" style="left:${x + side * 62}px;top:${y}px" title="${esc(I.themeName(th.name))}">${ART ? ART.theme(th.id) : th.icon}</span>`;
       const tier = TIERS.find(([lv]) => lv === n);
-      if (tier) html += `<div class="tier-banner" style="top:${y + GAP / 2 + 6}px">${DIFF[journeyDiff(n)].name} zone</div>`;
-      if (now) html += `<span class="me-pin" style="left:${x}px;top:${y - 58}px"><span class="pin-face">${face(me)}</span><small>You</small></span>`;
+      if (tier) html += `<div class="tier-banner" style="top:${y + GAP / 2 + 6}px">${tr('{0} zone', dname(journeyDiff(n)))}</div>`;
+      if (now) html += `<span class="me-pin" style="left:${x}px;top:${y - 58}px"><span class="pin-face">${face(me)}</span><small>${tr('You')}</small></span>`;
       (friendsAt[n] || []).forEach((f, k) => {
         const fp = { name: f.n, g: 'f', letter: f.n[0], color: '#7aa7ff', emoji: '🙂' };
         html += `<span class="friend-pin" style="left:${x + side * -1 * (52 + k * 30)}px;top:${y - 6}px"><span class="pin-face">${face(fp, PACK[f.s] ? f.s : 'classic')}</span><small>${esc(f.n)}${f.l > hi ? ' ↑' + f.l : f.l < lo ? ' ↓' + f.l : ''}</small></span>`;
@@ -594,12 +625,12 @@
     }
     $('map-canvas').style.width = W + 'px'; $('map-canvas').style.height = H + 'px';
     $('map-canvas').innerHTML = html;
-    $('map-friends').textContent = `Friends (${(store.friends || []).length})`;
+    $('map-friends').textContent = tr('Friends ({0})', (store.friends || []).length);
     $('map-canvas').querySelectorAll('.node').forEach((b) => b.addEventListener('click', () => {
       const n = +b.dataset.n;
       if (n === cur) return startJourney();
-      if (n < cur) toast(`<span class="ti">${ic('star', '⭐')}</span><span><b>Level ${n}</b><small>Solved with ${stars[n] || 1} star${(stars[n] || 1) > 1 ? 's' : ''}.</small></span>`);
-      else toast(`<span class="ti">${ic('lock', '🔒')}</span><span><b>Level ${n}</b><small>Solve level ${cur} first.</small></span>`);
+      if (n < cur) toast(`<span class="ti">${ic('star', '⭐')}</span><span><b>${tr('Level {0}', n)}</b><small>${trp(stars[n] || 1, 'Solved with 1 star.', 'Solved with {0} stars.')}</small></span>`);
+      else toast(`<span class="ti">${ic('lock', '🔒')}</span><span><b>${tr('Level {0}', n)}</b><small>${tr('Solve level {0} first.', cur)}</small></span>`);
     }));
     requestAnimationFrame(() => window.scrollTo(0, Math.max(0, Y(cur) - window.innerHeight * 0.55 + $('map-canvas').offsetTop)));
   }
@@ -612,26 +643,26 @@
     const k = store.friends.findIndex((x) => x.i === f.i);
     if (k >= 0) store.friends[k] = f; else store.friends.push(f);
     save();
-    if (!quiet) toast(`<span class="ti">${ic('hand', '🤝')}</span><span><b>${esc(f.n)} ${k >= 0 ? 'updated' : 'added'}!</b><small>Level ${f.l} on the journey map.</small></span>`);
+    if (!quiet) toast(`<span class="ti">${ic('hand', '🤝')}</span><span><b>${k >= 0 ? tr('{0} updated!', esc(f.n)) : tr('{0} added!', esc(f.n))}</b><small>${tr('Level {0} on the journey map.', f.l)}</small></span>`);
     return true;
   }
   function showFriends() {
     const list = (store.friends || []).sort((x, y) => y.l - x.l).map((f) => {
       const fp = { name: f.n, g: 'f', letter: f.n[0], color: '#7aa7ff', emoji: '🙂' };
       const age = today().num - (f.at || today().num);
-      return `<div class="friend-row"><span class="pf skin-${f.s}">${face(fp, f.s)}</span><div><b>${esc(f.n)}</b><small>Level ${f.l} · ${f.t} cases · ${f.d}-day streak · updated ${age ? age + 'd ago' : 'today'}</small></div>
-        <button class="mini-x" data-act="rm" data-id="${f.i}" aria-label="Remove">✕</button></div>`;
-    }).join('') || '<p><small>No friends yet. Send your link to a friend, and ask for theirs!</small></p>';
-    modal(`<div class="big">${ic('hand', '🤝')}</div><h2>Friends</h2>
-      <p><small>You're on level <b>${prog('journey').caseNum}</b>. Send your link so friends see you on their map. Send it again whenever you want them to see your new progress.</small></p>
+      return `<div class="friend-row"><span class="pf skin-${f.s}">${face(fp, f.s)}</span><div><b>${esc(f.n)}</b><small>${tr('Level {0} · {1} cases · {2}-day streak · updated {3}', f.l, f.t, f.d, age ? tr('{0}d ago', age) : tr('today'))}</small></div>
+        <button class="mini-x" data-act="rm" data-id="${f.i}" aria-label="${esc(tr('Remove'))}">✕</button></div>`;
+    }).join('') || `<p><small>${tr('No friends yet. Send your link to a friend, and ask for theirs!')}</small></p>`;
+    modal(`<div class="big">${ic('hand', '🤝')}</div><h2>${tr('Friends')}</h2>
+      <p><small>${tr("You're on level <b>{0}</b>. Send your link so friends see you on their map. Send it again whenever you want them to see your new progress.", prog('journey').caseNum)}</small></p>
       <div class="friend-list">${list}</div>
-      <div class="row"><button class="primary" data-act="mine">Send my link</button><button class="secondary" data-act="add">Add a friend</button></div>
-      <div class="row"><button class="secondary" data-act="close">Close</button></div>`, {
-      mine: () => share(`Join me on Mystery Grid! I'm on level ${prog('journey').caseNum}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Friends → Add a friend):`, linkFor('friend', myCard())),
+      <div class="row"><button class="primary" data-act="mine">${tr('Send my link')}</button><button class="secondary" data-act="add">${tr('Add a friend')}</button></div>
+      <div class="row"><button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
+      mine: () => share(tr("Join me on Mystery Grid! I'm on level {0}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Friends → Add a friend):", prog('journey').caseNum), linkFor('friend', myCard())),
       add: () => {
-        modal(`<h2>Add a friend</h2><p><small>Paste the link (or code) your friend sent you.</small></p>
-          <textarea class="name-in share-box" id="friend-in" placeholder="https://…#friend=…"></textarea>
-          <div class="row"><button class="primary" data-act="ok">Add</button><button class="secondary" data-act="back">Back</button></div>`, {
+        modal(`<h2>${tr('Add a friend')}</h2><p><small>${tr('Paste the link (or code) your friend sent you.')}</small></p>
+          <textarea class="name-in share-box code-box" id="friend-in" placeholder="https://…#friend=…"></textarea>
+          <div class="row"><button class="primary" data-act="ok">${tr('Add')}</button><button class="secondary" data-act="back">${tr('Back')}</button></div>`, {
           ok: () => {
             const raw = $('friend-in').value.trim(), m = raw.match(/friend=([A-Za-z0-9_-]+)/), card = b64d(m ? m[1] : raw);
             if (!addFriend(card, true)) { shake($('modal-body')); return; }
@@ -649,14 +680,14 @@
   function offerShareBack(name, code) {
     const inApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     const iosBrowser = /iphone|ipad|ipod/i.test(navigator.userAgent) && !inApp;
-    modal(`<div class="big">${ic('hand', '🤝')}</div><h2>${esc(name)} is your friend!</h2>
-      <p>${esc(name)} is now on your map. To show up on <b>${esc(name)}'s</b> map too, send your link back.</p>
-      ${iosBrowser ? `<div class="ios-note"><b>Using the installed app on iPhone?</b> This link opened in Safari, which keeps its own copy of the game. Open the app, go to <b>Map → Friends → Add a friend</b> and paste the same link there.
-        <button class="secondary" data-act="copy">Copy this friend's link</button></div>` : ''}
-      <div class="row"><button class="primary" data-act="back">Send my link to ${esc(name)}</button><button class="secondary" data-act="close">Later</button></div>`, {
-      back: () => { closeModal(); share(`Hey ${name}, add me back on Mystery Grid! I'm on level ${prog('journey').caseNum}:`, linkFor('friend', myCard())); },
+    modal(`<div class="big">${ic('hand', '🤝')}</div><h2>${tr('{0} is your friend!', esc(name))}</h2>
+      <p>${tr("{0} is now on your map. To show up on <b>{0}'s</b> map too, send your link back.", esc(name))}</p>
+      ${iosBrowser ? `<div class="ios-note">${tr('<b>Using the installed app on iPhone?</b> This link opened in Safari, which keeps its own copy of the game. Open the app, go to <b>Map → Friends → Add a friend</b> and paste the same link there.')}
+        <button class="secondary" data-act="copy">${tr("Copy this friend's link")}</button></div>` : ''}
+      <div class="row"><button class="primary" data-act="back">${tr('Send my link to {0}', esc(name))}</button><button class="secondary" data-act="close">${tr('Later')}</button></div>`, {
+      back: () => { closeModal(); share(tr("Hey {0}, add me back on Mystery Grid! I'm on level {1}:", name, prog('journey').caseNum), linkFor('friend', myCard())); },
       copy: async (b) => {
-        try { await navigator.clipboard.writeText(`${location.origin}${location.pathname}#friend=${code}`); b.textContent = 'Copied! Now paste it in the app'; } catch (e) { b.textContent = 'Copy failed: long-press the link in WhatsApp and copy it'; }
+        try { await navigator.clipboard.writeText(`${location.origin}${location.pathname}#friend=${code}`); b.textContent = tr('Copied! Now paste it in the app'); } catch (e) { b.textContent = tr('Copy failed: long-press the link in WhatsApp and copy it'); }
       },
     });
   }
@@ -670,7 +701,7 @@
     const p = prog('challenge');
     const go = (puzzle) => { $('loading').classList.remove('show'); begin(c.diff, c.seed, puzzle, 'challenge'); };
     if (p.cur && p.cur.caseNum === c.seed && p.cur.puzzle) return go(p.cur.puzzle);
-    $('loading-text').textContent = `Opening ${c.n}'s challenge…`;
+    $('loading-text').textContent = tr("Opening {0}'s challenge…", c.n);
     $('loading').classList.add('show');
     buildCase(c.diff, c.seed, go, c.seed);
   }
@@ -685,10 +716,10 @@
     if (store.bonusDay === t) return;
     const streak = store.bonusDay === t - 1 ? (store.bonusStreak || 0) + 1 : 1;
     const idx = (streak - 1) % 7, reward = BONUS[idx];
-    const days = BONUS.map((c, k) => `<div class="bday${k < idx ? ' got' : ''}${k === idx ? ' now' : ''}"><small>Day ${k + 1}</small>${k < idx ? ic('check', '✓') : coinIc()}<b>${c}</b></div>`).join('');
-    modal(`<div class="big">${ic('gift', '🎁')}</div><h2>Daily gift!</h2>
-      <p>Come back every day for a bigger gift.</p><div class="bonus-row">${days}</div>
-      <div class="row"><button class="primary" data-act="take">Collect +${reward} ${ART ? 'coins' : '🪙'}</button></div>`, {
+    const days = BONUS.map((c, k) => `<div class="bday${k < idx ? ' got' : ''}${k === idx ? ' now' : ''}"><small>${tr('Day {0}', k + 1)}</small>${k < idx ? ic('check', '✓') : coinIc()}<b>${c}</b></div>`).join('');
+    modal(`<div class="big">${ic('gift', '🎁')}</div><h2>${tr('Daily gift!')}</h2>
+      <p>${tr('Come back every day for a bigger gift.')}</p><div class="bonus-row">${days}</div>
+      <div class="row"><button class="primary" data-act="take">${tr('Collect +{0} coins', reward)}</button></div>`, {
       take: () => {
         store.bonusDay = t; store.bonusStreak = streak;
         addCoins(reward); sfx('coin'); closeModal();
@@ -701,19 +732,19 @@
     const now = new Date(), y = now.getFullYear(), m = now.getMonth(), t = today().num, log = dailyLog();
     const first = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate();
     const dn = (d) => Math.floor(Date.UTC(y, m, d) / 86400000);
-    let cellsHtml = ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((x) => `<div class="cal-h">${x}</div>`).join('') + '<div></div>'.repeat(first);
+    let cellsHtml = [0, 1, 2, 3, 4, 5, 6].map((x) => `<div class="cal-h">${I.weekdayNarrow(x)}</div>`).join('') + '<div></div>'.repeat(first);
     let solved = 0;
     for (let d = 1; d <= days; d++) {
       const k = dn(d), done = !!log[k];
       if (done) solved++;
       cellsHtml += `<div class="cal-d${done ? ' done' : ''}${k === t ? ' today' : ''}${k > t ? ' future' : ''}">${done ? ic('star', '⭐') : ''}<span>${d}</span></div>`;
     }
-    const monthName = now.toLocaleString('en', { month: 'long' });
+    const monthName = I.month(now);
     const won = (store.trophies || {})[`${y}-${m + 1}`];
-    modal(`<h2>${monthName} cases</h2><div class="cal">${cellsHtml}</div>
-      <p><b>${solved}</b> of ${days} days solved.</p>
-      <p class="cal-tro">${ic(won ? 'trophy' : 'trophyOff', '🏆')} ${won ? `You won the ${monthName} trophy!` : `Solve every daily case this month to win the ${monthName} trophy.`}</p>
-      <div class="row"><button class="primary" data-act="close">Close</button></div>`);
+    modal(`<h2>${tr('{0} cases', monthName)}</h2><div class="cal">${cellsHtml}</div>
+      <p>${tr('<b>{0}</b> of {1} days solved.', solved, days)}</p>
+      <p class="cal-tro">${ic(won ? 'trophy' : 'trophyOff', '🏆')} ${won ? tr('You won the {0} trophy!', monthName) : tr('Solve every daily case this month to win the {0} trophy.', monthName)}</p>
+      <div class="row"><button class="primary" data-act="close">${tr('Close')}</button></div>`);
   }
 
   const SHOP_PEOPLE = [
@@ -723,29 +754,29 @@
   function showShop() {
     store.owned = store.owned || ['classic'];
     const coinCards = COIN_PACKS.map((c) => `<button class="coin-pack" data-act="iap" data-id="${c.iap}">
-        ${c.tag ? `<span class="cp-tag">${c.tag}</span>` : ''}<span class="cp-ic">${coinIc()}</span><b>${c.coins.toLocaleString('en')}</b><span class="cp-price">${IAP.price(c.iap, c.usd)}</span></button>`).join('');
+        ${c.tag ? `<span class="cp-tag">${tr(c.tag)}</span>` : ''}<span class="cp-ic">${coinIc()}</span><b>${I.num(c.coins)}</b><span class="cp-price">${IAP.price(c.iap, c.usd)}</span></button>`).join('');
     const cards = PACKS.map((x) => {
       const owned = store.owned.includes(x.id), on = skinId() === x.id, short = (x.price || 0) - coins();
-      const btn = on ? '<button class="secondary" disabled>Equipped ✓</button>'
-        : owned ? `<button class="primary" data-act="equip" data-id="${x.id}">Equip</button>`
-        : x.iap ? `<button class="primary premium-btn" data-act="iap" data-id="${x.iap}">Buy for ${IAP.price(x.iap, x.usd)}</button>`
-        : short > 0 ? `<button class="secondary" disabled>${coinIc()} ${x.price.toLocaleString('en')} · need ${short.toLocaleString('en')} more</button>`
-        : `<button class="primary" data-act="buy" data-id="${x.id}">Buy for ${coinIc()} ${x.price.toLocaleString('en')}</button>`;
+      const btn = on ? `<button class="secondary" disabled>${tr('Equipped ✓')}</button>`
+        : owned ? `<button class="primary" data-act="equip" data-id="${x.id}">${tr('Equip')}</button>`
+        : x.iap ? `<button class="primary premium-btn" data-act="iap" data-id="${x.iap}">${tr('Buy for {0}', IAP.price(x.iap, x.usd))}</button>`
+        : short > 0 ? `<button class="secondary" disabled>${coinIc()} ${I.num(x.price)} · ${tr('need {0} more', I.num(short))}</button>`
+        : `<button class="primary" data-act="buy" data-id="${x.id}">${tr('Buy for {0}', coinIc() + ' ' + I.num(x.price))}</button>`;
       return `<div class="pack rar-${x.rarity.toLowerCase()}${on ? ' on' : ''}">
-        <div class="pk-top"><b>${x.name}</b><span class="rar">${x.rarity}</span></div>
+        <div class="pk-top"><b>${tr(x.name)}</b><span class="rar">${tr(x.rarity)}</span></div>
         <div class="pk-faces">${SHOP_PEOPLE.map((p) => `<span class="pf skin-${x.id}">${face(p, x.id)}</span>`).join('')}</div>
-        <small>${x.desc}</small>${btn}</div>`;
+        <small>${tr(x.desc)}</small>${btn}</div>`;
     }).join('');
-    modal(`<h2>${ic('coin', '🪙')} Detective Shop</h2><p>You have ${coinIc()} <b>${coins()}</b> coins. New looks for every suspect and victim.</p>
-      <div class="shop-list"><div class="shop-h">Get coins</div><div class="coin-packs">${coinCards}</div><div class="shop-h">Skin packs</div>${cards}</div>
-      <div class="row"><button class="secondary" data-act="close">Close</button></div>`, {
+    modal(`<h2>${ic('coin', '🪙')} ${tr('Detective Shop')}</h2><p>${tr('You have {0} <b>{1}</b> coins. New looks for every suspect and victim.', coinIc(), I.num(coins()))}</p>
+      <div class="shop-list"><div class="shop-h">${tr('Get coins')}</div><div class="coin-packs">${coinCards}</div><div class="shop-h">${tr('Skin packs')}</div>${cards}</div>
+      <div class="row"><button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
       buy: (b) => {
         const x = PACK[b.dataset.id];
         if (!x || coins() < x.price) return;
         store.coins -= x.price; store.owned.push(x.id); store.skin = x.id; save();
         applySkin(); renderCoins(); sfx('unlock'); confetti();
         showShop();
-        toast(`<span class="ti">${ic('gift', '🎁')}</span><span><b>${x.name} unlocked!</b><small>Equipped on every suspect.</small></span>`);
+        toast(`<span class="ti">${ic('gift', '🎁')}</span><span><b>${tr('{0} unlocked!', tr(x.name))}</b><small>${tr('Equipped on every suspect.')}</small></span>`);
       },
       equip: (b) => { store.skin = b.dataset.id; save(); applySkin(); sfx('coin'); showShop(); },
       iap: (b) => IAP.buy(b.dataset.id),
@@ -754,25 +785,25 @@
 
   function showTrophies() {
     store.ach = store.ach || {};
-    const list = ACH.map((x) => `<div class="ach${store.ach[x.id] ? ' got' : ''}">${ic(store.ach[x.id] ? 'medal' : 'trophyOff', store.ach[x.id] ? '🏅' : '🔒')}<div><b>${x.name}</b><small>${x.desc}</small></div></div>`).join('');
+    const list = ACH.map((x) => `<div class="ach${store.ach[x.id] ? ' got' : ''}">${ic(store.ach[x.id] ? 'medal' : 'trophyOff', store.ach[x.id] ? '🏅' : '🔒')}<div><b>${tr(x.name)}</b><small>${tr(x.desc)}</small></div></div>`).join('');
     const months = Object.keys(store.trophies || {});
-    modal(`<div class="big">${ic('trophy', '🏆')}</div><h2>Trophy room</h2>
+    modal(`<div class="big">${ic('trophy', '🏆')}</div><h2>${tr('Trophy room')}</h2>
       <div class="ach-list">${list}</div>
-      ${months.length ? `<p><b>Monthly trophies:</b> ${months.map((k) => new Date(k.split('-')[0], k.split('-')[1] - 1, 1).toLocaleString('en', { month: 'short', year: 'numeric' })).join(', ')}</p>` : ''}
-      <p><small>Each trophy is worth 50 coins.</small></p>
-      <div class="row"><button class="primary" data-act="close">Close</button></div>`);
+      ${months.length ? `<p><b>${tr('Monthly trophies:')}</b> ${months.map((k) => I.monthYear(new Date(k.split('-')[0], k.split('-')[1] - 1, 1))).join(', ')}</p>` : ''}
+      <p><small>${tr('Each trophy is worth 50 coins.')}</small></p>
+      <div class="row"><button class="primary" data-act="close">${tr('Close')}</button></div>`);
   }
 
   function renderDaily() {
     const t = today(), diff = DAILY_DIFF[t.weekday], d = DIFF[diff];
     const done = dailyLog()[t.num], p = prog('daily'), streak = dailyStreak();
-    const status = done ? `<span class="dc-done">✓ ${fmtTime(done.t)}</span>` : p.cur && p.cur.caseNum === t.num ? 'Continue' : 'Play';
+    const status = done ? `<span class="dc-done">✓ ${fmtTime(done.t)}</span>` : p.cur && p.cur.caseNum === t.num ? tr('Continue') : tr('Play');
     $('daily').innerHTML = `<button class="daily-card" id="daily-btn">
         <span class="dc-ic">${ic('calendar', '📅')}</span>
-        <span class="dc-tx"><b>Daily Case</b><small>${WEEKDAYS[t.weekday]} · ${d.name} · ${d.sub.split(' · ')[0]}</small></span>
+        <span class="dc-tx"><b>${tr('Daily Case')}</b><small>${I.weekday(t.weekday)} · ${tr(d.name)} · ${tr(d.sub).split(' · ')[0]}</small></span>
         <span class="badge">${status}</span>
       </button>
-      <div class="streak">${streak ? `${ic('flame', '🔥')} ${streak}-day streak${done ? '' : ', solve today to keep it!'}` : 'A new case every day. Same one for everyone!'} · <button class="mini-link" id="cal-btn">Calendar</button></div>`;
+      <div class="streak">${streak ? `${ic('flame', '🔥')} ${done ? tr('{0}-day streak', streak) : tr('{0}-day streak, solve today to keep it!', streak)}` : tr('A new case every day. Same one for everyone!')} · <button class="mini-link" id="cal-btn">${tr('Calendar')}</button></div>`;
     $('daily-btn').addEventListener('click', startDaily);
     $('cal-btn').addEventListener('click', showCalendar);
   }
@@ -796,8 +827,8 @@
   }
 
   function offerTutorial() {
-    modal(`<div class="big">${ic('cap', '🎓')}</div><h2>New here?</h2><p>Take the 2-minute tutorial: we'll solve a tiny case together, step by step.</p>
-      <div class="row"><button class="primary" data-act="go">Start tutorial</button><button class="secondary" data-act="close">I know how to play</button></div>`, {
+    modal(`<div class="big">${ic('cap', '🎓')}</div><h2>${tr('New here?')}</h2><p>${tr("Take the 2-minute tutorial: we'll solve a tiny case together, step by step.")}</p>
+      <div class="row"><button class="primary" data-act="go">${tr('Start tutorial')}</button><button class="secondary" data-act="close">${tr('I know how to play')}</button></div>`, {
       go: () => { closeModal(); startTutorial(); },
     });
   }
@@ -807,7 +838,7 @@
     const t = today(), diff = DAILY_DIFF[t.weekday], p = prog('daily');
     const go = (puzzle) => { $('loading').classList.remove('show'); begin(diff, t.num, puzzle, 'daily'); };
     if (p.cur && p.cur.caseNum === t.num && p.cur.puzzle) return go(p.cur.puzzle);
-    $('loading-text').textContent = 'Opening today\'s case file…';
+    $('loading-text').textContent = tr("Opening today's case file…");
     $('loading').classList.add('show');
     buildCase(diff, t.num, go, 1000000 + t.num);
   }
@@ -817,7 +848,7 @@
     const go = (puzzle) => { $('loading').classList.remove('show'); begin(diff, n, puzzle, 'journey'); };
     if (p.cur && p.cur.caseNum === n && p.cur.puzzle) return go(p.cur.puzzle);
     if (p.next && p.next.caseNum === n && p.next.puzzle) { const pz = p.next.puzzle; p.next = null; return go(pz); }
-    $('loading-text').textContent = isBoss(n) ? 'Building a boss level…' : 'Building the crime scene…';
+    $('loading-text').textContent = isBoss(n) ? tr('Building a boss level…') : tr('Building the crime scene…');
     $('loading').classList.add('show');
     buildCase(diff, n, go, JOURNEY_SEED + n);
   }
@@ -835,7 +866,7 @@
     };
     if (p.cur && p.cur.caseNum === caseNum && p.cur.puzzle) return go(p.cur.puzzle);
     if (p.next && p.next.caseNum === caseNum && p.next.puzzle) { const pz = p.next.puzzle; p.next = null; return go(pz); }
-    $('loading-text').textContent = diff === 'extreme' ? 'Building a really nasty crime scene…' : 'Building the crime scene…';
+    $('loading-text').textContent = diff === 'extreme' ? tr('Building a really nasty crime scene…') : tr('Building the crime scene…');
     $('loading').classList.add('show');
     buildCase(diff, caseNum, go);
   }
@@ -859,10 +890,8 @@
     $('map').classList.remove('active');
     $('game').classList.add('active');
     if (slot === 'challenge') S.challenge = pendingChallenge || (p.cur && p.cur.challenge) || null;
-    const label = slot === 'challenge' && S.challenge ? `${S.challenge.n}'s challenge: ${puzzle.title}` : slot === 'daily' ? `Daily Case: ${puzzle.title}` : slot === 'tutorial' ? puzzle.title : slot === 'journey' ? `Level ${caseNum}: ${puzzle.title}` : `Case #${caseNum}: ${puzzle.title}`;
-    $('case-title').innerHTML = (ART ? `<span class="tic">${ART.theme(puzzle.theme.id)}</span>` : puzzle.theme.icon + ' ') + esc(label);
-    $('intro').textContent = slot === 'challenge' && S.challenge ? `⚔ ${S.challenge.n} solved this in ${fmtTime(S.challenge.time)}. Can you beat that?` : puzzle.intro;
     $('game').classList.toggle('tut', slot === 'tutorial');
+    paintCaseHeader();
     buildLegend();
     setMode('place');
     render();
@@ -875,13 +904,28 @@
     checkDone(true);
   }
 
+  // title, subtitle and intro of the open case, in the current language
+  function caseText() {
+    const P = S.P, slot = S.slot;
+    const [title, intro] = slot === 'tutorial' ? [tr('Your First Case'), tr("A quiet evening, a loud scream. Let's learn the ropes together.")] : I.story(P.title, P.intro);
+    return { title, intro };
+  }
+  function paintCaseHeader() {
+    if (!S) return;
+    const P = S.P, slot = S.slot, { title, intro } = caseText();
+    const label = slot === 'challenge' && S.challenge ? tr("{0}'s challenge: {1}", S.challenge.n, title) : slot === 'daily' ? tr('Daily Case: {0}', title) : slot === 'tutorial' ? title : slot === 'journey' ? tr('Level {0}: {1}', S.caseNum, title) : tr('Case #{0}: {1}', S.caseNum, title);
+    $('case-title').innerHTML = (ART ? `<span class="tic">${ART.theme(P.theme.id)}</span>` : P.theme.icon + ' ') + esc(label);
+    $('intro').textContent = slot === 'challenge' && S.challenge ? tr('⚔ {0} solved this in {1}. Can you beat that?', S.challenge.n, fmtTime(S.challenge.time)) : intro;
+    updateSub();
+  }
+
   function renderCoach() {
     const el = $('coach');
     if (!S || S.tut < 0) { el.hidden = true; return; }
     const step = TUTORIAL[S.tut];
     el.hidden = false;
-    el.innerHTML = `<div class="coach-face">${ART ? ART.ui('logo') : '🕵️'}</div><div class="coach-tx">${plain(step.text)}</div>
-      ${step.next ? '<button class="primary coach-next" id="coach-next">Next</button>' : ''}`;
+    el.innerHTML = `<div class="coach-face">${ART ? ART.ui('logo') : '🕵️'}</div><div class="coach-tx">${plain(tr(step.text))}</div>
+      ${step.next ? `<button class="primary coach-next" id="coach-next">${tr('Next')}</button>` : ''}`;
     if (step.next) $('coach-next').addEventListener('click', () => { S.tut++; renderCoach(); render(); });
   }
 
@@ -904,8 +948,9 @@
   }
   function stopTimer() { if (timer) clearInterval(timer); timer = null; }
   function updateSub() {
-    const kind = S.slot === 'challenge' ? `Challenge · ${DIFF[S.diff].name}` : S.slot === 'daily' ? `Daily · ${DIFF[S.diff].name}` : S.slot === 'tutorial' ? 'Tutorial' : S.slot === 'journey' ? `Level ${S.caseNum} · ${DIFF[S.diff].name}${isBoss(S.caseNum) ? ' · Boss' : ''}` : DIFF[S.diff].name;
-    $('case-sub').textContent = `${S.P.theme.name} · ${kind} · ${ART ? '' : '⏱ '}${fmtTime(S.elapsed)}`;
+    const dn = dname(S.diff);
+    const kind = S.slot === 'challenge' ? tr('Challenge') + ' · ' + dn : S.slot === 'daily' ? tr('Daily') + ' · ' + dn : S.slot === 'tutorial' ? tr('Tutorial') : S.slot === 'journey' ? tr('Level {0}', S.caseNum) + ' · ' + dn + (isBoss(S.caseNum) ? ' · ' + tr('Boss') : '') : dn;
+    $('case-sub').textContent = `${I.themeName(S.P.theme.name)} · ${kind} · ${ART ? '' : '⏱ '}${fmtTime(S.elapsed)}`;
   }
 
   function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
@@ -916,9 +961,9 @@
     $('mode-place').classList.toggle('on', m === 'place');
     $('mode-x').classList.toggle('on', m === 'x');
     $('mode-draft').classList.toggle('on', m === 'draft');
-    if (m === 'x') { S.sel = -1; setStatus('Mark mode: tap a square to cross it out ✕'); }
-    else if (m === 'draft') setStatus(S.sel >= 0 ? `Draft: tap every square where ${S.P.people[S.sel].name} might be.` : 'Draft mode: pick a suspect, then tap all the squares where they might be.');
-    else setStatus('Pick a suspect below, then tap a square.');
+    if (m === 'x') { S.sel = -1; setStatus(tr('Mark mode: tap a square to cross it out ✕')); }
+    else if (m === 'draft') setStatus(S.sel >= 0 ? tr('Draft: tap every square where {0} might be.', S.P.people[S.sel].name) : tr('Draft mode: pick a suspect, then tap all the squares where they might be.'));
+    else setStatus(tr('Pick a suspect below, then tap a square.'));
     render();
   }
 
@@ -939,8 +984,8 @@
       return;
     }
     if (S.mode === 'draft') {
-      if (S.sel < 0) { setStatus('Pick a suspect first, then tap the squares where they might be 👇', true); return; }
-      if (E.isBlocked(P.obj[i])) { setStatus('Nobody can stand there!', true); return; }
+      if (S.sel < 0) { setStatus(tr('Pick a suspect first, then tap the squares where they might be 👇'), true); return; }
+      if (E.isBlocked(P.obj[i])) { setStatus(tr('Nobody can stand there!'), true); return; }
       if (occ >= 0) return;
       snapshot();
       const list = S.draft[i] || [];
@@ -953,34 +998,34 @@
     }
     if (S.tut >= 0) {
       const step = TUTORIAL[S.tut];
-      if (!step.expect) { setStatus(step.next ? 'Tap Next in the box above first.' : 'Pick a suspect card below.', true); return; }
-      if (S.sel < 0) { setStatus(`First tap ${P.people[step.expect.p].name}'s card below 👇`, true); return; }
-      if (S.sel !== step.expect.p) { setStatus(`Let's place ${P.people[step.expect.p].name} first.`, true); S.sel = -1; render(); return; }
-      if (i !== step.expect.cell) { setStatus('Not quite. Read the clue again 🙂', true); return; }
+      if (!step.expect) { setStatus(step.next ? tr('Tap Next in the box above first.') : tr('Pick a suspect card below.'), true); return; }
+      if (S.sel < 0) { setStatus(tr("First tap {0}'s card below 👇", P.people[step.expect.p].name), true); return; }
+      if (S.sel !== step.expect.p) { setStatus(tr("Let's place {0} first.", P.people[step.expect.p].name), true); S.sel = -1; render(); return; }
+      if (i !== step.expect.cell) { setStatus(tr('Not quite. Read the clue again 🙂'), true); return; }
       S.place[S.sel] = i; S.sel = -1; S.tut++; sfx('place');
       setStatus('');
       renderCoach(); render(); checkDone(false);
       return;
     }
     if (S.sel >= 0) {
-      if (E.isBlocked(P.obj[i])) { setStatus(`Nobody can stand on ${E.OBJECTS[P.obj[i]].name === 'TV' ? 'the TV' : 'the ' + E.OBJECTS[P.obj[i]].name}!`, true); return; }
+      if (E.isBlocked(P.obj[i])) { setStatus(I.lang === 'en' ? `Nobody can stand on ${E.OBJECTS[P.obj[i]].name === 'TV' ? 'the TV' : 'the ' + E.OBJECTS[P.obj[i]].name}!` : tr('Nobody can stand there!'), true); return; }
       snapshot();
       if (occ >= 0) S.place[occ] = -1;
       S.place[S.sel] = i; S.xs.delete(i); sfx('place');
       clearDrafts(S.sel);
       S.sel = -1;
-      setStatus('Pick a suspect below, then tap a square.');
+      setStatus(tr('Pick a suspect below, then tap a square.'));
       render(); persist(); checkDone(false);
       return;
     }
     if (occ >= 0) {
       snapshot();
       S.place[occ] = -1; S.sel = occ;
-      setStatus(`You picked up ${P.people[occ].name}. Tap a new square.`);
+      setStatus(tr('You picked up {0}. Tap a new square.', P.people[occ].name));
       render(); persist();
       return;
     }
-    setStatus('First pick a suspect from the list below 👇', true);
+    setStatus(tr('First pick a suspect from the list below 👇'), true);
   }
 
   function clearDrafts(p) {
@@ -994,7 +1039,7 @@
     if (S.solvedGrid) return;
     if (S.mode === 'x') setMode('place');
     S.sel = S.sel === p ? -1 : p;
-    if (S.sel >= 0) setStatus(S.mode === 'draft' ? `Draft: tap every square where ${S.P.people[p].name} might be. Tap again to erase.` : `Where was ${S.P.people[p].name}? Tap a square.`);
+    if (S.sel >= 0) setStatus(S.mode === 'draft' ? tr('Draft: tap every square where {0} might be. Tap again to erase.', S.P.people[p].name) : tr('Where was {0}? Tap a square.', S.P.people[p].name));
     render();
   }
 
@@ -1011,14 +1056,14 @@
   function checkDone(silent) {
     const P = S.P;
     if (S.place.some((x) => x < 0)) return;
-    if (conflicts().size) { if (!silent) setStatus('Two people share a row or column. That can\'t be right!', true); return; }
+    if (conflicts().size) { if (!silent) setStatus(tr("Two people share a row or column. That can't be right!"), true); return; }
     if (!S.place.every((x, p) => x === P.solution[p])) {
-      if (!silent) setStatus('🤔 Something doesn\'t add up… someone breaks one of their clues.', true);
+      if (!silent) setStatus(tr("🤔 Something doesn't add up… someone breaks one of their clues."), true);
       return;
     }
     S.solvedGrid = true;
     persist(); render();
-    setStatus('✅ Everyone is in place! Now… who did it?');
+    setStatus(tr('✅ Everyone is in place! Now… who did it?'));
     setTimeout(showAccuse, 450);
   }
 
@@ -1027,7 +1072,7 @@
     // one label per area, on a square near its bottom, without two labels overlapping
     const N = P.N, cellPx = Math.min(window.innerWidth * 0.94, 470, window.innerHeight * 0.52) / N;
     const fontPx = Math.max(8, cellPx * 0.19);
-    const span = (z) => (P.zones[z].name.length * fontPx * 0.58 + 10) / cellPx; // label width in squares
+    const span = (z) => (I.zone(P.zones[z].name).n.length * fontPx * 0.58 + 10) / cellPx; // label width in squares
     const taken = []; // [row, from, to]
     const out = {};
     const zonesBySize = [...P.zones.keys()].sort((a, b) => P.zoneOf.filter((x) => x === a).length - P.zoneOf.filter((x) => x === b).length);
@@ -1046,7 +1091,7 @@
       for (const [i] of cells) {
         const r = Math.floor(i / N), c = i % N + 0.5;
         const from = Math.max(0, c - w / 2), to = Math.min(N, c + w / 2);
-        if (!taken.some(([tr, tf, tt]) => tr === r && from < tt && to > tf)) { chosen = i; break; }
+        if (!taken.some(([tRow, tf, tt]) => tRow === r && from < tt && to > tf)) { chosen = i; break; }
       }
       const r = Math.floor(chosen / N), c = chosen % N + 0.5;
       taken.push([r, c - w / 2, c + w / 2]);
@@ -1099,7 +1144,7 @@
       });
       if (i in labels) {
         const lb = document.createElement('div');
-        lb.className = 'zone-label'; lb.textContent = P.zones[labels[i]].name;
+        lb.className = 'zone-label'; lb.textContent = I.zone(P.zones[labels[i]].name).n;
         cell.appendChild(lb);
       }
       if (who >= 0) {
@@ -1132,7 +1177,7 @@
 
     const notes = $('extra');
     notes.hidden = !S.extra.length;
-    notes.innerHTML = `<b>${ART ? '' : '🧾 '}Extra clues from headquarters</b>` + S.extra.map((x) => `<div>• ${rich(x.text)}</div>`).join('');
+    notes.innerHTML = `<b>${ART ? '' : '🧾 '}${tr('Extra clues from headquarters')}</b>` + S.extra.map((x) => `<div>• ${rich((x.d && I.fact(x.d, P)) || x.text)}</div>`).join('');
 
     const list = $('suspects');
     list.innerHTML = '';
@@ -1141,22 +1186,31 @@
       card.className = 'suspect' + (person.isVictim ? ' is-victim' : '') + (S.sel === p ? ' sel' : '') + (S.place[p] >= 0 ? ' placed' : '')
         + (S.tut >= 0 && TUTORIAL[S.tut].card === p && S.place[p] < 0 ? ' coach-hl' : '');
       const clues = person.isVictim
-        ? '<div><b>The victim.</b> Found in the last remaining square.</div>'
-        : person.clues.map((c) => `<div>${rich(c)}</div>`).join('');
+        ? `<div>${tr('<b>The victim.</b> Found in the last remaining square.')}</div>`
+        : clueLines(person).map((c) => `<div>${rich(c)}</div>`).join('');
       card.innerHTML = `<div class="face">${face(person)}<span class="lt" style="background:${person.color}">${person.letter}</span></div>
-        <div><div class="nm">${esc(person.name)}${person.isVictim ? (ART ? ' <span class="rip">rip</span>' : ' ☠️') : ''}</div><div class="cl">${clues}</div></div>`;
+        <div><div class="nm">${esc(person.name)}${person.isVictim ? (ART ? ` <span class="rip">${tr('rip')}</span>` : ' ☠️') : ''}</div><div class="cl">${clues}</div></div>`;
       card.addEventListener('click', () => onSuspect(p));
       list.appendChild(card);
     });
     renderAccuse();
   }
 
+  // the clue lines of a suspect in the current language (English comes straight from the engine)
+  function clueLines(person) {
+    const P = S.P;
+    return (person.rawClues || []).map((c, i) => I.clue(c, P, person) || (person.clues || [])[i] || '');
+  }
+
   function buildLegend() {
+    if (!S) return;
     const P = S.P, T = P.theme;
     const present = [...new Set(P.obj.filter(Boolean))];
-    const show = (o) => (ART && ART.has(o) ? `<span class="ic lg">${ART.icon(o)}</span>` : E.OBJECTS[o].e || (o === 'rug' ? '▨' : '▬')) + ' ' + E.OBJECTS[o].name;
+    const show = (o) => (ART && ART.has(o) ? `<span class="ic lg">${ART.icon(o)}</span>` : E.OBJECTS[o].e || (o === 'rug' ? '▨' : '▬')) + ' ' + I.objName(o);
     const can = present.filter((o) => !E.isBlocked(o)).map(show);
     const cant = present.filter((o) => E.isBlocked(o)).map(show);
+    const local = I.legend(P, can, cant);
+    if (local) { $('legend').innerHTML = `<summary>${ART ? '' : '📖 '}${tr("Detective's dictionary")}</summary><ul>${local}</ul>`; return; }
     $('legend').innerHTML = `<summary>${ART ? '' : '📖 '}Detective's dictionary</summary><ul>
       <li>Every person was in a <b>different row</b> and a <b>different column</b>.</li>
       <li>You <b>can</b> stand on: bare ${T.floor}${can.length ? ', ' + can.join(', ') : ''}.</li>
@@ -1183,23 +1237,23 @@
   });
   $('reset').addEventListener('click', () => {
     if (S.solvedGrid) return;
-    modal(`<div class="big">${ic('trash', '🗑️')}</div><h2>Clear the board?</h2><p>All placements, drafts and ✕ marks will be erased. Extra clues stay.</p>
-      <div class="row"><button class="primary" data-act="yes">Yes, clear</button><button class="secondary" data-act="close">Cancel</button></div>`, {
+    modal(`<div class="big">${ic('trash', '🗑️')}</div><h2>${tr('Clear the board?')}</h2><p>${tr('All placements, drafts and ✕ marks will be erased. Extra clues stay.')}</p>
+      <div class="row"><button class="primary" data-act="yes">${tr('Yes, clear')}</button><button class="secondary" data-act="close">${tr('Cancel')}</button></div>`, {
       yes: () => { snapshot(); S.place.fill(-1); S.xs.clear(); S.draft = {}; S.sel = -1; render(); persist(); closeModal(); },
     });
   });
   $('hint').addEventListener('click', () => {
     if (S.solvedGrid) return;
-    if (S.tut >= 0) { setStatus('Follow the hints in the box above 🙂'); return; }
+    if (S.tut >= 0) { setStatus(tr('Follow the hints in the box above 🙂')); return; }
     const price = (k) => `<span class="price">${coinIc()} ${COST[k]}</span>`;
-    modal(`<div class="big">${ic('bulb', '💡')}</div><h2>Need a hand, detective?</h2>
-      <p>You have ${coinIc()} <b>${coins()}</b> coins.</p>
+    modal(`<div class="big">${ic('bulb', '💡')}</div><h2>${tr('Need a hand, detective?')}</h2>
+      <p>${tr('You have {0} <b>{1}</b> coins.', coinIc(), I.num(coins()))}</p>
       <div class="help-list">
-        <button class="primary" data-act="clue">${ic('note', '🧾')} Give me an extra clue ${price('clue')}<small>A fact about the whole scene. Nobody's spot is revealed.</small></button>
-        <button class="secondary" data-act="check">${ic('check', '✔️')} Check my placements ${price('check')}<small>Tells you if someone on the board is in the wrong spot.</small></button>
-        <button class="secondary" data-act="reveal">${ic('eye', '👁️')} Reveal one suspect ${price('reveal')}<small>The last resort.</small></button>
+        <button class="primary" data-act="clue">${ic('note', '🧾')} ${tr('Give me an extra clue')} ${price('clue')}<small>${tr("A fact about the whole scene. Nobody's spot is revealed.")}</small></button>
+        <button class="secondary" data-act="check">${ic('check', '✔️')} ${tr('Check my placements')} ${price('check')}<small>${tr('Tells you if someone on the board is in the wrong spot.')}</small></button>
+        <button class="secondary" data-act="reveal">${ic('eye', '👁️')} ${tr('Reveal one suspect')} ${price('reveal')}<small>${tr('The last resort.')}</small></button>
       </div>
-      <div class="row"><button class="secondary" data-act="close">Never mind</button></div>`, {
+      <div class="row"><button class="secondary" data-act="close">${tr('Never mind')}</button></div>`, {
       clue: () => { closeModal(); if (pay('clue')) giveExtraClue(); },
       check: () => { closeModal(); if (pay('check')) checkPlacements(); },
       reveal: () => { closeModal(); if (pay('reveal')) revealOne(); },
@@ -1207,7 +1261,7 @@
   });
 
   function pay(kind) {
-    if (coins() < COST[kind]) { setStatus(`Not enough coins (${COST[kind]} needed). Solve cases and collect your daily gift to earn more!`, true); return false; }
+    if (coins() < COST[kind]) { setStatus(tr('Not enough coins ({0} needed). Solve cases and collect your daily gift to earn more!', COST[kind]), true); return false; }
     store.coins -= COST[kind]; save(); sfx('coin');
     return true;
   }
@@ -1226,13 +1280,13 @@
     const facts = E.sceneFacts(P, knownForHints())
       .filter((f) => !have.has(f.id) && !(f.dup && have.has(f.dup)))
       .sort((x, y) => y.score - x.score);
-    if (!facts.length) { setStatus('Headquarters has no more extra clues for this case. Try another kind of help.', true); return; }
+    if (!facts.length) { setStatus(tr('Headquarters has no more extra clues for this case. Try another kind of help.'), true); return; }
     const top = facts[0].score;
     const pool = facts.filter((f) => f.score >= top * 0.8);
     const f = pool[Math.floor(Math.random() * pool.length)];
-    S.extra.push({ id: f.id, text: f.text });
+    S.extra.push({ id: f.id, text: f.text, d: f.d });
     S.helps++;
-    setStatus('🧾 New clue added above the suspects.');
+    setStatus(tr('🧾 New clue added above the suspects.'));
     render(); persist();
     const el = $('extra');
     el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
@@ -1242,11 +1296,11 @@
   function checkPlacements() {
     const P = S.P;
     const placed = S.place.map((x, p) => [x, p]).filter(([x]) => x >= 0);
-    if (!placed.length) { setStatus('Place somebody on the board first, then I can check.', true); return; }
+    if (!placed.length) { setStatus(tr('Place somebody on the board first, then I can check.'), true); return; }
     S.helps++;
     const wrong = placed.filter(([x, p]) => x !== P.solution[p]);
-    if (!wrong.length) setStatus(`✅ So far so good: all ${placed.length} placed ${placed.length === 1 ? 'person is' : 'people are'} in the right spot.`);
-    else setStatus(`🔴 ${wrong.length === 1 ? P.people[wrong[0][1]].name + ' is' : wrong.length + ' people are'} in the wrong spot.`, true);
+    if (!wrong.length) setStatus(trp(placed.length, '✅ So far so good: the 1 person you placed is in the right spot.', '✅ So far so good: all {0} people you placed are in the right spot.'));
+    else setStatus(wrong.length === 1 ? tr('🔴 {0} is in the wrong spot.', P.people[wrong[0][1]].name) : trp(wrong.length, '🔴 1 person is in the wrong spot.', '🔴 {0} people are in the wrong spot.'), true);
     persist();
   }
 
@@ -1262,7 +1316,7 @@
     if (occ >= 0) S.place[occ] = -1;
     S.place[p] = target; S.xs.delete(target); clearDrafts(p); S.sel = -1; S.hints++;
     const person = P.people[p];
-    setStatus(wasWrong ? `👁️ ${person.name} was in the wrong place. Fixed it.` : `👁️ Placed ${person.name} in the right spot.`);
+    setStatus(wasWrong ? tr('👁️ {0} was in the wrong place. Fixed it.', person.name) : tr('👁️ Placed {0} in the right spot.', person.name));
     render(); persist(); checkDone(false);
   }
   $('back').addEventListener('click', () => { persist(); showHome(); });
@@ -1272,12 +1326,12 @@
   $('tut-btn').addEventListener('click', startTutorial);
   $('ach-btn').addEventListener('click', showTrophies);
   $('shop-btn').addEventListener('click', showShop);
-  $('backup-btn').addEventListener('click', showBackup);
+  $('settings-btn').addEventListener('click', showSettings);
   $('map-back').addEventListener('click', () => { $('map').classList.remove('active'); showHome(); });
   $('map-friends').addEventListener('click', showFriends);
   window.addEventListener('hashchange', handleLink);
   $('coins-pill').addEventListener('click', showShop);
-  $('sound-btn').addEventListener('click', () => { store.sound = store.sound === false; save(); showHome(); if (store.sound) sfx('coin'); });
+
 
   /* ---------- modals ---------- */
   let modalActions = {}, modalSticky = false;
@@ -1297,20 +1351,20 @@
   });
 
   function showHowto() {
-    modal(`<div class="big">${ic('logo', '👮')}</div><h2>Welcome, detective!</h2>
+    modal(`<div class="big">${ic('logo', '👮')}</div><h2>${tr('Welcome, detective!')}</h2>
       <div class="howto">
-      <p>There was (yep, you guessed it) a murder last night. The good news? We have a lineup of suspects and a clue about each of them.</p>
-      <p><b>Your goal:</b> find the murderer: the one person who was <b>alone with the victim</b> in the same room.</p>
+      <p>${tr('There was (yep, you guessed it) a murder last night. The good news? We have a lineup of suspects and a clue about each of them.')}</p>
+      <p>${tr('<b>Your goal:</b> find the murderer: the one person who was <b>alone with the victim</b> in the same room.')}</p>
       <ul>
-        <li>Every person was in a <b>different row</b> and a <b>different column</b>, like sudoku.</li>
-        <li>Some objects can be stood on (chairs, beds, rugs…), others can't (tables, plants…). Check the dictionary under the suspects.</li>
-        <li>The victim (<b>V</b>) is in the <b>last remaining square</b>.</li>
+        <li>${tr('Every person was in a <b>different row</b> and a <b>different column</b>, like sudoku.')}</li>
+        <li>${tr("Some objects can be stood on (chairs, beds, rugs…), others can't (tables, plants…). Check the dictionary under the suspects.")}</li>
+        <li>${tr('The victim (<b>V</b>) is in the <b>last remaining square</b>.')}</li>
       </ul>
-      <p><b>How to play:</b> tap a suspect card, then a square. Tap a placed suspect to pick them up again. Use <b>✏️ Draft</b> to pencil in every square where a suspect <i>might</i> be, and <b>✕ Mark</b> to cross out squares nobody can use.</p>
-      <p><b>Stuck?</b> 💡 gives you an extra clue about the whole scene, checks your board, or (last resort) reveals a suspect.</p>
-      <p>Each scene is different: a mansion, a ship, a forest, a space station and more.</p>
+      <p>${tr('<b>How to play:</b> tap a suspect card, then a square. Tap a placed suspect to pick them up again. Use <b>✏️ Draft</b> to pencil in every square where a suspect <i>might</i> be, and <b>✕ Mark</b> to cross out squares nobody can use.')}</p>
+      <p>${tr('<b>Stuck?</b> 💡 gives you an extra clue about the whole scene, checks your board, or (last resort) reveals a suspect.')}</p>
+      <p>${tr('Each scene is different: a mansion, a ship, a forest, a space station and more.')}</p>
       </div>
-      <div class="row"><button class="primary" data-act="close">Let's investigate!</button><button class="secondary" data-act="tut">Guided tutorial</button></div>`, {
+      <div class="row"><button class="primary" data-act="close">${tr("Let's investigate!")}</button><button class="secondary" data-act="tut">${tr('Guided tutorial')}</button></div>`, {
       tut: () => { closeModal(); startTutorial(); },
     });
   }
@@ -1338,11 +1392,11 @@
         if (btn.dataset.home) { closeModal(); return showHome(); }
         const p = +btn.dataset.p;
         if (Number.isNaN(p) || S.won) return;
-        const P = S.P, zone = P.zones[P.zoneOf[P.solution[P.victim]]].name;
+        const P = S.P, zone = I.zone(P.zones[P.zoneOf[P.solution[P.victim]]].name);
         if (p === P.murderer) return win();
         if (!S.wrongAccuse.includes(p)) S.wrongAccuse.push(p);
         persist(); renderAccuse();
-        $('acc-msg').textContent = `${P.people[p].name} wasn't alone with ${P.people[P.victim].name} in the ${zone}! Look again.`;
+        $('acc-msg').textContent = tr("{0} wasn't alone with {1} {2}! Look again.", P.people[p].name, P.people[P.victim].name, zone.in);
         shake(el); sfx('wrong');
       });
     }
@@ -1350,36 +1404,36 @@
     el.hidden = !on;
     $('game').classList.toggle('accusing', on);
     if (!on) return;
-    const P = S.P, v = P.people[P.victim], zone = P.zones[P.zoneOf[P.solution[P.victim]]].name;
+    const P = S.P, v = P.people[P.victim], zone = I.zone(P.zones[P.zoneOf[P.solution[P.victim]]].name);
     if (S.won) {
       const m = P.people[P.murderer];
-      const nextLabel = S.slot === 'journey' ? `Level ${S.caseNum + 1} →` : S.slot === 'tutorial' ? 'Play level 1 →' : S.slot === 'daily' || S.slot === 'challenge' ? '' : 'Next case →';
-      el.innerHTML = `<div class="acc-t">Case closed: <b>${esc(m.name)}</b> did it.</div>
-        <div class="acc-btns">${nextLabel ? `<button class="primary" data-next="1">${nextLabel}</button>` : ''}<button class="secondary" data-home="1">Menu</button></div>`;
+      const nextLabel = S.slot === 'journey' ? tr('Level {0} →', S.caseNum + 1) : S.slot === 'tutorial' ? tr('Play level 1 →') : S.slot === 'daily' || S.slot === 'challenge' ? '' : tr('Next case →');
+      el.innerHTML = `<div class="acc-t">${tr('Case closed: <b>{0}</b> did it.', esc(m.name))}</div>
+        <div class="acc-btns">${nextLabel ? `<button class="primary" data-next="1">${nextLabel}</button>` : ''}<button class="secondary" data-home="1">${tr('Menu')}</button></div>`;
       return;
     }
     const btns = P.people.map((person, p) => person.isVictim ? '' :
       `<button data-p="${p}" class="${S.wrongAccuse.includes(p) ? 'nope' : ''}"><span class="af">${face(person)}</span>${esc(person.name)}</button>`).join('');
-    el.innerHTML = `<div class="acc-t">${ic('knife', '🔪')} <b>Who did it?</b> ${esc(v.name)} was found in the <b>${esc(zone)}</b> (highlighted). Who was alone with ${pr(v, 'him', 'her')}?</div>
+    el.innerHTML = `<div class="acc-t">${ic('knife', '🔪')} <b>${tr('Who did it?')}</b> ${v.g === 'm' ? tr('{0} was found {1} (highlighted). Who was alone with him?', esc(v.name), `<b>${esc(zone.in)}</b>`) : tr('{0} was found {1} (highlighted). Who was alone with her?', esc(v.name), `<b>${esc(zone.in)}</b>`)}</div>
       <div class="acc-row">${btns}</div><div class="acc-msg" id="acc-msg"></div>`;
   }
 
   function win() {
     const P = S.P, pg = prog(S.slot);
     const m = P.people[P.murderer], v = P.people[P.victim];
-    const zone = P.zones[P.zoneOf[P.solution[P.victim]]].name;
+    const zone = I.zone(P.zones[P.zoneOf[P.solution[P.victim]]].name);
     stopTimer();
     S.won = true; renderAccuse();
     if (S.slot === 'tutorial') {
       store.tutorialDone = true; store.seenHowto = true; save();
       S.tut = -1; renderCoach();
-      modal(`<div class="big">${ic('cap', '🎓')}</div><h2>You did it, detective!</h2>
-        <p><b>Ben</b> was alone with Victor in the Bedroom. Case closed!</p>
-        <div class="howto"><p>Real cases have more suspects and trickier clues. Your tools:</p><ul>
-          <li><b>Draft</b>: pencil in every square where a suspect <i>might</i> be.</li>
-          <li><b>Mark</b>: cross out squares nobody can use.</li>
-          <li><b>Help</b>: an extra clue when you're stuck.</li></ul></div>
-        <div class="row"><button class="primary" data-act="first">Play level 1</button><button class="secondary" data-act="home">Menu</button></div>`, {
+      modal(`<div class="big">${ic('cap', '🎓')}</div><h2>${tr('You did it, detective!')}</h2>
+        <p>${tr('<b>{0}</b> was alone with {1} {2}. Case closed!', 'Ben', 'Victor', zone.in)}</p>
+        <div class="howto"><p>${tr('Real cases have more suspects and trickier clues. Your tools:')}</p><ul>
+          <li>${tr('<b>Draft</b>: pencil in every square where a suspect <i>might</i> be.')}</li>
+          <li>${tr('<b>Mark</b>: cross out squares nobody can use.')}</li>
+          <li>${tr("<b>Help</b>: an extra clue when you're stuck.")}</li></ul></div>
+        <div class="row"><button class="primary" data-act="first">${tr('Play level 1')}</button><button class="secondary" data-act="home">${tr('Menu')}</button></div>`, {
         first: () => { closeModal(); startJourney(); },
         home: () => { closeModal(); showHome(); },
       });
@@ -1399,12 +1453,12 @@
       for (let k = 1; k <= last; k++) if (!dailyLog()[Math.floor(Date.UTC(y, mo, k) / 86400000)]) { all = false; break; }
       if (all) { store.trophies = store.trophies || {}; store.trophies[`${y}-${mo + 1}`] = true; }
       const n = dailyStreak();
-      dailyTxt = `<br>${ic('flame', '🔥')} ${n}-day streak! Come back tomorrow for a new case.`;
+      dailyTxt = `<br>${ic('flame', '🔥')} ${tr('{0}-day streak! Come back tomorrow for a new case.', n)}`;
     } else if (S.slot === 'challenge') {
       pg.cur = null;
       const c = S.challenge, diff = c ? S.elapsed - c.time : 0;
       if (c && diff < 0) store.coins += 30;
-      dailyTxt = c ? `<div class="duel ${diff < 0 ? 'won' : 'lost'}">${diff < 0 ? `You beat ${esc(c.n)} by ${fmtTime(-diff)}! +30 coins` : diff === 0 ? `A perfect tie with ${esc(c.n)}!` : `${esc(c.n)} was faster by ${fmtTime(diff)}.`}<br><small>You ${fmtTime(S.elapsed)} · ${esc(c.n)} ${fmtTime(c.time)}</small></div>` : '';
+      dailyTxt = c ? `<div class="duel ${diff < 0 ? 'won' : 'lost'}">${diff < 0 ? tr('You beat {0} by {1}! +30 coins', esc(c.n), fmtTime(-diff)) : diff === 0 ? tr('A perfect tie with {0}!', esc(c.n)) : tr('{0} was faster by {1}.', esc(c.n), fmtTime(diff))}<br><small>${tr('You {0} · {1} {2}', fmtTime(S.elapsed), esc(c.n), fmtTime(c.time))}</small></div>` : '';
     } else {
       if (S.slot === 'journey') { store.jStars = store.jStars || {}; store.jStars[S.caseNum] = Math.max(store.jStars[S.caseNum] || 0, nStars); }
       pg.solved++; pg.caseNum++; pg.cur = null;
@@ -1413,17 +1467,18 @@
     }
     save();
     sfx('win'); confetti();
-    const levelTxt = S.slot === 'journey' ? `<div class="lvl-done">Level ${S.caseNum} complete!</div>` : '';
-    const helpTxt = [S.helps ? `🧾 ${S.helps} clue${S.helps > 1 ? 's' : ''}/check${S.helps > 1 ? 's' : ''}` : '', S.hints ? `👁️ ${S.hints} reveal${S.hints > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ');
-    modal(`<div class="big">${ART ? `<span class="ic win-face">${face(m)}</span><span class="ic">${ART.ui('siren')}</span>` : m.emoji + '🚔'}</div><h2>Case closed!</h2>
-      <p><b>${esc(m.name)}</b> was alone with ${esc(v.name)} in the ${esc(zone)}.<br>${pr(m, 'He', 'She')}'s on the way to jail. ${ic('lock', '🔒')}</p>
+    const levelTxt = S.slot === 'journey' ? `<div class="lvl-done">${tr('Level {0} complete!', S.caseNum)}</div>` : '';
+    const helpTxt = [S.helps ? '🧾 ' + trp(S.helps, '1 clue/check', '{0} clues/checks') : '', S.hints ? '👁️ ' + trp(S.hints, '1 reveal', '{0} reveals') : ''].filter(Boolean).join(' · ');
+    const lockLine = m.g === 'm' ? tr("He's on the way to jail.") : tr("She's on the way to jail.");
+    modal(`<div class="big">${ART ? `<span class="ic win-face">${face(m)}</span><span class="ic">${ART.ui('siren')}</span>` : m.emoji + '🚔'}</div><h2>${tr('Case closed!')}</h2>
+      <p>${tr('<b>{0}</b> was alone with {1} {2}.', esc(m.name), esc(v.name), esc(zone.in))}<br>${lockLine} ${ic('lock', '🔒')}</p>
       ${levelTxt}<p class="stars-row" style="font-size:28px;margin:6px 0">${stars(nStars)}</p>
-      <p class="earned">${coinIc()} +<b id="earned">0</b> coins</p>
-      <p>${ART ? '' : '⏱ '}${fmtTime(S.elapsed)}${helpTxt ? ' · ' + plain(helpTxt) : ''}${isBest ? '<br>New personal best!' : ''}${dailyTxt}</p>
-      <div class="row">${S.slot === 'daily' || S.slot === 'challenge' ? '' : `<button class="primary" data-act="next">${S.slot === 'journey' ? `Level ${S.caseNum + 1} →` : 'Next case →'}</button>`}<button class="${S.slot === 'daily' || S.slot === 'challenge' ? 'primary' : 'secondary'}" data-act="home">Menu</button></div>
-      <div class="row"><button class="secondary duel-btn" data-act="duel">${ic('knife', '⚔️')} ${S.slot === 'challenge' ? 'Challenge back' : 'Challenge a friend'}</button></div>`, {
+      <p class="earned">${coinIc()} ${tr('+{0} coins', '<b id="earned">0</b>')}</p>
+      <p>${ART ? '' : '⏱ '}${fmtTime(S.elapsed)}${helpTxt ? ' · ' + plain(helpTxt) : ''}${isBest ? '<br>' + tr('New personal best!') : ''}${dailyTxt}</p>
+      <div class="row">${S.slot === 'daily' || S.slot === 'challenge' ? '' : `<button class="primary" data-act="next">${S.slot === 'journey' ? tr('Level {0} →', S.caseNum + 1) : tr('Next case →')}</button>`}<button class="${S.slot === 'daily' || S.slot === 'challenge' ? 'primary' : 'secondary'}" data-act="home">${tr('Menu')}</button></div>
+      <div class="row"><button class="secondary duel-btn" data-act="duel">${ic('knife', '⚔️')} ${S.slot === 'challenge' ? tr('Challenge back') : tr('Challenge a friend')}</button></div>`, {
       next: nextCase,
-      duel: () => share(`I solved "${S.P.title}" in ${fmtTime(S.elapsed)} on Mystery Grid. Can you beat my time?`, challengeLink()),
+      duel: () => share(tr('I solved "{0}" in {1} on Mystery Grid. Can you beat my time?', caseText().title, fmtTime(S.elapsed)), challengeLink()),
       home: () => { closeModal(); showHome(); },
     });
     // count the coins up, then hand out any new trophies
@@ -1445,15 +1500,15 @@
   if (!standalone && isIOS) $('install-btn').hidden = false;
   $('install-btn').addEventListener('click', () => {
     if (installEvent) { installEvent.prompt(); installEvent = null; return; }
-    modal(`<div class="big">${ic('phone', '📲')}</div><h2>Install on iPhone</h2>
+    modal(`<div class="big">${ic('phone', '📲')}</div><h2>${tr('Install on iPhone')}</h2>
       <ol class="steps">
-        <li>Open this page in <b>Safari</b>.</li>
-        <li>Tap the <b>Share</b> button (square with an arrow).</li>
-        <li>Choose <b>"Add to Home Screen"</b>.</li>
-        <li>From now on, open the game from the icon.</li>
+        <li>${tr('Open this page in <b>Safari</b>.')}</li>
+        <li>${tr('Tap the <b>Share</b> button (square with an arrow).')}</li>
+        <li>${tr('Choose <b>"Add to Home Screen"</b>.')}</li>
+        <li>${tr('From now on, open the game from the icon.')}</li>
       </ol>
-      <p><small>Install before you start playing: on iPhone the app keeps its progress separately from Safari.</small></p>
-      <div class="row"><button class="primary" data-act="close">Got it</button></div>`);
+      <p><small>${tr('Install before you start playing: on iPhone the app keeps its progress separately from Safari.')}</small></p>
+      <div class="row"><button class="primary" data-act="close">${tr('Got it')}</button></div>`);
   });
 
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
@@ -1475,6 +1530,7 @@
 
   document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
   window.addEventListener('resize', () => { if (S) $('play-area').style.top = $('topbar').offsetHeight + 'px'; });
+  I.setLang(store.lang || I.detect());
   applySkin();
   IAP.init().then(() => { if ($('home').classList.contains('active')) renderShopCard(); });
   showHome();
