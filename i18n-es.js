@@ -521,7 +521,7 @@
  ],
  "Old Oak": [
   "Roble viejo",
-  "junto al roble viejo"
+  "en la zona del roble viejo"
  ],
  "Command Deck": [
   "Cubierta de mando",

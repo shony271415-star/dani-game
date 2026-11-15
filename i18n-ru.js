@@ -21,7 +21,7 @@
       case 'on': { const o = x.obj(c.a); return `${cap(verb(o[2], g))} **${o[3]}**.`; }
       case 'floor': return `${cap(verb('stand', g))} **${ONBARE[x.floor]}**.`;
       case 'beside': return `${cap(be)} **рядом с ${x.obj(c.a)[1]}**.`;
-      case 'notBeside': { const o = x.obj(c.a); return `**Не** ${be} **рядом ни с ${o[4]} ${o[1]}**.`; }
+      case 'notBeside': { const o = x.obj(c.a); return `**Не** ${be} **рядом ни с ${String(o[4]).replace(/^ни/, '')} ${o[1]}**.`; }
       case 'edge': return `${cap(be)} **${EDGE[x.edge]}**.`;
       case 'corner': return `${cap(be)} **в углу**.`;
       case 'center': return `**Не** ${be} **${notWallPhrase(x)}**.`;
@@ -532,7 +532,7 @@
  ],
  "Old Oak": [
   "Старый дуб",
-  "у старого дуба"
+  "в зоне старого дуба"
  ],
  "Command Deck": [
   "Командная палуба",
@@ -644,11 +644,11 @@
  ],
  "Snack Stand": [
   "Лоток с закусками",
-  "у лотка с закусками"
+  "в зоне лотка с закусками"
  ],
  "Ticket Booth": [
   "Касса",
-  "у кассы"
+  "в зоне кассы"
  ],
  "Strongman Tent": [
   "Шатёр силача",
