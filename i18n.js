@@ -1,4 +1,4 @@
-/* Mystery Grid translations: the engine and the app write English; this file turns it into the player's language.
+/* Crime Grid translations: the engine and the app write English; this file turns it into the player's language.
    - t('English text {0}', arg) looks the English text up in the language pack (falls back to English).
    - Puzzle text (clues, scene facts, area names, titles) is built from structured data, so a case already in
      progress switches language instantly.
@@ -54,7 +54,7 @@
     r.querySelectorAll('[data-t-placeholder]').forEach((el) => { el.placeholder = I.t(el.dataset.tPlaceholder); });
     r.querySelectorAll('[data-t-label]').forEach((el) => { el.setAttribute('aria-label', I.t(el.dataset.tLabel)); });
     const title = document.querySelector('title');
-    if (title) title.textContent = 'Mystery Grid';
+    if (title) title.textContent = 'Crime Grid';
   };
 
   /* ---------- puzzle content ---------- */

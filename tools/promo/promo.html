@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Mystery Grid promo</title>
+<title>Crime Grid promo</title>
 <style>
   @font-face { font-family: "Fredoka"; font-weight: 600; src: url(../fonts/fredoka-latin-600-normal.woff2) format("woff2"); }
   @font-face { font-family: "Fredoka"; font-weight: 500; src: url(../fonts/fredoka-latin-500-normal.woff2) format("woff2"); }
@@ -71,6 +71,14 @@
   .fl-marble { background-image: linear-gradient(135deg, rgba(255,255,255,.55), transparent 45%, rgba(255,255,255,.35) 70%, transparent 85%); }
   .fl-carpet { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.16) 0 6px, transparent 6px 16px); }
   .fl-snow { background-image: radial-gradient(#fff 2.8px, transparent 3.6px); background-size: 20px 20px; }
+  #tap { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; z-index: 40; pointer-events: none; opacity: 0;
+    background: radial-gradient(circle, rgba(255,255,255,.95) 0 22%, rgba(255,255,255,.35) 23% 45%, transparent 46%); }
+  #tap::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 6px solid rgba(255,255,255,.9); transform: scale(var(--r, 0)); opacity: calc(1 - var(--r, 0)); }
+  #stamp { position: absolute; left: 50%; top: 760px; z-index: 35; font-family: "Oswald"; font-weight: 600; font-size: 150px; letter-spacing: 6px; padding: 10px 50px;
+    border: 14px solid currentColor; border-radius: 18px; color: #e63946; background: rgba(12,10,17,.55); white-space: nowrap; opacity: 0; transform: translate(-50%, -50%); }
+  .xm { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #c0392b; font-family: "Fredoka"; font-weight: 600; z-index: 4; opacity: 0; line-height: 1; }
+  .lvtag { position: absolute; left: 50%; transform: translateX(-50%); font-family: "Oswald"; font-weight: 600; font-size: 64px; letter-spacing: 4px; color: #f3e6c8; background: #2e2442; border: 5px solid #d9a441; border-radius: 14px; padding: 4px 34px; z-index: 12; white-space: nowrap; }
+  .stars { font-size: 120px; color: #ffd166; letter-spacing: 16px; text-shadow: 0 6px 0 rgba(0,0,0,.3); }
 </style>
 </head>
 <body>
@@ -81,6 +89,8 @@
 <div id="dim"></div>
 <div id="over"></div>
 <div id="brand"></div>
+<div id="tap"></div>
+<div id="stamp"></div>
 <script src="../../engine.js"></script>
 <script src="../../art.js"></script>
 <script>
@@ -113,10 +123,10 @@ function tutorialPuzzle() {
 }
 
 /* ---------- building blocks ---------- */
-let P, cells = [], toks = [], hls = [], glows = [], cardEls = [];
-function buildBoard(size) {
+let P, cells = [], toks = [], hls = [], glows = [], cardEls = [], xms = [];
+function buildBoard(size, wrap) {
   const N = P.N, cs = size / N;
-  const wrap = $('boardwrap');
+  wrap = wrap || $('boardwrap');
   wrap.style.marginLeft = -(size + 24) / 2 + 'px';
   const b = document.createElement('div');
   b.className = 'board';
@@ -142,6 +152,7 @@ function buildBoard(size) {
     else if (o) c.innerHTML = `<div class="obj">${A.icon(o)}</div>`;
     for (const s of ['n', 's', 'e', 'w']) if (edges.has(i + s)) c.insertAdjacentHTML('beforeend', `<div class="edge ${s}" style="background:${P.theme.edgeColor}"></div>`);
     if (i in label && size / N > 70) c.insertAdjacentHTML('beforeend', `<div class="zl" style="font-size:${Math.min(34, cs * 0.17)}px">${esc(P.zones[label[i]].name)}</div>`);
+    const xm = document.createElement('div'); xm.className = 'xm'; xm.textContent = '✕'; xm.style.fontSize = cs * 0.8 + 'px'; c.appendChild(xm); xms[i] = xm;
     const g = document.createElement('div'); g.className = 'zoneglow'; g.style.opacity = 0; c.appendChild(g); glows[i] = g;
     const h = document.createElement('div'); h.className = 'hl'; h.style.opacity = 0; c.appendChild(h); hls[i] = h;
     b.appendChild(c); cells[i] = c;
@@ -170,17 +181,43 @@ function buildCards(scale) {
     box.appendChild(d); cardEls.push(d);
   });
 }
-const brand = () => { $('brand').innerHTML = `${A.ui('logo')}<span>Mystery Grid</span>`; };
+const brand = () => { $('brand').innerHTML = `${A.ui('logo')}<span>Crime Grid</span>`; };
 function endCard(x, lines) {
   const o = $('over');
   $('dim').style.opacity = ease(x) * 0.95;
   o.style.opacity = ease(x);
   o.innerHTML = `<div class="ic" style="transform:scale(${0.6 + 0.4 * pop(x)})">${A.ui('logo')}</div>
-    <div class="big">Mystery Grid</div><div class="sub">${lines.join('<br>')}</div>`;
+    <div class="big">Crime Grid</div><div class="sub">${lines.join('<br>')}</div>`;
 }
 const setCap = (html, x) => { const c = $('cap'); c.innerHTML = html ? `<div>${html}</div>` : ''; c.style.opacity = ease(x); c.style.transform = `translateY(${(1 - ease(x)) * 30}px)`; };
 
-/* ---------- the three videos ---------- */
+
+/* tap indicator (a finger touch) over any element, at time progress x (0..1) */
+function tapAt(el, x, show) {
+  const tp = $('tap');
+  if (!show || !el) { tp.style.opacity = 0; return; }
+  const r = el.getBoundingClientRect();
+  tp.style.left = r.left + r.width / 2 + 'px'; tp.style.top = r.top + r.height / 2 + 'px';
+  tp.style.opacity = 1; tp.style.setProperty('--r', clamp(x));
+  tp.style.transform = `scale(${1 - 0.15 * Math.sin(Math.PI * clamp(x * 2))})`;
+}
+function stamp(text, color, x, rot) {
+  const st = $('stamp');
+  st.textContent = text; st.style.color = color; st.style.opacity = x > 0 ? 1 : 0;
+  st.style.transform = `translate(-50%, -50%) rotate(${rot || -8}deg) scale(${x > 0 ? 2.2 - 1.2 * pop(x) : 2})`;
+}
+/* sweep X marks along the row and column of square c, outward from it */
+function sweepX(c, t0, t, sec) {
+  const N = P.N, r = Math.floor(c / N), k = c % N;
+  for (let j = 0; j < N; j++) for (const i of [r * N + j, j * N + k]) {
+    if (i === c) continue;
+    const d = Math.abs(Math.floor(i / N) - r) + Math.abs((i % N) - k);
+    const x = span(t, t0 + d * (sec || 0.07), t0 + d * (sec || 0.07) + 0.18);
+    if (x > 0) { xms[i].style.opacity = Math.max(+xms[i].style.opacity || 0, 0.75 * x); xms[i].style.transform = `scale(${pop(x)})`; }
+  }
+}
+
+/* ---------- the videos ---------- */
 const VIDEOS = {
   // 1: easy case, countdown, worked solution, reveal
   1: {
@@ -305,6 +342,128 @@ const VIDEOS = {
       // a few suspects drop in to tease the start of the solve
       [0, 1, 2].forEach((p, k) => { const x = span(t, 9 + k * 1.1, 9.4 + k * 1.1); toks[p].style.opacity = x > 0 ? 1 : 0; toks[p].style.transform = `scale(${pop(x)})`; });
       toks.forEach((tk, p) => { if (p > 2) tk.style.opacity = 0; });
+    },
+  },
+  // 4: "Only 1% find the killer": challenge hook + a fail moment (wrong accusation) + countdown, answer not shown
+  4: {
+    duration: 16,
+    setup() { P = tutorialPuzzle(); buildBoard(760); buildCards(); brand(); },
+    render(t) {
+      const o = $('over'), dim = $('dim');
+      xms.forEach((x) => { x.style.opacity = 0; });
+      // gameplay is on screen from the very first frame, with the challenge on top
+      $('boardwrap').style.transform = 'scale(1)'; $('boardwrap').style.opacity = 1;
+      cardEls.forEach((c) => { c.style.opacity = 1; c.style.transform = 'none'; });
+      if (t < 2.4) setCap('Only <b>1%</b> can find the killer 🔪'.replace('🔪', ''), span(t, 0, 0.25));
+      else if (t < 7.6) setCap('He said it was <b>easy</b>…', span(t, 2.4, 2.7));
+      else setCap('', 0);
+      // quick "player" moves: Ava, Chloe, Ben, Victor
+      const moves = [[2.6, 0], [3.4, 2], [4.2, 1], [5.0, 3]];
+      let tapEl = null, tapX = 0;
+      moves.forEach(([s0, p]) => {
+        const x = span(t, s0 + 0.25, s0 + 0.55);
+        toks[p].style.opacity = x > 0 ? 1 : 0; toks[p].style.transform = `scale(${pop(x)})`;
+        if (x > 0) sweepX(P.solution[p], s0 + 0.4, t, 0.05);
+        if (t >= s0 && t < s0 + 0.6) { tapEl = cells[P.solution[p]]; tapX = span(t, s0, s0 + 0.6); }
+      });
+      // the accusation: taps Chloe, gets it WRONG
+      if (t >= 6 && t < 10.4) {
+        const x = span(t, 6, 6.4);
+        dim.style.opacity = 0.85 * ease(x); o.style.opacity = ease(x);
+        const sus = P.people.filter((p) => !p.isVictim);
+        o.innerHTML = `<div class="big" style="font-size:90px">Who did it?</div>
+          <div class="facerow">${sus.map((p, k) => `<div class="f" id="acc${k}" style="transform:scale(${pop(span(t, 6.3 + k * 0.12, 6.7 + k * 0.12))})"><div>${A.avatar(p)}</div>${esc(p.name)}</div>`).join('')}</div>`;
+        if (t >= 7.2 && t < 7.8) { tapEl = $('acc2'); tapX = span(t, 7.2, 7.8); }
+        if (t >= 7.6) { const w = $('acc2'); if (w) w.firstChild.style.boxShadow = '0 0 0 10px #e63946'; }
+        stamp('WRONG!', '#e63946', span(t, 7.7, 8.0), -8);
+        if (t >= 7.7 && t < 8.3) document.body.style.transform = `translate(${Math.sin(t * 90) * 14 * (1 - span(t, 7.7, 8.3))}px, 0)`;
+        else document.body.style.transform = 'none';
+        if (t >= 8.6) stamp('', '#e63946', 0);
+        if (t >= 8.6) setCap('Can <b>YOU</b> do better?', span(t, 8.6, 8.9));
+        if (t >= 8.6) { const k = 3 - Math.floor((t - 8.8) / 0.55); o.querySelector('.big').innerHTML = `Who did it?<div class="ring" style="margin:30px auto 0;width:200px;height:200px;font-size:110px">${Math.max(1, Math.min(3, k))}</div>`; }
+      } else if (t >= 10.4) {
+        stamp('', '#e63946', 0); setCap('', 0);
+        endCard(span(t, 10.4, 11), ['Only 1% get it right', 'New murder every day', '<b style="color:#ff7b8b">Play free</b>']);
+      } else { dim.style.opacity = 0; o.style.opacity = 0; stamp('', '#e63946', 0); }
+      tapAt(tapEl, tapX, !!tapEl);
+    },
+  },
+  // 5: "satisfying" solve: fast placements, X marks sweep across rows and columns, CASE CLOSED stamp
+  5: {
+    duration: 15,
+    setup() {
+      P = E.generate(9500007, 'hard'); buildBoard(860); brand(); $('boardwrap').style.top = '400px';
+      const bar = document.createElement('div'); bar.id = 'pbar';
+      bar.style.cssText = 'position:absolute;left:110px;right:110px;top:1400px;text-align:center;font-family:Oswald;font-weight:600;font-size:46px;letter-spacing:3px;color:#f3e6c8';
+      bar.innerHTML = '<div id="ptxt"></div><div style="margin-top:18px;height:46px;border-radius:23px;background:rgba(255,255,255,.12);border:4px solid #d9a441;overflow:hidden"><div id="pfill" style="height:100%;width:0;background:linear-gradient(90deg,#d9a441,#ff7b8b)"></div></div>';
+      document.body.appendChild(bar);
+    },
+    render(t) {
+      const o = $('over'), dim = $('dim');
+      xms.forEach((x) => { x.style.opacity = 0; });
+      $('boardwrap').style.transform = `scale(${0.85 + 0.15 * pop(span(t, 0, 0.5))})`; $('boardwrap').style.opacity = 1;
+      if (t < 10.8) setCap('Catching a killer in <b>10 seconds</b> 😮‍💨'.replace(' 😮‍💨', ''), span(t, 0, 0.3));
+      const order = P.people.map((p, k) => k).filter((k) => k !== P.victim).concat([P.victim]);
+      let tapEl = null, tapX = 0;
+      order.forEach((p, k) => {
+        const s0 = 0.9 + k * 1.15, x = span(t, s0 + 0.2, s0 + 0.5);
+        toks[p].style.opacity = x > 0 ? 1 : 0; toks[p].style.transform = `scale(${pop(x)})`;
+        if (x > 0) sweepX(P.solution[p], s0 + 0.3, t, 0.06);
+        if (t >= s0 && t < s0 + 0.55) { tapEl = cells[P.solution[p]]; tapX = span(t, s0, s0 + 0.55); }
+      });
+      const done = 0.9 + order.length * 1.15;
+      const placed = order.filter((p, k) => t >= 0.9 + k * 1.15 + 0.35).length;
+      $('ptxt').textContent = placed < order.length ? `SUSPECTS PLACED ${placed}/${order.length}` : 'WHO WAS ALONE WITH THE VICTIM?';
+      $('pfill').style.width = (100 * placed / order.length) + '%';
+      $('pbar').style.opacity = t < 11.2 ? 1 : 0;
+      const vz = P.zoneOf[P.solution[P.victim]];
+      P.zoneOf.forEach((z, i) => { glows[i].style.opacity = t > done && t < 11.2 && z === vz ? 0.5 + 0.4 * Math.sin(t * 7) : 0; });
+      if (t > done && t < 11.2) toks[P.murderer].style.transform = `scale(${1 + 0.15 * Math.sin((t - done) * 10)})`;
+      stamp(t < 11.2 ? 'CASE CLOSED' : '', '#2a9d5c', span(t, done + 0.6, done + 0.9), -6);
+      if (t >= 11.2) endCard(span(t, 11.2, 11.8), ['<span class="stars">★★★</span>', 'Pure logic. No luck.', '<b style="color:#ff7b8b">Play free</b>']);
+      else { dim.style.opacity = 0; o.style.opacity = 0; }
+      tapAt(tapEl, tapX, !!tapEl);
+    },
+  },
+  // 6: "Level 1 vs Level 100" progression tease
+  6: {
+    duration: 14,
+    setup() {
+      P = E.generate(9600002, 'extreme'); buildBoard(980); const big = { P, toks: toks.slice(), cells: cells.slice() };
+      const w2 = document.createElement('div'); w2.id = 'boardwrap2'; w2.style.cssText = 'position:absolute;left:50%;top:470px;transform-origin:50% 0';
+      document.body.appendChild(w2);
+      toks = []; cells = []; xms = []; glows = []; hls = [];
+      P = tutorialPuzzle(); buildBoard(760, w2);
+      this.small = { P, toks, cells }; this.big = big;
+      const tag = (id, txt) => { const d = document.createElement('div'); d.className = 'lvtag'; d.id = id; d.textContent = txt; document.body.appendChild(d); };
+      tag('tag1', 'LEVEL 1'); tag('tag2', 'LEVEL 100');
+      $('tag1').style.top = '330px'; $('tag2').style.top = '300px';
+      brand();
+    },
+    render(t) {
+      const o = $('over'), dim = $('dim');
+      const cut = 4.2, w1 = $('boardwrap2'), w2 = $('boardwrap');
+      const before = t < cut;
+      w1.style.opacity = before ? 1 : 0; $('tag1').style.opacity = before ? 1 : 0;
+      w2.style.opacity = before ? 0 : 1; $('tag2').style.opacity = !before && t < 11 ? 1 : 0;
+      w2.style.top = '420px';
+      w1.style.transform = `scale(${0.7 + 0.3 * pop(span(t, 0, 0.5))})`;
+      w2.style.transform = `scale(${1.25 - 0.25 * pop(span(t, cut, cut + 0.5))})`;
+      if (before) setCap('Level 1: <b>cute</b> 😊'.replace(' 😊', ''), span(t, 0, 0.3));
+      else if (t < 11) setCap('Level 100: <b>9 suspects. 1 killer.</b>', span(t, cut, cut + 0.3));
+      else setCap('', 0);
+      // level 1 solves itself in a blink
+      this.small.toks.forEach((tk, p) => { const x = span(t, 1 + p * 0.55, 1.3 + p * 0.55); tk.style.opacity = x > 0 ? 1 : 0; tk.style.transform = `scale(${pop(x)})`; });
+      // level 100: nothing placed, the camera slowly pushes in, then the challenge
+      this.big.toks.forEach((tk) => { tk.style.opacity = 0; });
+      if (t >= cut && t < cut + 0.5) document.body.style.transform = `translate(${Math.sin(t * 80) * 16 * (1 - span(t, cut, cut + 0.5))}px, ${Math.cos(t * 70) * 10 * (1 - span(t, cut, cut + 0.5))}px)`;
+      else document.body.style.transform = 'none';
+      if (t >= 7.4 && t < 11) {
+        const x = span(t, 7.4, 7.8);
+        dim.style.opacity = 0.55 * ease(x); o.style.opacity = ease(x);
+        o.innerHTML = `<div class="big" style="font-size:110px;margin-top:700px">Where would<br>you quit?</div>`;
+      } else if (t >= 11) endCard(span(t, 11, 11.6), ['Rookie 4×4 → Extreme 10×10', 'A new case every day', '<b style="color:#ff7b8b">Play free</b>']);
+      else { dim.style.opacity = 0; o.style.opacity = 0; }
     },
   },
 };

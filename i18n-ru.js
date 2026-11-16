@@ -1,4 +1,4 @@
-/* Mystery Grid: Русский language pack (generated from the translation tables; edit with care). */
+/* Crime Grid: Русский language pack (generated from the translation tables; edit with care). */
 (function (root) {
   'use strict';
   const I = root.I18N;
@@ -67,7 +67,7 @@
  "+{0} coins": "+{0} монет",
  "{0} unlocked": "{0}: разблокировано!",
  "Available in the app": "Доступно в приложении",
- "Purchases with real money work in the Google Play version of Mystery Grid.": "Покупки за реальные деньги работают в версии Mystery Grid для Google Play.",
+ "Purchases with real money work in the Google Play version of Crime Grid.": "Покупки за реальные деньги работают в версии Crime Grid для Google Play.",
  "OK": "ОК",
  "Thank you!": "Спасибо!",
  "Link copied!": "Ссылка скопирована!",
@@ -129,7 +129,7 @@
  "Restore": "Восстановить",
  "Copied ✓": "Скопировано ✓",
  "Select & copy ↑": "Выделите и скопируйте ↑",
- "My Mystery Grid progress backup (paste it in Settings → Save progress → Restore):": "Резервная копия моего прогресса в Mystery Grid (вставьте её в Настройки → Сохранить прогресс → Восстановить):",
+ "My Crime Grid progress backup (paste it in Settings → Save progress → Restore):": "Резервная копия моего прогресса в Crime Grid (вставьте её в Настройки → Сохранить прогресс → Восстановить):",
  "Progress restored!": "Прогресс восстановлен!",
  "Level {0}, {1} coins.": "Уровень {0}, монет: {1}.",
  "That code does not look right. Copy the whole thing, starting with MG1.": "Код выглядит неправильно. Скопируйте его целиком, начиная с MG1.",
@@ -149,7 +149,7 @@
  "You're on level <b>{0}</b>. Send your link so friends see you on their map. Send it again whenever you want them to see your new progress.": "Вы на уровне <b>{0}</b>. Отправьте свою ссылку, чтобы друзья видели вас на своей карте. Отправляйте её снова, когда хотите показать новый прогресс.",
  "Send my link": "Отправить мою ссылку",
  "Add a friend": "Добавить друга",
- "Join me on Mystery Grid! I'm on level {0}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Friends → Add a friend):": "Присоединяйся ко мне в Mystery Grid! Я на уровне {0}. Открой эту ссылку, чтобы добавить меня в друзья (на iPhone с установленным приложением: скопируй её и вставь в Карта → Друзья → Добавить друга):",
+ "Join me on Crime Grid! I'm on level {0}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Friends → Add a friend):": "Присоединяйся ко мне в Crime Grid! Я на уровне {0}. Открой эту ссылку, чтобы добавить меня в друзья (на iPhone с установленным приложением: скопируй её и вставь в Карта → Друзья → Добавить друга):",
  "Paste the link (or code) your friend sent you.": "Вставьте ссылку (или код), которую прислал друг.",
  "Add": "Добавить",
  "Back": "Назад",
@@ -159,7 +159,7 @@
  "Copy this friend's link": "Скопировать ссылку этого друга",
  "Send my link to {0}": "Отправить мою ссылку: {0}",
  "Later": "Позже",
- "Hey {0}, add me back on Mystery Grid! I'm on level {1}:": "Привет, {0}, добавь и меня в Mystery Grid! Я на уровне {1}:",
+ "Hey {0}, add me back on Crime Grid! I'm on level {1}:": "Привет, {0}, добавь и меня в Crime Grid! Я на уровне {1}:",
  "Copied! Now paste it in the app": "Скопировано! Теперь вставьте в приложении",
  "Copy failed: long-press the link in WhatsApp and copy it": "Не удалось скопировать: нажмите на ссылку в WhatsApp и удерживайте, затем скопируйте",
  "Opening {0}'s challenge…": "Открываем вызов от {0}…",
@@ -290,7 +290,7 @@
  "New personal best!": "Новый личный рекорд!",
  "Challenge back": "Ответный вызов",
  "Challenge a friend": "Бросить вызов другу",
- "I solved \"{0}\" in {1} on Mystery Grid. Can you beat my time?": "Я раскрыл(а) дело «{0}» за {1} в Mystery Grid. Сможешь быстрее?",
+ "I solved \"{0}\" in {1} on Crime Grid. Can you beat my time?": "Я раскрыл(а) дело «{0}» за {1} в Crime Grid. Сможешь быстрее?",
  "Install on iPhone": "Установка на iPhone",
  "Open this page in <b>Safari</b>.": "Откройте эту страницу в <b>Safari</b>.",
  "Tap the <b>Share</b> button (square with an arrow).": "Нажмите кнопку <b>«Поделиться»</b> (квадрат со стрелкой).",

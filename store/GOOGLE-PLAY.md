@@ -1,4 +1,4 @@
-# Mystery Grid: Google Play kit
+# Crime Grid: Google Play kit
 
 Everything here is ready to copy into the Google Play Console.
 
@@ -13,7 +13,7 @@ Everything here is ready to copy into the Google Play Console.
 
 ## Store listing
 
-**App name** (max 30): `Mystery Grid: Murder Puzzles`
+**App name** (max 30): `Crime Grid: Murder Puzzles`
 
 **Short description** (max 80):
 `Sudoku meets murder mystery. Place the suspects, find the killer. New case daily!`
@@ -22,7 +22,7 @@ Everything here is ready to copy into the Google Play Console.
 ```
 There was a murder. Can you work out who did it?
 
-Mystery Grid is a logic puzzle where sudoku meets a murder mystery. Every suspect gives you a clue: "She was sitting on a chair", "He was beside a plant", "She was in a higher row than Ben". Place everyone on the crime scene so each person has their own row and column, then name the killer: the one suspect who was alone with the victim.
+Crime Grid is a logic puzzle where sudoku meets a murder mystery. Every suspect gives you a clue: "She was sitting on a chair", "He was beside a plant", "She was in a higher row than Ben". Place everyone on the crime scene so each person has their own row and column, then name the killer: the one suspect who was alone with the victim.
 
 FEATURES
 • Unlimited cases, from a gentle 4×4 Rookie case to a brutal 10×10 Extreme case with 9 suspects
@@ -59,9 +59,9 @@ Grab a cup of tea, sharpen your pencil, and start investigating.
 ## Videos for TikTok / Instagram Reels
 | File | Idea | Suggested caption |
 |---|---|---|
-| `promo/mystery-grid-can-you-solve.mp4` | Easy case, countdown, full solution | `Can you solve this murder before the timer? 🔍🔪 #puzzle #murdermystery #sudoku #logicpuzzle #braingames` |
-| `promo/mystery-grid-who-did-it.mp4` | 10-second challenge, no answer | `Only real detectives get this one. Who did it? Comment A, B, C or D 👇 #whodunnit #puzzlegame #detective #braintest` |
-| `promo/mystery-grid-extreme.mp4` | Extreme level teaser | `Level EXTREME: 9 suspects, 100 squares, 1 killer. Would you even try? 💀 #puzzle #logic #hardpuzzle #mystery` |
+| `promo/crime-grid-can-you-solve.mp4` | Easy case, countdown, full solution | `Can you solve this murder before the timer? 🔍🔪 #puzzle #murdermystery #sudoku #logicpuzzle #braingames` |
+| `promo/crime-grid-who-did-it.mp4` | 10-second challenge, no answer | `Only real detectives get this one. Who did it? Comment A, B, C or D 👇 #whodunnit #puzzlegame #detective #braintest` |
+| `promo/crime-grid-extreme.mp4` | Extreme level teaser | `Level EXTREME: 9 suspects, 100 squares, 1 killer. Would you even try? 💀 #puzzle #logic #hardpuzzle #mystery` |
 
 **Answer to the "Who did it?" video:** D, Diego. Post it in a pinned comment a day later, or in a follow-up video.
 
@@ -74,7 +74,7 @@ Tips:
 
 ## Packaging the web game as an Android app (PWABuilder)
 1. Open https://www.pwabuilder.com and enter `https://shony271415-star.github.io/dani-game/v2/`.
-2. Choose **Package for stores → Android → Generate**. Keep the suggested package ID or set one like `io.github.shony271415.mysterygrid`.
+2. Choose **Package for stores → Android → Generate**. Keep the suggested package ID or set one like `io.github.shony271415.crimegrid`.
 3. Download the zip. It contains the `.aab` file (upload this to Google Play), a **signing key** (keep it safe: you need it for every update) and an `assetlinks.json` file.
 4. **Remove the browser bar (optional, recommended):** Android only trusts the app fully when `assetlinks.json` is published at `https://shony271415-star.github.io/.well-known/assetlinks.json`. That address belongs to a repository named exactly `shony271415-star.github.io`. Create it on GitHub, then the file can be added there. Without it the game still works, but it shows a small address bar at the top.
 

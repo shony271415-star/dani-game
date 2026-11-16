@@ -1,4 +1,4 @@
-# 🕵️ Mystery Grid
+# 🕵️ Crime Grid
 
 Sudoku meets murder mystery. Place every suspect on the crime scene using their clues, then work out who was alone with the victim.
 

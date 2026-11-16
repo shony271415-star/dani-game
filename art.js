@@ -1,4 +1,4 @@
-/* Mystery Grid original artwork: hand-written SVG icons, scenes and characters.
+/* Crime Grid original artwork: hand-written SVG icons, scenes and characters.
    Loaded only by the illustrated edition (v2/). Everything is drawn here, no emoji. */
 (function (root) {
   'use strict';

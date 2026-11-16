@@ -1,4 +1,4 @@
-/* Builds a printable, ink-light black & white casebook from the Mystery Grid engine.
+/* Builds a printable, ink-light black & white casebook from the Crime Grid engine.
    Output:
      casebook-print.pdf    single-sided A4 landscape; fold each sheet in half (print outside), stack, staple on the fold
      casebook-read.pdf     single-sided A4 landscape, one whole case per sheet (for a screen or loose sheets)
@@ -192,7 +192,7 @@ function coverPage() {
     <div class="corner tl">✿</div><div class="corner tr">✿</div><div class="corner bl">✿</div><div class="corner br">✿</div>
     <div class="secret">top secret ♡</div>
     <div class="owner">${esc(OWNER)}'s</div>
-    <h1>Mystery Grid</h1>
+    <h1>Crime Grid</h1>
     <div class="book">~ casebook ~</div>
     <div class="art">${sparkle(6)}${magnifier()}${sparkle(4.5)}</div>
     <p class="tag">sudoku meets murder mystery</p>
@@ -445,7 +445,7 @@ async function main() {
   pages.push(backCover());
   console.log(`${pages.length} booklet pages → ${pages.length / 4} sheets of A4`);
 
-  const head = (size) => `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${esc(OWNER)}'s Mystery Grid Casebook</title>
+  const head = (size) => `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${esc(OWNER)}'s Crime Grid Casebook</title>
     <style>${FONTS}
 @page { size: ${size}; margin: 0; }${CSS}</style></head>`;
   // simple copy: single-sided A4 landscape, no folding. Every case fills exactly one sheet

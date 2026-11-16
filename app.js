@@ -70,7 +70,7 @@
     async buy(id) {
       if (!this.service) {
         modal(`<div class="big">${ic('phone', '📲')}</div><h2>${tr('Available in the app')}</h2>
-          <p>${tr('Purchases with real money work in the Google Play version of Mystery Grid.')}</p>
+          <p>${tr('Purchases with real money work in the Google Play version of Crime Grid.')}</p>
           <div class="row"><button class="primary" data-act="close">${tr('OK')}</button></div>`);
         return;
       }
@@ -168,7 +168,7 @@
     return { i: myId(), n: (store.profile && store.profile.name) || 'Detective', l: prog('journey').caseNum, s: skinId(), d: dailyStreak(), t: totalSolved() };
   }
   async function share(text, url) {
-    try { if (navigator.share) { await navigator.share({ title: 'Mystery Grid', text, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+    try { if (navigator.share) { await navigator.share({ title: 'Crime Grid', text, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
     try { await navigator.clipboard.writeText(`${text} ${url}`); toast(`<span class="ti">${ic('check', '✓')}</span><span><b>${tr('Link copied!')}</b><small>${tr('Paste it to your friend in any chat.')}</small></span>`); return; } catch (e) { /* fall through */ }
     modal(`<h2>${tr('Send this to a friend')}</h2><textarea class="name-in share-box" readonly>${esc(text + ' ' + url)}</textarea>
       <div class="row"><button class="primary" data-act="close">${tr('Done')}</button></div>`);
@@ -580,7 +580,7 @@
       <div class="row"><button class="secondary" data-act="restore">${tr('Restore')}</button><button class="secondary" data-act="close">${tr('Close')}</button></div>
       <p id="bk-msg" class="acc-msg"></p>`, {
       copy: async (b) => { try { await navigator.clipboard.writeText(code); b.textContent = tr('Copied ✓'); } catch (e) { $('backup-box').select(); b.textContent = tr('Select & copy ↑'); } },
-      send: () => share(tr('My Mystery Grid progress backup (paste it in Settings → Save progress → Restore):'), code),
+      send: () => share(tr('My Crime Grid progress backup (paste it in Settings → Save progress → Restore):'), code),
       restore: () => {
         const r = restoreCode($('restore-box').value);
         if (r === true) { closeModal(); showHome(); toast(`<span class="ti">${ic('check', '✓')}</span><span><b>${tr('Progress restored!')}</b><small>${tr('Level {0}, {1} coins.', prog('journey').caseNum, coins())}</small></span>`); }
@@ -658,7 +658,7 @@
       <div class="friend-list">${list}</div>
       <div class="row"><button class="primary" data-act="mine">${tr('Send my link')}</button><button class="secondary" data-act="add">${tr('Add a friend')}</button></div>
       <div class="row"><button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
-      mine: () => share(tr("Join me on Mystery Grid! I'm on level {0}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Friends → Add a friend):", prog('journey').caseNum), linkFor('friend', myCard())),
+      mine: () => share(tr("Join me on Crime Grid! I'm on level {0}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Friends → Add a friend):", prog('journey').caseNum), linkFor('friend', myCard())),
       add: () => {
         modal(`<h2>${tr('Add a friend')}</h2><p><small>${tr('Paste the link (or code) your friend sent you.')}</small></p>
           <textarea class="name-in share-box code-box" id="friend-in" placeholder="https://…#friend=…"></textarea>
@@ -685,7 +685,7 @@
       ${iosBrowser ? `<div class="ios-note">${tr('<b>Using the installed app on iPhone?</b> This link opened in Safari, which keeps its own copy of the game. Open the app, go to <b>Map → Friends → Add a friend</b> and paste the same link there.')}
         <button class="secondary" data-act="copy">${tr("Copy this friend's link")}</button></div>` : ''}
       <div class="row"><button class="primary" data-act="back">${tr('Send my link to {0}', esc(name))}</button><button class="secondary" data-act="close">${tr('Later')}</button></div>`, {
-      back: () => { closeModal(); share(tr("Hey {0}, add me back on Mystery Grid! I'm on level {1}:", name, prog('journey').caseNum), linkFor('friend', myCard())); },
+      back: () => { closeModal(); share(tr("Hey {0}, add me back on Crime Grid! I'm on level {1}:", name, prog('journey').caseNum), linkFor('friend', myCard())); },
       copy: async (b) => {
         try { await navigator.clipboard.writeText(`${location.origin}${location.pathname}#friend=${code}`); b.textContent = tr('Copied! Now paste it in the app'); } catch (e) { b.textContent = tr('Copy failed: long-press the link in WhatsApp and copy it'); }
       },
@@ -1519,7 +1519,7 @@
       <div class="row">${S.slot === 'daily' || S.slot === 'challenge' ? '' : `<button class="primary" data-act="next">${S.slot === 'journey' ? tr('Level {0} →', S.caseNum + 1) : tr('Next case →')}</button>`}<button class="${S.slot === 'daily' || S.slot === 'challenge' ? 'primary' : 'secondary'}" data-act="home">${tr('Menu')}</button></div>
       <div class="row"><button class="secondary duel-btn" data-act="duel">${ic('knife', '⚔️')} ${S.slot === 'challenge' ? tr('Challenge back') : tr('Challenge a friend')}</button></div>`, {
       next: nextCase,
-      duel: () => share(tr('I solved "{0}" in {1} on Mystery Grid. Can you beat my time?', caseText().title, fmtTime(S.elapsed)), challengeLink()),
+      duel: () => share(tr('I solved "{0}" in {1} on Crime Grid. Can you beat my time?', caseText().title, fmtTime(S.elapsed)), challengeLink()),
       home: () => { closeModal(); showHome(); },
     });
     // count the coins up, then hand out any new trophies

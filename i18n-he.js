@@ -1,4 +1,4 @@
-/* Mystery Grid: עברית language pack (generated from the translation tables; edit with care). */
+/* Crime Grid: עברית language pack (generated from the translation tables; edit with care). */
 (function (root) {
   'use strict';
   const I = root.I18N;
@@ -68,7 +68,7 @@
  "+{0} coins": "+{0} מטבעות",
  "{0} unlocked": "{0} נפתח!",
  "Available in the app": "זמין באפליקציה",
- "Purchases with real money work in the Google Play version of Mystery Grid.": "רכישות בכסף אמיתי עובדות בגרסת Mystery Grid של Google Play.",
+ "Purchases with real money work in the Google Play version of Crime Grid.": "רכישות בכסף אמיתי עובדות בגרסת Crime Grid של Google Play.",
  "OK": "אישור",
  "Thank you!": "תודה!",
  "Link copied!": "הקישור הועתק!",
@@ -130,7 +130,7 @@
  "Restore": "שחזור",
  "Copied ✓": "הועתק ✓",
  "Select & copy ↑": "סמנו והעתיקו ↑",
- "My Mystery Grid progress backup (paste it in Settings → Save progress → Restore):": "גיבוי ההתקדמות שלי ב-Mystery Grid (הדביקו אותו בהגדרות ← שמירת התקדמות ← שחזור):",
+ "My Crime Grid progress backup (paste it in Settings → Save progress → Restore):": "גיבוי ההתקדמות שלי ב-Crime Grid (הדביקו אותו בהגדרות ← שמירת התקדמות ← שחזור):",
  "Progress restored!": "ההתקדמות שוחזרה!",
  "Level {0}, {1} coins.": "שלב {0}, {1} מטבעות.",
  "That code does not look right. Copy the whole thing, starting with MG1.": "הקוד לא נראה תקין. העתיקו את כולו, החל מ-MG1.",
@@ -150,7 +150,7 @@
  "You're on level <b>{0}</b>. Send your link so friends see you on their map. Send it again whenever you want them to see your new progress.": "אתם בשלב <b>{0}</b>. שלחו את הקישור שלכם כדי שחברים יראו אתכם במפה שלהם. שלחו אותו שוב בכל פעם שרוצים שיראו את ההתקדמות החדשה.",
  "Send my link": "שליחת הקישור שלי",
  "Add a friend": "הוספת חבר",
- "Join me on Mystery Grid! I'm on level {0}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Friends → Add a friend):": "הצטרפו אליי ל-Mystery Grid! אני בשלב {0}. פתחו את הקישור הזה כדי להוסיף אותי כחבר (באייפון עם האפליקציה מותקנת: העתיקו אותו והדביקו ב-מפה ← חברים ← הוספת חבר):",
+ "Join me on Crime Grid! I'm on level {0}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Friends → Add a friend):": "הצטרפו אליי ל-Crime Grid! אני בשלב {0}. פתחו את הקישור הזה כדי להוסיף אותי כחבר (באייפון עם האפליקציה מותקנת: העתיקו אותו והדביקו ב-מפה ← חברים ← הוספת חבר):",
  "Paste the link (or code) your friend sent you.": "הדביקו את הקישור (או הקוד) ששלח לכם החבר.",
  "Add": "הוספה",
  "Back": "חזרה",
@@ -160,7 +160,7 @@
  "Copy this friend's link": "העתקת הקישור של החבר הזה",
  "Send my link to {0}": "שליחת הקישור שלי אל {0}",
  "Later": "אחר כך",
- "Hey {0}, add me back on Mystery Grid! I'm on level {1}:": "היי {0}, תוסיפו גם אותי ב-Mystery Grid! אני בשלב {1}:",
+ "Hey {0}, add me back on Crime Grid! I'm on level {1}:": "היי {0}, תוסיפו גם אותי ב-Crime Grid! אני בשלב {1}:",
  "Copied! Now paste it in the app": "הועתק! עכשיו הדביקו באפליקציה",
  "Copy failed: long-press the link in WhatsApp and copy it": "ההעתקה נכשלה: לחצו לחיצה ארוכה על הקישור בוואטסאפ והעתיקו אותו",
  "Opening {0}'s challenge…": "פותחים את האתגר של {0}…",
@@ -291,7 +291,7 @@
  "New personal best!": "שיא אישי חדש!",
  "Challenge back": "אתגר חזרה",
  "Challenge a friend": "לאתגר חבר",
- "I solved \"{0}\" in {1} on Mystery Grid. Can you beat my time?": "פתרתי את \"{0}\" תוך {1} ב-Mystery Grid. תצליחו לנצח את הזמן שלי?",
+ "I solved \"{0}\" in {1} on Crime Grid. Can you beat my time?": "פתרתי את \"{0}\" תוך {1} ב-Crime Grid. תצליחו לנצח את הזמן שלי?",
  "Install on iPhone": "התקנה באייפון",
  "Open this page in <b>Safari</b>.": "פתחו את הדף הזה ב-<b>Safari</b>.",
  "Tap the <b>Share</b> button (square with an arrow).": "הקישו על כפתור <b>השיתוף</b> (ריבוע עם חץ).",

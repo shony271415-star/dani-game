@@ -1,4 +1,4 @@
-/* Mystery Grid: Español language pack (generated from the translation tables; edit with care). */
+/* Crime Grid: Español language pack (generated from the translation tables; edit with care). */
 (function (root) {
   'use strict';
   const I = root.I18N;
@@ -72,7 +72,7 @@
  "+{0} coins": "+{0} monedas",
  "{0} unlocked": "¡{0} desbloqueado!",
  "Available in the app": "Disponible en la app",
- "Purchases with real money work in the Google Play version of Mystery Grid.": "Las compras con dinero real funcionan en la versión de Mystery Grid para Google Play.",
+ "Purchases with real money work in the Google Play version of Crime Grid.": "Las compras con dinero real funcionan en la versión de Crime Grid para Google Play.",
  "OK": "Vale",
  "Thank you!": "¡Gracias!",
  "Link copied!": "¡Enlace copiado!",
@@ -134,7 +134,7 @@
  "Restore": "Restaurar",
  "Copied ✓": "Copiado ✓",
  "Select & copy ↑": "Selecciona y copia ↑",
- "My Mystery Grid progress backup (paste it in Settings → Save progress → Restore):": "Mi copia de seguridad de Mystery Grid (pégala en Ajustes → Guardar progreso → Restaurar):",
+ "My Crime Grid progress backup (paste it in Settings → Save progress → Restore):": "Mi copia de seguridad de Crime Grid (pégala en Ajustes → Guardar progreso → Restaurar):",
  "Progress restored!": "¡Progreso restaurado!",
  "Level {0}, {1} coins.": "Nivel {0}, {1} monedas.",
  "That code does not look right. Copy the whole thing, starting with MG1.": "Ese código no parece correcto. Copia todo, empezando por MG1.",
@@ -154,7 +154,7 @@
  "You're on level <b>{0}</b>. Send your link so friends see you on their map. Send it again whenever you want them to see your new progress.": "Estás en el nivel <b>{0}</b>. Envía tu enlace para que tus amigos te vean en su mapa. Vuelve a enviarlo cuando quieras que vean tu nuevo progreso.",
  "Send my link": "Enviar mi enlace",
  "Add a friend": "Añadir un amigo",
- "Join me on Mystery Grid! I'm on level {0}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Friends → Add a friend):": "¡Únete a mí en Mystery Grid! Estoy en el nivel {0}. Abre este enlace para añadirme como amigo (en iPhone con la app instalada: cópialo y pégalo en Mapa → Amigos → Añadir un amigo):",
+ "Join me on Crime Grid! I'm on level {0}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Friends → Add a friend):": "¡Únete a mí en Crime Grid! Estoy en el nivel {0}. Abre este enlace para añadirme como amigo (en iPhone con la app instalada: cópialo y pégalo en Mapa → Amigos → Añadir un amigo):",
  "Paste the link (or code) your friend sent you.": "Pega el enlace (o el código) que te envió tu amigo.",
  "Add": "Añadir",
  "Back": "Atrás",
@@ -164,7 +164,7 @@
  "Copy this friend's link": "Copiar el enlace de este amigo",
  "Send my link to {0}": "Enviar mi enlace a {0}",
  "Later": "Luego",
- "Hey {0}, add me back on Mystery Grid! I'm on level {1}:": "¡Hola {0}, añádeme tú también en Mystery Grid! Estoy en el nivel {1}:",
+ "Hey {0}, add me back on Crime Grid! I'm on level {1}:": "¡Hola {0}, añádeme tú también en Crime Grid! Estoy en el nivel {1}:",
  "Copied! Now paste it in the app": "¡Copiado! Ahora pégalo en la app",
  "Copy failed: long-press the link in WhatsApp and copy it": "No se pudo copiar: mantén pulsado el enlace en WhatsApp y cópialo",
  "Opening {0}'s challenge…": "Abriendo el desafío de {0}…",
@@ -295,7 +295,7 @@
  "New personal best!": "¡Nuevo récord personal!",
  "Challenge back": "Devolver el desafío",
  "Challenge a friend": "Desafiar a un amigo",
- "I solved \"{0}\" in {1} on Mystery Grid. Can you beat my time?": "Resolví «{0}» en {1} en Mystery Grid. ¿Puedes superar mi tiempo?",
+ "I solved \"{0}\" in {1} on Crime Grid. Can you beat my time?": "Resolví «{0}» en {1} en Crime Grid. ¿Puedes superar mi tiempo?",
  "Install on iPhone": "Instalar en iPhone",
  "Open this page in <b>Safari</b>.": "Abre esta página en <b>Safari</b>.",
  "Tap the <b>Share</b> button (square with an arrow).": "Toca el botón <b>Compartir</b> (el cuadrado con una flecha).",

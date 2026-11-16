@@ -1,4 +1,4 @@
-/* Mystery Grid engine: builds a themed crime scene, places the people, writes clues,
+/* Crime Grid engine: builds a themed crime scene, places the people, writes clues,
    proves the solution is unique and grades how much logic the puzzle needs. */
 (function (root) {
   'use strict';
