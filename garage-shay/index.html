@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>מוסך שי שירותי רכב | מוסך בראשון לציון – מוסך "יצאת צדיק"</title>
+  <meta name="description" content="מוסך שי שירותי רכב בראשון לציון – מאז 1997. טיפולים תקופתיים, הכנה לטסט, דיאגנוסטיקה, מיזוג אוויר, רכבים היברידיים וחשמליים. מוסך יצאת צדיק. עד 20% פחות ממחירי מוסכי שירות.">
+  <link rel="icon" href="images/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">דלג לתוכן</a>
+
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a href="#top" class="brand">
+        <img src="images/logo.png" alt="" width="44" height="44">
+        <span><strong data-bind="name"></strong><small>מוסך בראשון לציון</small></span>
+      </a>
+      <nav class="nav" id="nav" aria-label="ניווט ראשי">
+        <a href="#services">שירותים</a>
+        <a href="#about">אודות</a>
+        <a href="#reviews">ביקורות</a>
+        <a href="#tips">טיפים</a>
+        <a href="#contact">צור קשר</a>
+      </nav>
+      <a class="btn btn--red topbar__call" data-href="tel"><span>📞</span> <span data-bind="phone"></span></a>
+      <button class="burger" aria-label="תפריט" aria-expanded="false" aria-controls="nav">☰</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero" id="top">
+      <div class="container hero__inner">
+        <div class="hero__text">
+          <span class="badge">🏆 מוסך "יצאת צדיק" – ערוץ 2</span>
+          <h1>מוסך שי שירותי רכב<br><span class="red">ראשון לציון</span></h1>
+          <p class="hero__lead">עד <b>20% פחות</b> ממחירי מוסכי שירות!<br>מקצועיות, אמינות ומחירים הוגנים – מאז <span data-bind="founded"></span>.</p>
+          <div class="hero__cta">
+            <a class="btn btn--red btn--lg" href="#book">להזמנת טיפול</a>
+            <a class="btn btn--green btn--lg" data-href="wa" target="_blank" rel="noopener">💬 וואטסאפ</a>
+          </div>
+          <ul class="hero__facts">
+            <li><b data-bind="years"></b><span>שנות ניסיון</span></li>
+            <li><b>6</b><span>תאי עבודה</span></li>
+            <li><b>314</b><span>מ"ר מוסך</span></li>
+            <li><b>BOSCH</b><span>הסמכות בינלאומיות</span></li>
+          </ul>
+        </div>
+        <figure class="hero__img">
+          <img src="images/shay.jpg" alt="שי שחר מקבל את תעודת יצאת צדיק במוסך">
+        </figure>
+      </div>
+    </section>
+
+    <!-- QUICK INFO -->
+    <section class="quick">
+      <div class="container quick__grid">
+        <a class="quick__item" data-href="tel"><span>📞</span><div><small>טלפון</small><b data-bind="phone"></b></div></a>
+        <a class="quick__item" data-href="waze" target="_blank" rel="noopener"><span>📍</span><div><small>כתובת</small><b data-bind="addressShort"></b></div></a>
+        <a class="quick__item" href="#hours"><span>🕗</span><div><small>היום</small><b id="todayHours"></b></div></a>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="section" id="services">
+      <div class="container">
+        <h2 class="title">השירותים שלנו</h2>
+        <p class="subtitle">שירותי מכונאות רכב לרכבי בנזין ודיזל לכל המותגים המיובאים לישראל, בהתאם להוראות היצרן.</p>
+        <div class="cards" id="servicesList"></div>
+
+        <h3 class="title title--sm">שירותים נוספים</h3>
+        <div class="extras" id="extrasList"></div>
+      </div>
+    </section>
+
+    <!-- YETZAT TZADIK -->
+    <section class="section section--dark" id="tzadik">
+      <div class="container split">
+        <div>
+          <h2 class="title title--light">מוסך שי – יצאת צדיק!</h2>
+          <p>צוות תוכנית הטלוויזיה <b>"יצאת צדיק"</b> של ערוץ 2 ביקר במוסך, ושי שחר, מנהל המוסך, קיבל ממנחה התוכנית חיים הכט תעודת <b>מוסך יצאת צדיק</b> – לאחר שהמוסך עמד בשלושת המבחנים:</p>
+          <ul class="pills"><li>מקצועיות</li><li>אמינות</li><li>מחירים הוגנים</li></ul>
+        </div>
+        <div class="video" id="video">
+          <button class="video__play" aria-label="נגן את הסרטון">
+            <img src="https://img.youtube.com/vi/wbRC1M_l_eU/hqdefault.jpg" alt="מוסך שי בתוכנית יצאת צדיק" loading="lazy">
+            <span class="video__icon">▶</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section" id="about">
+      <div class="container split">
+        <div>
+          <h2 class="title">אודות מוסך שי</h2>
+          <p class="lead">מקצוענות ומצוינות ללא פשרות</p>
+          <p>מוסך שי שירותי רכב נוסד בשנת <span data-bind="founded"></span> על ידי <b data-bind="owner"></b>. המוסך מספק שירותי מכונאות רכב לרכבי בנזין ודיזל, ומתמחה במערכות ניהול מנוע בנזין ודיזל, מערכות בטיחות ברכב, דיאגנוסטיקה, מיזוג אוויר לרכב ותחזוקת רכבים היברידיים.</p>
+          <p>המוסך משרת חוג לקוחות פרטיים רחב וכן ציי רכב של חברות פרטיות. הצוות מחזיק בידע מקצועי רב ותודעת שירות גבוהה – שירות מקצועי, הוגן ואמין.</p>
+          <p>שי ממשיך כל העת להשתלם ולהתעדכן בחידושים הטכנולוגיים בענף, ומשתתף בקביעות בתערוכות רכב, חלפים וציוד מוסכים בארץ ובחו"ל.</p>
+          <h3 class="title title--sm">המוסך והציוד</h3>
+          <ul class="checks" id="facilityList"></ul>
+        </div>
+        <div class="gallery">
+          <img src="images/garage.jpg" alt="המוסך" loading="lazy">
+          <img src="images/workshop.jpg" alt="עבודה במוסך" loading="lazy">
+          <img src="images/mechanic.jpg" alt="מכונאי בעבודה" loading="lazy">
+        </div>
+      </div>
+      <div class="container">
+        <h3 class="title title--sm">תעודות והסמכות של שי שחר</h3>
+        <div class="certs">
+          <ul class="checks" id="certList"></ul>
+          <div class="certs__imgs">
+            <a href="images/benzene_diploma.jpg" target="_blank"><img src="images/benzene_diploma.jpg" alt="תעודת מומחה – ניהול מנוע בנזין" loading="lazy"></a>
+            <a href="images/safety_diploma.jpg" target="_blank"><img src="images/safety_diploma.jpg" alt="תעודת מומחה – מערכות בטיחות" loading="lazy"></a>
+          </div>
+        </div>
+        <p class="note" data-bind="certificatesNote"></p>
+      </div>
+    </section>
+
+    <!-- BRANDS -->
+    <section class="section section--gray" id="brands">
+      <div class="container">
+        <h2 class="title">מטפלים בכל המותגים</h2>
+        <div class="brands" id="brandsList"></div>
+        <p class="note center" data-bind="brandsNote"></p>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="section" id="reviews">
+      <div class="container">
+        <h2 class="title">מה אומרים עלינו</h2>
+        <div class="reviews" id="reviewsList"></div>
+        <p class="center"><a class="link" data-href="facebook" target="_blank" rel="noopener">עוד ביקורות בעמוד הפייסבוק שלנו ←</a></p>
+      </div>
+    </section>
+
+    <!-- TIPS -->
+    <section class="section section--gray" id="tips">
+      <div class="container narrow">
+        <h2 class="title">טיפים ומידע מקצועי</h2>
+        <div class="faq" id="tipsList"></div>
+      </div>
+    </section>
+
+    <!-- BOOK + CONTACT -->
+    <section class="section section--dark" id="contact">
+      <div class="container split">
+        <div id="book">
+          <h2 class="title title--light">להזמנת טיפול והצעת מחיר</h2>
+          <p>מלאו את הפרטים – ההודעה תישלח ישירות לוואטסאפ של המוסך.</p>
+          <form class="form" id="bookForm">
+            <label>שם מלא<input name="name" required autocomplete="name"></label>
+            <label>טלפון<input name="phone" type="tel" required autocomplete="tel" inputmode="tel"></label>
+            <label>סוג רכב / מספר רישוי<input name="car" placeholder="לדוגמה: קיה פיקנטו 2019"></label>
+            <label>שירות מבוקש
+              <select name="service" id="serviceSelect"></select>
+            </label>
+            <label class="full">הערות<textarea name="notes" rows="3" placeholder="תיאור התקלה, תאריך מועדף, צורך באיסוף רכב..."></textarea></label>
+            <button class="btn btn--green btn--lg full" type="submit">💬 שליחה בוואטסאפ</button>
+          </form>
+        </div>
+        <div>
+          <h2 class="title title--light">צור קשר</h2>
+          <ul class="contact">
+            <li><span>📞</span><a data-href="tel" data-bind="phone"></a></li>
+            <li><span>💬</span><a data-href="wa" target="_blank" rel="noopener" data-bind="whatsappDisplay"></a></li>
+            <li><span>✉️</span><a data-href="mail" data-bind="email"></a></li>
+            <li><span>📍</span><span data-bind="addressFull"></span></li>
+            <li><span>👍</span><a data-href="facebook" target="_blank" rel="noopener">פייסבוק – ShayGarage</a></li>
+          </ul>
+          <h3 class="title title--sm title--light" id="hours">שעות פעילות</h3>
+          <table class="hours" id="hoursTable"></table>
+          <p class="note note--light" data-bind="hoursNote"></p>
+          <div class="nav-btns">
+            <a class="btn btn--outline" data-href="waze" target="_blank" rel="noopener">ניווט ב-Waze</a>
+            <a class="btn btn--outline" data-href="gmaps" target="_blank" rel="noopener">Google Maps</a>
+          </div>
+        </div>
+      </div>
+      <div class="container">
+        <iframe class="map" id="map" title="מפת הגעה למוסך שי" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p>© <span id="year"></span> <span data-bind="name"></span> • <span data-bind="addressFull"></span> • <a data-href="tel" data-bind="phone"></a></p>
+      <button class="link link--light" id="a11yBtn">הצהרת נגישות</button>
+    </div>
+  </footer>
+
+  <dialog id="a11yDialog" class="dialog">
+    <h2>הצהרת נגישות</h2>
+    <p>אנו פועלים רבות כדי להנגיש את המוסך ואת אתר האינטרנט לאנשים עם מוגבלות, לקידום שוויון זכויות ושקיפות.</p>
+    <p>האתר בנוי בהתאם לתקן הנגישות (WCAG 2.1 AA): תמיכה בניווט מקלדת, ניגודיות צבעים, טקסט חלופי לתמונות ותמיכה בקוראי מסך.</p>
+    <p id="a11yNote"></p>
+    <p><b>רכז/ת נגישות:</b> <span id="a11yName"></span><br>
+       <b>טלפון:</b> <a id="a11yPhone"></a><br>
+       <b>מייל:</b> <a id="a11yMail"></a></p>
+    <form method="dialog"><button class="btn btn--red">סגירה</button></form>
+  </dialog>
+
+  <!-- כפתורי פעולה צפים (מובייל) -->
+  <div class="fab">
+    <a class="fab__btn fab__btn--call" data-href="tel" aria-label="התקשרו אלינו">📞 התקשרו</a>
+    <a class="fab__btn fab__btn--wa" data-href="wa" target="_blank" rel="noopener" aria-label="וואטסאפ">💬 וואטסאפ</a>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
