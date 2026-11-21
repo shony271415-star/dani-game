@@ -382,7 +382,27 @@
  "Undo": "ביטול פעולה",
  "Clear": "ניקוי",
  "The Journey": "המסע",
- "Every level is a brand-new case": "כל שלב הוא תיק חדש לגמרי"
+ "Every level is a brand-new case": "כל שלב הוא תיק חדש לגמרי",
+ "Kitchen Crew": "צוות המטבח",
+ "Chef hats, curly mustaches and a pinch of suspicion.": "כובעי שף, שפמים מסולסלים וקורט של חשד.",
+ "Circus Clowns": "ליצני קרקס",
+ "Red noses, wild hair. Nobody trusts a clown.": "אף אדום, שיער פרוע. אף אחד לא סומך על ליצן.",
+ "Wild West": "המערב הפרוע",
+ "Cowboy hats, bandanas and a shiny sheriff star.": "כובעי בוקרים, בנדנות וכוכב שריף נוצץ.",
+ "Robo Squad": "חוליית הרובוטים",
+ "Beep boop. Box heads with glowing LED eyes.": "ביפ בופ. ראשי קופסה עם עיני לד זוהרות.",
+ "Pirate Crew": "צוות הפיראטים",
+ "Eye patches, tricorns and gold earrings. Arr!": "רטיות, כובעי פיראטים ועגילי זהב. ארררר!",
+ "Shadow Ninjas": "נינג'ות הצללים",
+ "Silent hoods, colourful headbands, one throwing star.": "ברדסים שקטים, סרטי ראש צבעוניים וכוכב נינג'ה אחד.",
+ "Wizard Academy": "אקדמיית הקוסמים",
+ "Starry hats, long beards and glowing wands.": "כובעים מכוכבים, זקנים ארוכים ושרביטים זוהרים.",
+ "Dino Hoodies": "קפוצ'וני דינוזאור",
+ "Everyone in a dinosaur onesie. Rawr.": "כולם בתחפושת דינוזאור. גרררר.",
+ "Super Squad": "חוליית העל",
+ "Masks, capes and big shiny emblems.": "מסכות, גלימות וסמלים גדולים ונוצצים.",
+ "Deep Sea Gang": "כנופיית המעמקים",
+ "Octopus, shark, pufferfish, crab, jellyfish and a whale.": "תמנון, כריש, אבו נפחא, סרטן, מדוזה ולווייתן."
 },
     pl: {
  "{0} cases solved": {

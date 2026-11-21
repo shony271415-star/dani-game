@@ -24,6 +24,16 @@
   /* ---------- skin packs sold in the coin shop ---------- */
   const PACKS = [
     { id: 'classic', name: 'Classic Detectives', price: 0, rarity: 'Basic', desc: 'The original cast.', emoji: null },
+    { id: 'chefs', name: 'Kitchen Crew', price: 10, rarity: 'Common', desc: 'Chef hats, curly mustaches and a pinch of suspicion.', emoji: ['👨‍🍳', '👩‍🍳', '🧑‍🍳'] },
+    { id: 'clowns', name: 'Circus Clowns', price: 15, rarity: 'Common', desc: 'Red noses, wild hair. Nobody trusts a clown.', emoji: ['🤡', '🎪', '🎈', '🤹'] },
+    { id: 'cowboys', name: 'Wild West', price: 20, rarity: 'Common', desc: 'Cowboy hats, bandanas and a shiny sheriff star.', emoji: ['🤠', '🐴', '🌵', '⭐'] },
+    { id: 'robots', name: 'Robo Squad', price: 20, rarity: 'Common', desc: 'Beep boop. Box heads with glowing LED eyes.', emoji: ['🤖', '🦾', '🔋', '⚙️'] },
+    { id: 'pirates', name: 'Pirate Crew', price: 25, rarity: 'Rare', desc: 'Eye patches, tricorns and gold earrings. Arr!', emoji: ['🏴‍☠️', '🦜', '⚓', '🗺️', '💰'] },
+    { id: 'ninjas', name: 'Shadow Ninjas', price: 25, rarity: 'Rare', desc: 'Silent hoods, colourful headbands, one throwing star.', emoji: ['🥷', '🗡️', '🌙', '🎋'] },
+    { id: 'wizards', name: 'Wizard Academy', price: 30, rarity: 'Rare', desc: 'Starry hats, long beards and glowing wands.', emoji: ['🧙', '🧙‍♀️', '🧙‍♂️', '🪄', '🔮'] },
+    { id: 'dinos', name: 'Dino Hoodies', price: 30, rarity: 'Rare', desc: 'Everyone in a dinosaur onesie. Rawr.', emoji: ['🦖', '🦕', '🐊', '🐉'] },
+    { id: 'heroes', name: 'Super Squad', price: 35, rarity: 'Epic', desc: 'Masks, capes and big shiny emblems.', emoji: ['🦸', '🦸‍♀️', '🦸‍♂️', '⚡', '🛡️'] },
+    { id: 'sea', name: 'Deep Sea Gang', price: 40, rarity: 'Epic', desc: 'Octopus, shark, pufferfish, crab, jellyfish and a whale.', emoji: ['🐙', '🦈', '🐡', '🦀', '🪼', '🐳'] },
     { id: 'pets', name: 'Pet Detectives', price: 300, rarity: 'Common', desc: 'Cats, dogs, foxes, owls and more. Paws off the evidence!', emoji: ['🐱', '🐶', '🦊', '🐰', '🐻', '🐼', '🦉', '🐸', '🐯', '🐨'] },
     { id: 'gangsters', name: 'Noir Gangsters', price: 600, rarity: 'Rare', desc: 'Fedoras, trench coats and very dark sunglasses.', emoji: ['🕴️', '🤵', '🤵‍♀️', '🧔‍♂️', '👩‍🦰', '🧑‍💼', '👨‍💼', '👩‍💼'] },
     { id: 'monsters', name: 'Monster Mash', price: 1000, rarity: 'Rare', desc: 'Vampires, mummies, ghosts and one very polite werewolf.', emoji: ['🧛', '🧟', '👻', '🧙', '🧌', '🐺', '🎃', '💀', '🧞'] },

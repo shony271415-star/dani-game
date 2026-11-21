@@ -377,6 +377,140 @@
     return SVG64(`${bg}${body}${face}${hairSvg}${visor}${mouth}${scan}`);
   }
 
+  /* ---------- budget packs (cheap, lots of variety) ---------- */
+  const headBase = (skin) => `<circle cx="18.5" cy="32" r="3.2" fill="${skin}" ${st(1.4)}/><circle cx="45.5" cy="32" r="3.2" fill="${skin}" ${st(1.4)}/><ellipse cx="32" cy="32" rx="12.5" ry="13.5" fill="${skin}" ${st(1.6)}/>`;
+  const skinOf = (p, k = 0) => SKIN[(hash(p.name + p.letter) >>> k) % SKIN.length];
+
+  // Kitchen Crew: chef hats, neckerchiefs, curly mustaches
+  function chefAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter), f = p.g === 'f', skin = skinOf(p);
+    const coat = `<path d="M10 64c0-11 9-17 22-17s22 6 22 17Z" fill="#fbfbf7" ${st(1.6)}/><circle cx="27" cy="56" r="1.4" fill="${INK}"/><circle cx="27" cy="61" r="1.4" fill="${INK}"/><circle cx="37" cy="56" r="1.4" fill="${INK}"/><circle cx="37" cy="61" r="1.4" fill="${INK}"/><path d="M25 47l7 5 7-5-2 4h-10Z" fill="${p.color}" ${st(1.2)}/>`;
+    const hat = `<path d="M21 22c-6 0-8-8-3-11 2-6 9-6 11-3 3-4 10-3 11 1 6-1 9 6 5 10-1 2-3 3-5 3Z" fill="#fff" ${st(1.5)}/><rect x="21" y="19" width="22" height="6" rx="1.5" fill="#fff" ${st(1.5)}/><path d="M26 19v6M32 19v6M38 19v6" stroke="#d8d4cc" stroke-width="1.2"/>`;
+    const stache = !f && (h >>> 4) % 2 === 0 ? `<path d="M25 38c3-3 5-2 7-.5 2-1.5 4-2.5 7 .5-2 0-3 1-4 2-1-1-2-1.5-3-1.5s-2 .5-3 1.5c-1-1-2-2-4-2Z" fill="#3a2a22"/><path d="M24 37.6c-1-1-2.4-.6-2.4.6M40 37.6c1-1 2.4-.6 2.4.6" fill="none" stroke="#3a2a22" stroke-width="1.4"/>` : smile(d, 38, 3.5);
+    const blush = d ? '' : '<circle cx="23" cy="36" r="2" fill="#f4a3b5" opacity=".6"/><circle cx="41" cy="36" r="2" fill="#f4a3b5" opacity=".6"/>';
+    return SVG64(`${coat}${headBase(skin)}${blush}${eyesAt(d, 27, 37, 31, 2)}${stache}${hat}`);
+  }
+
+  // Circus Clowns: puffy hair, red noses, painted smiles
+  function clownAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter);
+    const hair = ['#ff5e7e', '#3bc4ff', '#ffb300', '#8a5cff', '#2ecc71'][h % 5];
+    const ruff = `<path d="M10 64c0-11 9-17 22-17s22 6 22 17Z" fill="${p.color}" ${st(1.6)}/><circle cx="24" cy="56" r="2.4" fill="#fff" ${st(1)}/><circle cx="40" cy="58" r="2.4" fill="#fff" ${st(1)}/><path d="M16 49c3 3 6 3 8 0 2 3 6 3 8 0 2 3 6 3 8 0 2 3 5 3 8 0l-2 5c-10 3-18 3-28 0Z" fill="#fff" ${st(1.3)}/>`;
+    const puffs = `<g fill="${hair}" ${st(1.4)}><circle cx="15" cy="27" r="6.5"/><circle cx="15" cy="37" r="5.5"/><circle cx="49" cy="27" r="6.5"/><circle cx="49" cy="37" r="5.5"/></g>`;
+    const face = `<ellipse cx="32" cy="32" rx="12.5" ry="13.5" fill="#fff6ee" ${st(1.6)}/>`;
+    const paint = d ? '' : `<path d="M24.5 25l2 3M39.5 25l-2 3" stroke="#3b6fd8" stroke-width="1.4" stroke-linecap="round"/><path d="M24 38c3 5 13 5 16 0-2 6-14 6-16 0Z" fill="#e63946" ${st(1.1)}/>`;
+    const hat = (h >>> 3) % 2 ? `<path d="M26 19l6-13 6 13Z" fill="${hair}" ${st(1.4)}/><circle cx="32" cy="6" r="2.4" fill="#fff" ${st(1)}/><path d="M28 14h8" stroke="#fff" stroke-width="1.6"/>` : `<rect x="25" y="13" width="14" height="6" rx="1" fill="#2b2530" ${st(1.3)}/><path d="M21 19h22" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"/><circle cx="36" cy="15" r="1.8" fill="#ffd166"/>`;
+    return SVG64(`${ruff}${puffs}${face}${eyesAt(d, 27, 37, 30, 2)}${d ? smile(d, 39, 3.5) : paint}<circle cx="32" cy="34.5" r="3.4" fill="#e63946" ${st(1.2)}/><circle cx="31" cy="33.5" r="1" fill="#fff" opacity=".8"/>${hat}`);
+  }
+
+  // Wild West: cowboy hats, bandanas, sheriff stars
+  function cowboyAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter), f = p.g === 'f', skin = skinOf(p, 2);
+    const hatC = ['#8a5a32', '#3d2a1e', '#d9b48a', '#f2f0ea'][h % 4], hair = HAIR[(h >>> 5) % 6];
+    const vest = `<path d="M10 64c0-11 9-17 22-17s22 6 22 17Z" fill="#c9a27a" ${st(1.6)}/><path d="M24 48l8 16 8-16" fill="#f3e6c8" ${st(1.3)}/><path d="M44 54l1.3 2.6 2.9.4-2.1 2 .5 2.9-2.6-1.4-2.6 1.4.5-2.9-2.1-2 2.9-.4Z" fill="#ffd166" ${st(.9)}/>`;
+    const bandana = `<path d="M22 44c3 3 7 5 10 5s7-2 10-5l-3 8-7 4-7-4Z" fill="${p.color}" ${st(1.3)}/><circle cx="29" cy="49" r=".9" fill="#fff"/><circle cx="35" cy="49" r=".9" fill="#fff"/>`;
+    const long = f ? `<path d="M19 28c-3 6-2 14 1 18h4c-2-5-2-11 0-16M45 28c3 6 2 14-1 18h-4c2-5 2-11 0-16" fill="${hair}" ${st(1.3)}/>` : '';
+    const hat = `<path d="M9 24c2 4 8 6 23 6s21-2 23-6c-3 1-6 1-9 0H18c-3 1-6 1-9 0Z" fill="${hatC}" ${st(1.5)}/><path d="M19 24c-1-9 3-14 7-14 2 0 4 2 6 2s4-2 6-2c4 0 8 5 7 14-8 2-18 2-26 0Z" fill="${hatC}" ${st(1.5)}/><path d="M19.5 20.5c8 2 17 2 25 0v3c-8 2-17 2-25 0Z" fill="#5a3a22"/>`;
+    const grin = !f && (h >>> 7) % 2 ? `<path d="M26 37c3-1.6 9-1.6 12 0-1 1-3 1.4-6 1.4s-5-.4-6-1.4Z" fill="#5a3a22"/>${smile(d, 40, 2.5)}` : smile(d, 38.5, 3.5);
+    return SVG64(`${long}${vest}${headBase(skin)}${eyesAt(d, 27, 37, 31.5, 2)}${grin}${bandana}${hat}`);
+  }
+
+  // Robo Squad: box heads, antennas, LED eyes
+  function robotAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter);
+    const metal = ['#b8c4d6', '#d6c9b0', '#a9d6c9', '#c9b8e0'][h % 4], led = d ? '#555' : ['#3bf0ff', '#ff4fd8', '#9dff4a', '#ffd84a'][(h >>> 3) % 4];
+    const body = `<path d="M12 64v-9c0-5 4-8 9-8h22c5 0 9 3 9 8v9Z" fill="${metal}" ${st(1.6)}/><rect x="25" y="52" width="14" height="8" rx="2" fill="#2b2530" ${st(1.2)}/><circle cx="29" cy="56" r="1.6" fill="${led}"/><circle cx="35" cy="56" r="1.6" fill="${p.color}"/><rect x="28" y="43" width="8" height="5" fill="#8a94a6" ${st(1.2)}/>`;
+    const head = `<rect x="16" y="16" width="32" height="28" rx="7" fill="${metal}" ${st(1.7)}/><rect x="13" y="25" width="4" height="10" rx="1.5" fill="#8a94a6" ${st(1.2)}/><rect x="47" y="25" width="4" height="10" rx="1.5" fill="#8a94a6" ${st(1.2)}/><path d="M32 16V9" ${st(1.6)}/><circle cx="32" cy="7" r="3" fill="${p.color}" ${st(1.2)}/><circle cx="20" cy="20" r="1" fill="#6b7280"/><circle cx="44" cy="20" r="1" fill="#6b7280"/><circle cx="20" cy="40" r="1" fill="#6b7280"/><circle cx="44" cy="40" r="1" fill="#6b7280"/>`;
+    const screen = `<rect x="20" y="23" width="24" height="11" rx="5" fill="#1c1822" ${st(1.3)}/>`;
+    const eyes = d ? `<path d="M23.5 26l4 5M27.5 26l-4 5M36.5 26l4 5M40.5 26l-4 5" stroke="#ff3b5c" stroke-width="1.8" stroke-linecap="round"/>` : `<rect x="23" y="26" width="6" height="5" rx="2.5" fill="${led}"/><rect x="35" y="26" width="6" height="5" rx="2.5" fill="${led}"/>`;
+    const mouth = d ? `<path d="M26 39h12" stroke="#2b2530" stroke-width="1.8"/>` : `<rect x="25" y="37" width="14" height="4" rx="2" fill="#2b2530"/><path d="M28 37v4M31 37v4M34 37v4M37 37v4" stroke="${led}" stroke-width="1"/>`;
+    return SVG64(`${body}${head}${screen}${eyes}${mouth}`);
+  }
+
+  // Pirate Crew: bandanas and tricorns, eye patches, beards
+  function pirateAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter), f = p.g === 'f', skin = skinOf(p, 1), hair = HAIR[(h >>> 4) % 6];
+    const tricorn = (h >>> 2) % 2 === 0;
+    const shirtS = `<path d="M10 64c0-11 9-17 22-17s22 6 22 17Z" fill="#f3ead8" ${st(1.6)}/><path d="M12 56h40M11 61h42" stroke="#b5243a" stroke-width="2.4"/><path d="M27 47l5 6 5-6" fill="none" ${st(1.3)}/>`;
+    const long = f ? `<path d="M18 30c-3 7-2 13 1 16h5c-2-4-2-10 0-14M46 30c3 7 2 13-1 16h-5c2-4 2-10 0-14" fill="${hair}" ${st(1.3)}/>` : '';
+    const beard = !f && (h >>> 6) % 2 === 0 ? `<path d="M20 33c1 9 6 13 12 13s11-4 12-13c-2 3-5 4-7 4H27c-2 0-5-1-7-4Z" fill="${hair}" ${st(1.4)}/>` : '';
+    const patch = !d && (h >>> 8) % 3 !== 2;
+    const eyes = patch ? `${eyesAt(d, 27, 27, 31, 2)}<ellipse cx="37" cy="31" rx="4" ry="3.6" fill="#1c1822"/><path d="M20 25l21 4M41 29l4-3" stroke="#1c1822" stroke-width="1.4"/>` : eyesAt(d, 27, 37, 31, 2);
+    const hat = tricorn
+      ? `<path d="M12 22c6-6 14-9 20-9s14 3 20 9c-6 2-12 3-20 3s-14-1-20-3Z" fill="#2b2530" ${st(1.5)}/><path d="M15 21c5-1 11-2 17-2s12 1 17 2" fill="none" stroke="#ffd166" stroke-width="1.4"/><path d="M29 15l3 2 3-2-1 3.6h-4Z" fill="#fff" ${st(.8)}/>`
+      : `<path d="M19 26c0-8 6-13 13-13s13 5 13 13c-8-2-18-2-26 0Z" fill="${p.color}" ${st(1.5)}/><path d="M44 24c3 0 6 2 7 5-3 0-5-1-6-2" fill="${p.color}" ${st(1.3)}/><circle cx="26" cy="19" r="1" fill="#fff"/><circle cx="33" cy="17" r="1" fill="#fff"/><circle cx="39" cy="20" r="1" fill="#fff"/>`;
+    const earring = !d ? `<circle cx="18.5" cy="37" r="1.8" fill="none" stroke="#ffd166" stroke-width="1.3"/>` : '';
+    return SVG64(`${long}${shirtS}${headBase(skin)}${beard}${eyes}${beard ? '' : smile(d, 38.5, 3.2)}${hat}${earring}`);
+  }
+
+  // Shadow Ninjas: hoods, eye slits, coloured headbands
+  function ninjaAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter), skin = skinOf(p, 3);
+    const cloth = ['#1c1822', '#2b2340', '#3a2238', '#1d3a36'][h % 4];
+    const body = `<path d="M10 64c0-11 9-17 22-17s22 6 22 17Z" fill="${cloth}" ${st(1.6)}/><path d="M22 49l10 7 10-7" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="1.6"/><path d="M12 58h40" stroke="${p.color}" stroke-width="3"/>`;
+    const hood = `<path d="M17 32c0-11 7-18 15-18s15 7 15 18-7 16-15 16-15-5-15-16Z" fill="${cloth}" ${st(1.7)}/>`;
+    const slit = `<path d="M20 27h24c1 0 2 1 2 2v3c0 1-1 2-2 2H20c-1 0-2-1-2-2v-3c0-1 1-2 2-2Z" fill="${skin}" ${st(1.3)}/>`;
+    const eyes = d ? eyesAt(d, 27, 37, 30.5, 2) : `<path d="M24.5 29.5l5 1.6M39.5 29.5l-5 1.6" ${st(1.4)}/><circle cx="27.2" cy="31.2" r="1.7" fill="${INK}"/><circle cx="36.8" cy="31.2" r="1.7" fill="${INK}"/>`;
+    const band = `<path d="M17.5 24c9-2 20-2 29 0v3c-9-2-20-2-29 0Z" fill="${p.color}" ${st(1.2)}/><path d="M46 25c4 0 7 2 9 6-3-1-5-1-7-2M46 26c3 2 5 5 5 9-2-2-3-4-5-5" fill="${p.color}" ${st(1.1)}/>`;
+    const star = !d ? `<path d="M49 50l2 4 4 1-3 3 1 4-4-2-4 2 1-4-3-3 4-1Z" fill="#c9ced6" ${st(1)}/><circle cx="50" cy="56" r="1" fill="${cloth}"/>` : '';
+    return SVG64(`${body}${hood}${slit}${eyes}${band}${star}`);
+  }
+
+  // Wizard Academy: starry hats, long beards, glowing wands
+  function wizardAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter), f = p.g === 'f', skin = skinOf(p, 2);
+    const robe = ['#3b2a7a', '#1d3a6b', '#6b2a5a', '#2a5a4a'][h % 4], hair = f ? HAIR[(h >>> 4) % 6] : ['#e9e4ef', '#cfc8d8', '#8a7a6a'][(h >>> 4) % 3];
+    const body = `<path d="M10 64c0-11 9-17 22-17s22 6 22 17Z" fill="${robe}" ${st(1.6)}/><path d="M18 60l1.2 2.4 2.6.4-1.9 1.8M44 54l1.2 2.4 2.6.4-1.9 1.8-1.9-1.8 2.6-.4Z" fill="#ffd166"/>`;
+    const long = f ? `<path d="M18 28c-3 8-2 15 2 19h5c-3-5-3-11-1-17M46 28c3 8 2 15-2 19h-5c3-5 3-11 1-17" fill="${hair}" ${st(1.3)}/>` : '';
+    const beard = !f ? `<path d="M20 34c0 12 6 22 12 26 6-4 12-14 12-26-3 3-6 4-8 4h-8c-2 0-5-1-8-4Z" fill="${hair}" ${st(1.4)}/><path d="M27 37c2-1.6 3-1.6 5 0 2-1.6 3-1.6 5 0" fill="none" stroke="${hair}" stroke-width="2.4"/>` : '';
+    const hat = `<path d="M11 23c4 3 12 4 21 4s17-1 21-4c-3-2-9-3-14-3H25c-5 0-11 1-14 3Z" fill="${robe}" ${st(1.5)}/><path d="M20 22c3-6 6-12 9-17 2-3 6-3 9 0 2 2 4 5 6 9-2-1-3-1-4 0l3 8c-8 1.4-16 1.4-23 0Z" fill="${robe}" ${st(1.5)}/><path d="M30 13l1 2 2 .3-1.5 1.4.4 2.2-1.9-1-1.9 1 .4-2.2-1.5-1.4 2-.3Z" fill="#ffd166"/><circle cx="36" cy="18" r="1" fill="#ffd166"/><path d="M21 21.5c7 1.4 15 1.4 22 0" stroke="#ffd166" stroke-width="1.6"/>`;
+    const wand = !d ? `<path d="M50 62l6-14" stroke="#5c3d2b" stroke-width="2.4" stroke-linecap="round"/><circle cx="56.5" cy="47" r="2.6" fill="${p.color}" opacity=".9"/><circle cx="56.5" cy="47" r="4.5" fill="${p.color}" opacity=".25"/>` : '';
+    return SVG64(`${long}${body}${headBase(skin)}${eyesAt(d, 27, 37, 31, 2)}${beard}${f ? smile(d, 38.5, 3) : ''}${hat}${wand}`);
+  }
+
+  // Dino Hoodies: kids in dinosaur onesies
+  function dinoAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter), skin = skinOf(p, 5);
+    const dino = ['#7cc47a', '#f2a65a', '#8fb8f0', '#c4a2f0', '#f28da5'][h % 5], belly = '#fff3c4';
+    const body = `<path d="M10 64c0-11 9-17 22-17s22 6 22 17Z" fill="${dino}" ${st(1.6)}/><path d="M24 64c0-7 4-11 8-11s8 4 8 11Z" fill="${belly}" ${st(1.2)}/>`;
+    const spikes = `<path d="M18 22l-4-6 7 1M24 14l-2-7 6 4M32 11v-7l4 6M40 14l2-7 2 7M46 22l4-6-1 7" fill="${belly}" ${st(1.2)}/>`;
+    const hood = `<path d="M14 34c0-13 8-22 18-22s18 9 18 22c0 7-3 12-6 14H20c-3-2-6-7-6-14Z" fill="${dino}" ${st(1.7)}/>`;
+    const teeth = `<path d="M17 30c4 2 26 2 30 0" fill="none" ${st(1.2)}/><path d="M19 30.6l2 3 2-2.6 2 3 2-2.7 2 3 2-2.8 2 3 2-2.8 2 3 2-2.7 2 3 2-2.6 2 3 2-3" fill="#fff" ${st(.9)}/>`;
+    const face = `<ellipse cx="32" cy="39" rx="11" ry="9.5" fill="${skin}" ${st(1.5)}/>`;
+    const hoodEyes = `<circle cx="22" cy="21" r="3" fill="#fff" ${st(1.1)}/><circle cx="42" cy="21" r="3" fill="#fff" ${st(1.1)}/><circle cx="22.6" cy="21.4" r="1.4" fill="${INK}"/><circle cx="41.4" cy="21.4" r="1.4" fill="${INK}"/>`;
+    return SVG64(`${body}${spikes}${hood}${hoodEyes}${teeth}${face}${eyesAt(d, 28, 36, 38, 1.8)}${smile(d, 42.5, 2.6)}${d ? '' : '<circle cx="24.5" cy="41" r="1.6" fill="#f4a3b5" opacity=".7"/><circle cx="39.5" cy="41" r="1.6" fill="#f4a3b5" opacity=".7"/>'}`);
+  }
+
+  // Super Squad: domino masks, capes and big chest emblems
+  function heroAvatar(p) {
+    const d = p.isVictim, h = hash(p.name + p.letter), f = p.g === 'f', skin = skinOf(p, 4), hair = HAIR[(h >>> 6) % 6];
+    const suit = p.color, cape = ['#e63946', '#1d4ed8', '#ffb300', '#7c3aed'][h % 4];
+    const emblem = ['M32 52l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4Z', 'M29 51h7l-3 5h4l-8 8 2-6h-4Z', 'M32 51c3 0 6 2 6 5s-6 8-6 8-6-5-6-8 3-5 6-5Z'][(h >>> 3) % 3];
+    const capeB = `<path d="M8 64l6-16h36l6 16Z" fill="${cape}" ${st(1.5)}/>`;
+    const body = `<path d="M12 64c0-10 8-16 20-16s20 6 20 16Z" fill="${suit}" ${st(1.6)}/><circle cx="32" cy="57" r="7.5" fill="#fff" ${st(1.3)}/><path d="${emblem}" fill="${cape}" ${st(1)}/>`;
+    const hairS = f ? `<path d="M18 30c-2 7-1 13 2 17h5c-2-5-3-10-1-15M46 30c2 7 1 13-2 17h-5c2-5 3-10 1-15" fill="${hair}" ${st(1.3)}/>` : '';
+    const top = f ? `<path d="M19 28c0-9 6-14 13-14s13 5 13 14c-5-3-9-7-11-10-3 4-9 8-15 10Z" fill="${hair}" ${st(1.4)}/>` : `<path d="M19 27c-1-9 5-14 13-14s14 4 14 12c-3-3-6-4-10-4 2 2 2 4 1 6-3-4-8-5-12-4-3 1-5 2-6 4Z" fill="${hair}" ${st(1.4)}/>`;
+    const mask = `<path d="M18 28c4-2 8-2 14 0 6-2 10-2 14 0 0 4-3 7-7 7-3 0-5-2-7-3-2 1-4 3-7 3-4 0-7-3-7-7Z" fill="${cape}" ${st(1.3)}/>`;
+    const eyes = d ? `<path d="M23 29.5l4 4M27 29.5l-4 4M37 29.5l4 4M41 29.5l-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>` : `<ellipse cx="25" cy="31" rx="3" ry="2" fill="#fff"/><ellipse cx="39" cy="31" rx="3" ry="2" fill="#fff"/><circle cx="25.3" cy="31" r="1.2" fill="${INK}"/><circle cx="39.3" cy="31" r="1.2" fill="${INK}"/>`;
+    return SVG64(`${capeB}${hairS}${body}${headBase(skin)}${mask}${eyes}${smile(d, 39, 3.5)}${top}`);
+  }
+
+  // Deep Sea Gang: octopus, shark, pufferfish, crab, jellyfish, narwhal
+  function seaAvatar(p) {
+    const d = p.isVictim, kind = pickH(p, 2, ['octopus', 'shark', 'puffer', 'crab', 'jelly', 'whale']);
+    const bg = `<circle cx="32" cy="32" r="32" fill="#bfe6f5"/><circle cx="10" cy="16" r="2" fill="#fff" opacity=".7"/><circle cx="14" cy="9" r="1.2" fill="#fff" opacity=".7"/><circle cx="55" cy="22" r="1.6" fill="#fff" opacity=".7"/><path d="M0 58c8-4 14 4 22 0s14 4 22 0 14 4 20 0v6H0Z" fill="#f2dca0"/>`;
+    const tie = `<path d="M27 52l5 2-5 2ZM37 52l-5 2 5 2Z" fill="${p.color}" ${st(1.1)}/>`;
+    let b = '', ey = 30, ex1 = 26, ex2 = 38;
+    if (kind === 'octopus') b = `<g fill="#e86a8a" ${st(1.4)}><path d="M16 42c-4 6-4 12 0 14 1-5 4-8 6-10Z"/><path d="M48 42c4 6 4 12 0 14-1-5-4-8-6-10Z"/><path d="M22 46c-2 6 0 12 4 13 0-5 1-8 3-10Z"/><path d="M42 46c2 6 0 12-4 13 0-5-1-8-3-10Z"/></g><path d="M14 30c0-11 8-18 18-18s18 7 18 18c0 9-6 16-18 16S14 39 14 30Z" fill="#f07a98" ${st(1.7)}/><circle cx="22" cy="20" r="2" fill="#f7b3c4"/><circle cx="41" cy="18" r="1.6" fill="#f7b3c4"/>`;
+    if (kind === 'shark') { b = `<path d="M28 12l6-9 4 10Z" fill="#7d9bb8" ${st(1.4)}/><path d="M12 34c0-12 9-21 20-21s20 9 20 21-9 16-20 16-20-4-20-16Z" fill="#8fafcc" ${st(1.7)}/><path d="M18 38c4 7 9 10 14 10s10-3 14-10c-8 2-20 2-28 0Z" fill="#f5f2ea" ${st(1.2)}/><path d="M21 39l2 3 2-2.6 2 3 2-2.8 2 3 2-3 2 3 2-2.8 2 3 2-2.6 2 3 2-2.6" fill="#fff" stroke="#3d3250" stroke-width=".8"/><path d="M14 30l-3 2 3 2M50 30l3 2-3 2" fill="none" stroke="#5e7a96" stroke-width="1.2"/>`; ey = 27; ex1 = 24; ex2 = 40; }
+    if (kind === 'puffer') { b = `<g stroke="#3d3250" stroke-width="1.3"><path d="M32 8v6M18 12l3 5M46 12l-3 5M10 24l6 2M54 24l-6 2M9 38l6-1M55 38l-6-1M16 50l4-4M48 50l-4-4"/></g><circle cx="32" cy="32" r="19" fill="#ffd166" ${st(1.7)}/><path d="M18 38c4 6 9 9 14 9s10-3 14-9c-6 2-22 2-28 0Z" fill="#fff6d0"/><path d="M50 30c5-4 9-3 10 0-1 3-5 4-10 0Z" fill="#f2a65a" ${st(1.2)}/>`; ey = 28; }
+    if (kind === 'crab') { b = `<path d="M10 22c-4-6 2-12 6-8l-3 3 5 1c0 4-4 6-8 4ZM54 22c4-6-2-12-6-8l3 3-5 1c0 4 4 6 8 4Z" fill="#e8615a" ${st(1.4)}/><path d="M16 26l6 6M48 26l-6 6" stroke="#e8615a" stroke-width="3" stroke-linecap="round"/><path d="M14 44l-4 6M18 46l-3 7M50 44l4 6M46 46l3 7" stroke="#e8615a" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="32" cy="38" rx="18" ry="12" fill="#ff7a6b" ${st(1.7)}/><path d="M26 24v-4M38 24v-4" ${st(1.6)}/><circle cx="26" cy="20" r="3.6" fill="#fff" ${st(1.2)}/><circle cx="38" cy="20" r="3.6" fill="#fff" ${st(1.2)}/>`; ey = 20; }
+    if (kind === 'jelly') { b = `<g fill="none" stroke="#b38ae8" stroke-width="2" stroke-linecap="round"><path d="M20 38c-2 6 2 10 0 16M26 40c2 6-2 10 0 16M32 40c-2 6 2 10 0 16M38 40c2 6-2 10 0 16M44 38c-2 6 2 10 0 16"/></g><path d="M12 36c0-14 9-24 20-24s20 10 20 24c-3 2-6 2-8 0-3 2-6 2-8 0-3 2-5 2-8 0-3 2-5 2-8 0-2 2-5 2-8 0Z" fill="#d7b8ff" fill-opacity=".9" ${st(1.6)}/><path d="M18 26c2-6 6-9 10-10" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".8"/>`; ey = 28; }
+    if (kind === 'whale') { b = `<path d="M32 12V4" stroke="#8fd3f4" stroke-width="2"/><path d="M27 6c2-3 8-3 10 0" fill="none" stroke="#8fd3f4" stroke-width="2" stroke-linecap="round"/><path d="M10 34c0-12 10-20 22-20s22 8 22 20c0 9-8 14-22 14S10 43 10 34Z" fill="#5b7fd6" ${st(1.7)}/><path d="M14 40c6 5 12 7 18 7s12-2 18-7c-8 2-28 2-36 0Z" fill="#dce8ff" ${st(1.1)}/><path d="M20 43v3M26 44.5v3M32 45v3M38 44.5v3M44 43v3" stroke="#9ab0e0" stroke-width="1"/>`; ex1 = 24; ex2 = 40; ey = 31; }
+    const smileY = kind === 'shark' ? 0 : kind === 'crab' ? 41 : kind === 'puffer' ? 37 : kind === 'jelly' ? 34 : 38;
+    return SVG64(`${bg}${b}${eyesAt(d, ex1, ex2, ey, 2.2)}${smileY ? smile(d, smileY, 3) : ''}${kind === 'shark' || kind === 'jelly' ? '' : tie}${d ? '' : `<circle cx="${ex1 - 4}" cy="${ey + 5}" r="1.8" fill="#f4a3b5" opacity=".7"/><circle cx="${ex2 + 4}" cy="${ey + 5}" r="1.8" fill="#f4a3b5" opacity=".7"/>`}`);
+  }
+
   const SKINS = {
     classic: { name: 'Classic Detectives', price: 0, rarity: 'Basic', desc: 'The original cast.', draw: (p) => avatar(p), emoji: null },
     pets: { name: 'Pet Detectives', price: 150, rarity: 'Common', desc: 'Cats, dogs, foxes, owls and more. Paws off the evidence!', draw: petAvatar, emoji: ['🐱', '🐶', '🦊', '🐰', '🐻', '🐼', '🦉', '🐸', '🐯', '🐨'] },
@@ -385,6 +519,16 @@
     royals: { name: 'Royal Court', price: 800, rarity: 'Epic', desc: 'Crowns, jewels and ermine. Comes with a golden frame.', draw: royalAvatar, emoji: ['🤴', '👸', '🫅', '👑', '🦄', '💎'] },
     space: { name: 'Space Crew', price: 1200, rarity: 'Epic', desc: 'Astronauts and aliens, framed by the stars.', draw: spaceAvatar, emoji: ['👩‍🚀', '🧑‍🚀', '👨‍🚀', '👽', '🤖', '👾', '🛸'] },
     neon: { name: 'Neon Legends', price: 2000, rarity: 'Legendary', desc: 'Glowing neon characters with a pulsing frame. The finest skins in town.', draw: neonAvatar, emoji: ['🌟', '💫', '⚡', '🔮', '🌈', '🪩', '✨'] },
+    chefs: { name: 'Kitchen Crew', price: 10, rarity: 'Common', desc: 'Chef hats, curly mustaches and a pinch of suspicion.', draw: chefAvatar },
+    clowns: { name: 'Circus Clowns', price: 15, rarity: 'Common', desc: 'Red noses, wild hair. Nobody trusts a clown.', draw: clownAvatar },
+    cowboys: { name: 'Wild West', price: 20, rarity: 'Common', desc: 'Cowboy hats, bandanas and a shiny sheriff star.', draw: cowboyAvatar },
+    robots: { name: 'Robo Squad', price: 20, rarity: 'Common', desc: 'Beep boop. Box heads with glowing LED eyes.', draw: robotAvatar },
+    pirates: { name: 'Pirate Crew', price: 25, rarity: 'Rare', desc: 'Eye patches, tricorns and gold earrings. Arr!', draw: pirateAvatar },
+    ninjas: { name: 'Shadow Ninjas', price: 25, rarity: 'Rare', desc: 'Silent hoods, colourful headbands, one throwing star.', draw: ninjaAvatar },
+    wizards: { name: 'Wizard Academy', price: 30, rarity: 'Rare', desc: 'Starry hats, long beards and glowing wands.', draw: wizardAvatar },
+    dinos: { name: 'Dino Hoodies', price: 30, rarity: 'Rare', desc: 'Everyone in a dinosaur onesie. Rawr.', draw: dinoAvatar },
+    heroes: { name: 'Super Squad', price: 35, rarity: 'Epic', desc: 'Masks, capes and big shiny emblems.', draw: heroAvatar },
+    sea: { name: 'Deep Sea Gang', price: 40, rarity: 'Epic', desc: 'Octopus, shark, pufferfish, crab, jellyfish and a whale.', draw: seaAvatar },
     masquerade: { name: 'Masquerade Ball', price: 0, rarity: 'Premium', desc: 'Venetian masks and feathers.', draw: masqueradeAvatar },
     cyber: { name: 'Cyber Agents', price: 0, rarity: 'Premium', desc: 'Glowing visors and scan lines.', draw: cyberAvatar },
   };

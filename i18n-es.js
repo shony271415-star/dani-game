@@ -386,7 +386,27 @@
  "Undo": "Deshacer",
  "Clear": "Vaciar",
  "The Journey": "El viaje",
- "Every level is a brand-new case": "Cada nivel es un caso totalmente nuevo"
+ "Every level is a brand-new case": "Cada nivel es un caso totalmente nuevo",
+ "Kitchen Crew": "Brigada de cocina",
+ "Chef hats, curly mustaches and a pinch of suspicion.": "Gorros de chef, bigotes rizados y una pizca de sospecha.",
+ "Circus Clowns": "Payasos de circo",
+ "Red noses, wild hair. Nobody trusts a clown.": "Narices rojas, pelo alocado. Nadie se fía de un payaso.",
+ "Wild West": "Lejano Oeste",
+ "Cowboy hats, bandanas and a shiny sheriff star.": "Sombreros vaqueros, pañuelos y una brillante estrella de sheriff.",
+ "Robo Squad": "Escuadrón robot",
+ "Beep boop. Box heads with glowing LED eyes.": "Bip bup. Cabezas cuadradas con ojos LED brillantes.",
+ "Pirate Crew": "Tripulación pirata",
+ "Eye patches, tricorns and gold earrings. Arr!": "Parches, tricornios y pendientes de oro. ¡Arr!",
+ "Shadow Ninjas": "Ninjas de las sombras",
+ "Silent hoods, colourful headbands, one throwing star.": "Capuchas silenciosas, cintas de colores y una estrella ninja.",
+ "Wizard Academy": "Academia de magos",
+ "Starry hats, long beards and glowing wands.": "Sombreros estrellados, barbas largas y varitas brillantes.",
+ "Dino Hoodies": "Sudaderas de dino",
+ "Everyone in a dinosaur onesie. Rawr.": "Todos con pijama de dinosaurio. Grrr.",
+ "Super Squad": "Superescuadrón",
+ "Masks, capes and big shiny emblems.": "Antifaces, capas y grandes emblemas brillantes.",
+ "Deep Sea Gang": "Banda del fondo marino",
+ "Octopus, shark, pufferfish, crab, jellyfish and a whale.": "Pulpo, tiburón, pez globo, cangrejo, medusa y ballena."
 },
     pl: {
  "{0} cases solved": {

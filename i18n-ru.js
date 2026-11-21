@@ -381,7 +381,27 @@
  "Undo": "Отменить",
  "Clear": "Очистить",
  "The Journey": "Путешествие",
- "Every level is a brand-new case": "Каждый уровень это совершенно новое дело"
+ "Every level is a brand-new case": "Каждый уровень это совершенно новое дело",
+ "Kitchen Crew": "Кухонная бригада",
+ "Chef hats, curly mustaches and a pinch of suspicion.": "Поварские колпаки, закрученные усы и щепотка подозрений.",
+ "Circus Clowns": "Цирковые клоуны",
+ "Red noses, wild hair. Nobody trusts a clown.": "Красные носы, дикие причёски. Клоунам никто не верит.",
+ "Wild West": "Дикий Запад",
+ "Cowboy hats, bandanas and a shiny sheriff star.": "Ковбойские шляпы, банданы и блестящая звезда шерифа.",
+ "Robo Squad": "Робоотряд",
+ "Beep boop. Box heads with glowing LED eyes.": "Бип-буп. Квадратные головы со светящимися глазами.",
+ "Pirate Crew": "Пиратская команда",
+ "Eye patches, tricorns and gold earrings. Arr!": "Повязки на глаз, треуголки и золотые серьги. Арр!",
+ "Shadow Ninjas": "Ниндзя тени",
+ "Silent hoods, colourful headbands, one throwing star.": "Тихие капюшоны, яркие повязки и один сюрикен.",
+ "Wizard Academy": "Академия волшебников",
+ "Starry hats, long beards and glowing wands.": "Звёздные шляпы, длинные бороды и светящиеся палочки.",
+ "Dino Hoodies": "Дино-пижамы",
+ "Everyone in a dinosaur onesie. Rawr.": "Все в костюмах динозавров. Р-р-р.",
+ "Super Squad": "Суперотряд",
+ "Masks, capes and big shiny emblems.": "Маски, плащи и большие блестящие эмблемы.",
+ "Deep Sea Gang": "Банда глубин",
+ "Octopus, shark, pufferfish, crab, jellyfish and a whale.": "Осьминог, акула, рыба-фугу, краб, медуза и кит."
 },
     pl: {
  "{0} cases solved": {
