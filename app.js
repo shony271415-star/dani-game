@@ -1193,7 +1193,7 @@
   }
 
   /* ---------- drawing ---------- */
-  function zoneLabelCells(P) {
+  function zoneLabelCells(P, occupied) {
     // one label per area, on a square near its bottom, without two labels overlapping
     const N = P.N, cellPx = Math.min(window.innerWidth * 0.94, 470, window.innerHeight * (window.innerHeight <= 720 ? 0.39 : 0.44)) / N;
     const fontPx = Math.max(8, cellPx * 0.19);
@@ -1208,7 +1208,7 @@
         if (zz !== z) return;
         const r = Math.floor(i / N), c = i % N;
         let run = 0; for (let k = 0; k < N; k++) if (P.zoneOf[r * N + k] === z) run++;
-        const score = r * 10 + Math.min(run, w) * 3 + (P.obj[i] ? -2 : 0) - Math.abs(c - (N - 1) / 2) * 0.2;
+        const score = r * 10 + Math.min(run, w) * 3 + (P.obj[i] ? -2 : 0) - (occupied && occupied.has(i) ? 60 : 0) - Math.abs(c - (N - 1) / 2) * 0.2;
         cells.push([i, score]);
       });
       cells.sort((a, b) => b[1] - a[1]);
@@ -1238,7 +1238,7 @@
     board.style.gridTemplateColumns = `repeat(${N}, 1fr)`;
     board.style.gridTemplateRows = `repeat(${N}, 1fr)`;
     board.innerHTML = '';
-    const labels = zoneLabelCells(P), bad = conflicts();
+    const labels = zoneLabelCells(P, new Set(S.place)), bad = conflicts();
     const usedR = new Set(), usedC = new Set();
     if (S.sel >= 0) S.place.forEach((x, p) => { if (x >= 0 && p !== S.sel) { usedR.add(Math.floor(x / N)); usedC.add(x % N); } });
     const edges = new Set(P.edges);
@@ -1270,8 +1270,8 @@
       });
       if (i in labels) {
         const lb = document.createElement('div');
-        lb.className = 'zone-label'; lb.textContent = I.zone(P.zones[labels[i]].name).n;
-        cell.appendChild(lb);
+        lb.className = 'zone-label' + (i % N === 0 ? ' zl-l' : i % N === N - 1 ? ' zl-r' : ''); lb.textContent = I.zone(P.zones[labels[i]].name).n;
+        cell.appendChild(lb); cell.classList.add('has-zl');
       }
       if (who >= 0) {
         const person = P.people[who];

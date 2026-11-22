@@ -408,6 +408,10 @@
   #home .greet { padding: 8px 14px; font-size: 14px; margin: 14px auto 0; } #home .greet small { display: none; }
   @media (max-height: 720px) { :root { --bs: min(94vw, 470px, 39vh); } }
   @media (max-width: 480px) { .suspects { grid-template-columns: 1fr; gap: 6px; padding: 8px; } }
+  /* zone labels: always above avatars/objects and never outside the board */
+  .zone-label { z-index: 8 !important; } .cell.has-zl { z-index: 7; }
+  .zone-label.zl-l { left: 1px; transform: none; }
+  .zone-label.zl-r { left: auto; right: 1px; transform: none; }
   @media (max-width: 400px) { .tools { gap: 3px; margin: 7px 2px 0; } .tool { padding: 5px 5px; font-size: 12px; } body.art .tool .ic svg { width: 16px; height: 16px; } }
 </style>
 </head>
