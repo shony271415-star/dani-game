@@ -1663,6 +1663,11 @@
   applySkin();
   IAP.init().then(() => { if ($('home').classList.contains('active')) renderShopCard(); });
   showHome();
-  if (!store.profile) askProfile();
+  // one-tap start: no name or language dialog. A default name is used (it can be changed later from the greeting)
+  // and brand-new players go straight into the guided first case.
+  const brandNew = !store.profile;
+  if (brandNew) { store.profile = { name: tr('Detective'), auto: true }; save(); renderGreet(); }
+  const hadLink = location.hash.length > 1;
   handleLink();
+  if (brandNew && !hadLink && !store.tutorialDone && !totalSolved()) startTutorial();
 })();
