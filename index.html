@@ -21,7 +21,7 @@
     --ok: #2e8b57;
     --muted: #7a6f86;
     --wall: #2b2340;
-    --bs: min(94vw, 470px, 52vh);
+    --bs: min(94vw, 470px, 44vh);
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; height: 100%; }
@@ -406,6 +406,9 @@
   .home-more .link-btn { margin: 0; border: none; padding: 6px 4px; font-size: 14px; opacity: .8; text-decoration: underline; }
   .fold #diffs { margin-top: 8px; }
   #home .greet { padding: 8px 14px; font-size: 14px; margin: 14px auto 0; } #home .greet small { display: none; }
+  @media (max-height: 720px) { :root { --bs: min(94vw, 470px, 39vh); } }
+  @media (max-width: 480px) { .suspects { grid-template-columns: 1fr; gap: 6px; padding: 8px; } }
+  @media (max-width: 400px) { .tools { gap: 3px; margin: 7px 2px 0; } .tool { padding: 5px 5px; font-size: 12px; } body.art .tool .ic svg { width: 16px; height: 16px; } }
 </style>
 </head>
 <body>

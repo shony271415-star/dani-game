@@ -1195,7 +1195,7 @@
   /* ---------- drawing ---------- */
   function zoneLabelCells(P) {
     // one label per area, on a square near its bottom, without two labels overlapping
-    const N = P.N, cellPx = Math.min(window.innerWidth * 0.94, 470, window.innerHeight * 0.52) / N;
+    const N = P.N, cellPx = Math.min(window.innerWidth * 0.94, 470, window.innerHeight * (window.innerHeight <= 720 ? 0.39 : 0.44)) / N;
     const fontPx = Math.max(8, cellPx * 0.19);
     const span = (z) => (I.zone(P.zones[z].name).n.length * fontPx * 0.58 + 10) / cellPx; // label width in squares
     const taken = []; // [row, from, to]
