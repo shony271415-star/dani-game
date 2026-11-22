@@ -322,6 +322,20 @@
   .daily-card .dc-tx { flex: 1; } .daily-card .dc-tx b { display: block; }
   .daily-card small { font-weight: 400; font-size: 13.5px; color: #6b4f2a; }
   .daily-card .badge { background: var(--ink); color: #fff; border-radius: 10px; padding: 4px 10px; font-size: 13px; white-space: nowrap; }
+  .missions, .chest { width: min(380px, 100%); margin: 10px auto 0; border-radius: 12px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,214,150,.25); padding: 10px 12px; text-align: left; }
+  .mi-h { display: flex; justify-content: space-between; align-items: center; font-size: 15px; margin-bottom: 6px; }
+  .mi-h span { font-size: 13px; opacity: .9; } .mi-h .ic svg { width: 16px; height: 16px; vertical-align: -3px; }
+  .mi { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 14px; border-top: 1px dashed rgba(255,255,255,.14); }
+  .mi-ck { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #d9a441; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; color: #1c1822; flex: 0 0 auto; }
+  .mi.done .mi-ck { background: #d9a441; } .mi.done .mi-tx { opacity: .55; text-decoration: line-through; }
+  .mi-tx { flex: 1; } .mi-pr { font-size: 12px; opacity: .75; } .mi-rw { font-size: 13px; white-space: nowrap; } .mi-rw .ic svg { width: 14px; height: 14px; vertical-align: -2px; }
+  .chest { display: flex; align-items: center; gap: 12px; }
+  .ch-ic .ic svg { width: 38px; height: 38px; } .ch-tx { flex: 1; }
+  .ch-bar { height: 10px; border-radius: 6px; background: rgba(255,255,255,.18); overflow: hidden; margin: 6px 0 4px; }
+  .ch-bar div { height: 100%; background: linear-gradient(90deg, #ffd166, #ff7b8b); border-radius: 6px; transition: width .6s; }
+  .chest small { font-size: 12.5px; opacity: .85; } .chest small .ic svg { width: 13px; height: 13px; vertical-align: -2px; }
+  .ret-lines { margin: 8px 0; padding: 8px 10px; border-radius: 10px; background: rgba(217,164,65,.18); font-size: 14px; text-align: left; }
+  .ret-lines .ic svg { width: 16px; height: 16px; vertical-align: -3px; }
   .streak { font-size: 13.5px; opacity: .85; margin: 6px 0 4px; }
   .coach { display: flex; gap: 10px; align-items: flex-start; margin: 8px 10px 0; padding: 10px 12px; background: #fff7d6; border: 2px solid #d4b24c; border-radius: 14px; font-size: 14.5px; line-height: 1.45; text-align: left; }
   .coach[hidden] { display: none; }

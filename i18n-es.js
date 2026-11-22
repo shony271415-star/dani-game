@@ -406,7 +406,21 @@
  "Super Squad": "Superescuadrón",
  "Masks, capes and big shiny emblems.": "Antifaces, capas y grandes emblemas brillantes.",
  "Deep Sea Gang": "Banda del fondo marino",
- "Octopus, shark, pufferfish, crab, jellyfish and a whale.": "Pulpo, tiburón, pez globo, cangrejo, medusa y ballena."
+ "Octopus, shark, pufferfish, crab, jellyfish and a whale.": "Pulpo, tiburón, pez globo, cangrejo, medusa y ballena.",
+ "Solve {0} cases": "Resuelve {0} casos",
+ "Solve a Hard or harder case": "Resuelve un caso difícil o más",
+ "Solve a case without any help": "Resuelve un caso sin ayuda",
+ "Earn {0} stars": "Consigue {0} estrellas",
+ "Solve the Daily Case": "Resuelve el caso diario",
+ "Daily Missions": "Misiones diarias",
+ "All missions done! +{0} coins": "¡Todas las misiones completas! +{0} monedas",
+ "Mission complete: {0} · +{1} coins": "Misión completa: {0} · +{1} monedas",
+ "Win streak ×{0}: +{1} coins": "Racha de victorias ×{0}: +{1} monedas",
+ "Star chest": "Cofre de estrellas",
+ "{0}/{1} stars to the next chest": "{0}/{1} estrellas para el próximo cofre",
+ "Star chest opened! +{0} coins": "¡Cofre abierto! +{0} monedas",
+ "Star chest opened! New pack: {0}": "¡Cofre abierto! Nuevo pack: {0}",
+ "Win streak: {0}": "Racha de victorias: {0}"
 },
     pl: {
  "{0} cases solved": {

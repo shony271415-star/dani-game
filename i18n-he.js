@@ -402,7 +402,21 @@
  "Super Squad": "חוליית העל",
  "Masks, capes and big shiny emblems.": "מסכות, גלימות וסמלים גדולים ונוצצים.",
  "Deep Sea Gang": "כנופיית המעמקים",
- "Octopus, shark, pufferfish, crab, jellyfish and a whale.": "תמנון, כריש, אבו נפחא, סרטן, מדוזה ולווייתן."
+ "Octopus, shark, pufferfish, crab, jellyfish and a whale.": "תמנון, כריש, אבו נפחא, סרטן, מדוזה ולווייתן.",
+ "Solve {0} cases": "פתרו {0} תיקים",
+ "Solve a Hard or harder case": "פתרו תיק ברמה קשה ומעלה",
+ "Solve a case without any help": "פתרו תיק בלי שום עזרה",
+ "Earn {0} stars": "אספו {0} כוכבים",
+ "Solve the Daily Case": "פתרו את התיק היומי",
+ "Daily Missions": "משימות יומיות",
+ "All missions done! +{0} coins": "כל המשימות הושלמו! +{0} מטבעות",
+ "Mission complete: {0} · +{1} coins": "משימה הושלמה: {0} · +{1} מטבעות",
+ "Win streak ×{0}: +{1} coins": "רצף ניצחונות ×{0}: +{1} מטבעות",
+ "Star chest": "תיבת כוכבים",
+ "{0}/{1} stars to the next chest": "{0}/{1} כוכבים עד התיבה הבאה",
+ "Star chest opened! +{0} coins": "תיבת הכוכבים נפתחה! +{0} מטבעות",
+ "Star chest opened! New pack: {0}": "תיבת הכוכבים נפתחה! חבילה חדשה: {0}",
+ "Win streak: {0}": "רצף ניצחונות: {0}"
 },
     pl: {
  "{0} cases solved": {

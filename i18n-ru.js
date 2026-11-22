@@ -401,7 +401,21 @@
  "Super Squad": "Суперотряд",
  "Masks, capes and big shiny emblems.": "Маски, плащи и большие блестящие эмблемы.",
  "Deep Sea Gang": "Банда глубин",
- "Octopus, shark, pufferfish, crab, jellyfish and a whale.": "Осьминог, акула, рыба-фугу, краб, медуза и кит."
+ "Octopus, shark, pufferfish, crab, jellyfish and a whale.": "Осьминог, акула, рыба-фугу, краб, медуза и кит.",
+ "Solve {0} cases": "Раскройте дел: {0}",
+ "Solve a Hard or harder case": "Раскройте сложное дело или выше",
+ "Solve a case without any help": "Раскройте дело без подсказок",
+ "Earn {0} stars": "Заработайте звёзд: {0}",
+ "Solve the Daily Case": "Раскройте дело дня",
+ "Daily Missions": "Задания дня",
+ "All missions done! +{0} coins": "Все задания выполнены! +{0} монет",
+ "Mission complete: {0} · +{1} coins": "Задание выполнено: {0} · +{1} монет",
+ "Win streak ×{0}: +{1} coins": "Серия побед ×{0}: +{1} монет",
+ "Star chest": "Сундук звёзд",
+ "{0}/{1} stars to the next chest": "{0}/{1} звёзд до следующего сундука",
+ "Star chest opened! +{0} coins": "Сундук открыт! +{0} монет",
+ "Star chest opened! New pack: {0}": "Сундук открыт! Новый набор: {0}",
+ "Win streak: {0}": "Серия побед: {0}"
 },
     pl: {
  "{0} cases solved": {

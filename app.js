@@ -194,6 +194,80 @@
   const COIN_BASE = { easy: 10, medium: 15, hard: 20, expert: 30, extreme: 50 };
   const COST = { clue: 20, check: 10, reveal: 50 };
   const BONUS = [10, 15, 20, 25, 30, 40, 60];
+
+  /* ---------- retention: daily missions, win streak, star chest ---------- */
+  const CHEST_GOAL = 15, MISSION_ALL_BONUS = 30;
+  const MISSIONS = [
+    { id: 'solve3', n: 3, reward: 25, text: ['Solve {0} cases', 3], hit: () => 1 },
+    { id: 'hard', n: 1, reward: 25, text: ['Solve a Hard or harder case'], hit: (c) => (['hard', 'expert', 'extreme'].includes(c.diff) ? 1 : 0) },
+    { id: 'clean', n: 1, reward: 20, text: ['Solve a case without any help'], hit: (c) => (c.clean ? 1 : 0) },
+    { id: 'solve2', n: 2, reward: 15, text: ['Solve {0} cases', 2], hit: () => 1 },
+    { id: 'stars', n: 5, reward: 20, text: ['Earn {0} stars', 5], hit: (c) => c.stars },
+    { id: 'daily', n: 1, reward: 20, text: ['Solve the Daily Case'], hit: (c) => (c.slot === 'daily' ? 1 : 0) },
+  ];
+  function missions() {
+    const d = today().num;
+    if (!store.missions || store.missions.day !== d) {
+      store.missions = { day: d, list: [0, 2, 4].map((k) => ({ id: MISSIONS[(d + k) % MISSIONS.length].id, p: 0, done: false })), all: false };
+      save();
+    }
+    return store.missions;
+  }
+  const missionDef = (id) => MISSIONS.find((m) => m.id === id);
+  const missionText = (m) => tr(m.text[0], m.text[1]);
+  // called once per solved case; returns extra coins and a few message lines
+  function retentionOnWin(c) {
+    const lines = [], out = { coins: 0, lines };
+    // win streak: every win in a row without revealing a suspect
+    store.winStreak = c.hints ? 0 : (store.winStreak || 0) + 1;
+    store.bestStreak = Math.max(store.bestStreak || 0, store.winStreak);
+    if (store.winStreak >= 2) {
+      const b = Math.min(store.winStreak, 10) * 2;
+      out.coins += b; lines.push(`${ic('flame', '🔥')} ${tr('Win streak ×{0}: +{1} coins', store.winStreak, b)}`);
+    }
+    // daily missions
+    const ms = missions();
+    ms.list.forEach((it) => {
+      if (it.done) return;
+      const def = missionDef(it.id);
+      it.p = Math.min(def.n, it.p + def.hit(c));
+      if (it.p >= def.n) {
+        it.done = true; out.coins += def.reward;
+        lines.push(`${ic('check', '✔️')} ${tr('Mission complete: {0} · +{1} coins', missionText(def), def.reward)}`);
+      }
+    });
+    if (!ms.all && ms.list.every((it) => it.done)) {
+      ms.all = true; out.coins += MISSION_ALL_BONUS;
+      lines.push(`${ic('gift', '🎁')} ${tr('All missions done! +{0} coins', MISSION_ALL_BONUS)}`);
+    }
+    // star chest
+    store.chestStars = (store.chestStars || 0) + c.stars;
+    while (store.chestStars >= CHEST_GOAL) {
+      store.chestStars -= CHEST_GOAL;
+      const cheap = PACKS.filter((x) => !x.iap && x.price > 0 && x.price <= 40 && !(store.owned || ['classic']).includes(x.id));
+      if (cheap.length && Math.random() < 0.3) {
+        const x = cheap[Math.floor(Math.random() * cheap.length)];
+        store.owned = [...(store.owned || ['classic']), x.id];
+        lines.push(`${ic('gift', '🎁')} ${tr('Star chest opened! New pack: {0}', tr(x.name))}`);
+      } else {
+        const b = 30 + Math.floor(Math.random() * 12) * 10;
+        out.coins += b; lines.push(`${ic('gift', '🎁')} ${tr('Star chest opened! +{0} coins', b)}`);
+      }
+    }
+    return out;
+  }
+  function renderRetention() {
+    let el = $('retention');
+    if (!el) { el = document.createElement('div'); el.id = 'retention'; $('daily').after(el); }
+    const ms = missions(), got = ms.list.filter((it) => it.done).length;
+    const rows = ms.list.map((it) => {
+      const def = missionDef(it.id);
+      return `<div class="mi${it.done ? ' done' : ''}"><span class="mi-ck">${it.done ? '✓' : ''}</span><span class="mi-tx">${esc(missionText(def))}</span><span class="mi-pr">${it.done ? '' : def.n > 1 ? `${it.p}/${def.n}` : ''}</span><span class="mi-rw">${coinIc()} ${def.reward}</span></div>`;
+    }).join('');
+    const cs = store.chestStars || 0, ws = store.winStreak || 0;
+    el.innerHTML = `<div class="missions"><div class="mi-h"><b>${tr('Daily Missions')}</b><span>${got}/3${ms.all ? ' ✓' : ` · ${coinIc()} +${MISSION_ALL_BONUS}`}</span></div>${rows}</div>
+      <div class="chest"><span class="ch-ic">${ic('gift', '🎁')}</span><div class="ch-tx"><b>${tr('Star chest')}</b><div class="ch-bar"><div style="width:${Math.round((cs / CHEST_GOAL) * 100)}%"></div></div><small>${tr('{0}/{1} stars to the next chest', cs, CHEST_GOAL)}${ws >= 2 ? ` · ${ic('flame', '🔥')} ${tr('Win streak: {0}', ws)}` : ''}</small></div></div>`;
+  }
   const coinIc = () => ic('coin', '🪙');
 
   /* ---------- achievements ---------- */
@@ -464,6 +538,7 @@
     renderCoins();
     renderJourney();
     renderDaily();
+    renderRetention();
     renderShopCard();
     const got = Object.keys(store.ach || {}).length;
     $('ach-btn').innerHTML = `${ic('trophy', '🏆')} ${tr('Trophies')} ${got}/${ACH.length}`;
@@ -559,7 +634,7 @@
   }
 
   /* ---------- backup code: move progress to another phone or browser ---------- */
-  const BACKUP_KEYS = ['profile', 'coins', 'owned', 'skin', 'journey', 'jStars', 'easy', 'medium', 'hard', 'expert', 'extreme', 'daily', 'dailyLog', 'ach', 'trophies',
+  const BACKUP_KEYS = ['profile', 'coins', 'missions', 'winStreak', 'bestStreak', 'chestStars', 'owned', 'skin', 'journey', 'jStars', 'easy', 'medium', 'hard', 'expert', 'extreme', 'daily', 'dailyLog', 'ach', 'trophies',
     'themesSolved', 'friends', 'bonusDay', 'bonusStreak', 'pid', 'sound', 'seenHowto', 'tutorialDone', 'paid', 'engine'];
   function backupCode() {
     const o = {};
@@ -1491,7 +1566,9 @@
       return;
     }
     const nStars = !S.hints && !S.helps && !S.wrongAccuse.length ? 3 : !S.hints ? 2 : 1;
-    const earned = (COIN_BASE[S.diff] + (nStars === 3 ? 10 : nStars === 2 ? 5 : 0)) * (S.slot === 'daily' ? 2 : 1);
+    let earned = (COIN_BASE[S.diff] + (nStars === 3 ? 10 : nStars === 2 ? 5 : 0)) * (S.slot === 'daily' ? 2 : 1);
+    const ret = retentionOnWin({ diff: S.diff, slot: S.slot, stars: nStars, clean: !S.hints && !S.helps, hints: S.hints });
+    earned += ret.coins;
     store.coins = coins() + earned;
     store.themesSolved = [...new Set([...(store.themesSolved || []), P.theme.id])];
     let isBest = false, dailyTxt = '';
@@ -1526,6 +1603,7 @@
       ${levelTxt}<p class="stars-row" style="font-size:28px;margin:6px 0">${stars(nStars)}</p>
       <p class="earned">${coinIc()} ${tr('+{0} coins', '<b id="earned">0</b>')}</p>
       <p>${ART ? '' : '⏱ '}${fmtTime(S.elapsed)}${helpTxt ? ' · ' + plain(helpTxt) : ''}${isBest ? '<br>' + tr('New personal best!') : ''}${dailyTxt}</p>
+      ${ret.lines.length ? `<div class="ret-lines">${ret.lines.map((l) => `<div>${l}</div>`).join('')}</div>` : ''}
       <div class="row">${S.slot === 'daily' || S.slot === 'challenge' ? '' : `<button class="primary" data-act="next">${S.slot === 'journey' ? tr('Level {0} →', S.caseNum + 1) : tr('Next case →')}</button>`}<button class="${S.slot === 'daily' || S.slot === 'challenge' ? 'primary' : 'secondary'}" data-act="home">${tr('Menu')}</button></div>
       <div class="row"><button class="secondary duel-btn" data-act="duel">${ic('knife', '⚔️')} ${S.slot === 'challenge' ? tr('Challenge back') : tr('Challenge a friend')}</button></div>`, {
       next: nextCase,
