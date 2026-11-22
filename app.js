@@ -522,7 +522,7 @@
   }
   function renderGreet() {
     const el = $('greet');
-    if (!store.profile) { el.innerHTML = `<b>${tr('Tap here to sign in')}</b>`; return; }
+    if (!store.profile) { el.innerHTML = `<b>${tr('Tap here to set your name')}</b>`; return; }
     const t = totalSolved();
     el.innerHTML = `<b>${tr('Hello, {0}!', esc(store.profile.name))} ${ic('wave', '👋')}</b>
       <div>${tr('Rank: {0}', rankName())} · ${t ? trp(t, '1 case solved', '{0} cases solved') : tr('no cases solved yet')}</div>
@@ -711,7 +711,7 @@
     }
     $('map-canvas').style.width = W + 'px'; $('map-canvas').style.height = H + 'px';
     $('map-canvas').innerHTML = html;
-    $('map-friends').textContent = tr('Friends ({0})', (store.friends || []).length);
+    $('map-friends').textContent = tr('Share ({0})', (store.friends || []).length);
     $('map-canvas').querySelectorAll('.node').forEach((b) => b.addEventListener('click', () => {
       const n = +b.dataset.n;
       if (n === cur) return startJourney();
@@ -739,12 +739,12 @@
       return `<div class="friend-row"><span class="pf skin-${f.s}">${face(fp, f.s)}</span><div><b>${esc(f.n)}</b><small>${tr('Level {0} · {1} cases · {2}-day streak · updated {3}', f.l, f.t, f.d, age ? tr('{0}d ago', age) : tr('today'))}</small></div>
         <button class="mini-x" data-act="rm" data-id="${f.i}" aria-label="${esc(tr('Remove'))}">✕</button></div>`;
     }).join('') || `<p><small>${tr('No friends yet. Send your link to a friend, and ask for theirs!')}</small></p>`;
-    modal(`<div class="big">${ic('hand', '🤝')}</div><h2>${tr('Friends')}</h2>
+    modal(`<div class="big">${ic('hand', '🤝')}</div><h2>${tr('Share with friends')}</h2>
       <p><small>${tr("You're on level <b>{0}</b>. Send your link so friends see you on their map. Send it again whenever you want them to see your new progress.", prog('journey').caseNum)}</small></p>
       <div class="friend-list">${list}</div>
       <div class="row"><button class="primary" data-act="mine">${tr('Send my link')}</button><button class="secondary" data-act="add">${tr('Add a friend')}</button></div>
       <div class="row"><button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
-      mine: () => share(tr("Join me on Crime Grid! I'm on level {0}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Friends → Add a friend):", prog('journey').caseNum), linkFor('friend', myCard())),
+      mine: () => share(tr("Join me on Crime Grid! I'm on level {0}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Share → Add a friend):", prog('journey').caseNum), linkFor('friend', myCard())),
       add: () => {
         modal(`<h2>${tr('Add a friend')}</h2><p><small>${tr('Paste the link (or code) your friend sent you.')}</small></p>
           <textarea class="name-in share-box code-box" id="friend-in" placeholder="https://…#friend=…"></textarea>
@@ -768,7 +768,7 @@
     const iosBrowser = /iphone|ipad|ipod/i.test(navigator.userAgent) && !inApp;
     modal(`<div class="big">${ic('hand', '🤝')}</div><h2>${tr('{0} is your friend!', esc(name))}</h2>
       <p>${tr("{0} is now on your map. To show up on <b>{0}'s</b> map too, send your link back.", esc(name))}</p>
-      ${iosBrowser ? `<div class="ios-note">${tr('<b>Using the installed app on iPhone?</b> This link opened in Safari, which keeps its own copy of the game. Open the app, go to <b>Map → Friends → Add a friend</b> and paste the same link there.')}
+      ${iosBrowser ? `<div class="ios-note">${tr('<b>Using the installed app on iPhone?</b> This link opened in Safari, which keeps its own copy of the game. Open the app, go to <b>Map → Share → Add a friend</b> and paste the same link there.')}
         <button class="secondary" data-act="copy">${tr("Copy this friend's link")}</button></div>` : ''}
       <div class="row"><button class="primary" data-act="back">${tr('Send my link to {0}', esc(name))}</button><button class="secondary" data-act="close">${tr('Later')}</button></div>`, {
       back: () => { closeModal(); share(tr("Hey {0}, add me back on Crime Grid! I'm on level {1}:", name, prog('journey').caseNum), linkFor('friend', myCard())); },
