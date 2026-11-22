@@ -258,13 +258,14 @@
   }
   function renderRetention() {
     let el = $('retention');
-    if (!el) { el = document.createElement('div'); el.id = 'retention'; $('daily').after(el); }
+    if (!el) { el = document.createElement('div'); el.id = 'retention'; $('rewards-body').appendChild(el); }
     const ms = missions(), got = ms.list.filter((it) => it.done).length;
     const rows = ms.list.map((it) => {
       const def = missionDef(it.id);
       return `<div class="mi${it.done ? ' done' : ''}"><span class="mi-ck">${it.done ? '✓' : ''}</span><span class="mi-tx">${esc(missionText(def))}</span><span class="mi-pr">${it.done ? '' : def.n > 1 ? `${it.p}/${def.n}` : ''}</span><span class="mi-rw">${coinIc()} ${def.reward}</span></div>`;
     }).join('');
     const cs = store.chestStars || 0, ws = store.winStreak || 0;
+    $('rewards-sum').innerHTML = `${ic('gift', '🎁')} ${tr('Daily Missions')} ${got}/3 · ${cs}/${CHEST_GOAL} ★`;
     el.innerHTML = `<div class="missions"><div class="mi-h"><b>${tr('Daily Missions')}</b><span>${got}/3${ms.all ? ' ✓' : ` · ${coinIc()} +${MISSION_ALL_BONUS}`}</span></div>${rows}</div>
       <div class="chest"><span class="ch-ic">${ic('gift', '🎁')}</span><div class="ch-tx"><b>${tr('Star chest')}</b><div class="ch-bar"><div style="width:${Math.round((cs / CHEST_GOAL) * 100)}%"></div></div><small>${tr('{0}/{1} stars to the next chest', cs, CHEST_GOAL)}${ws >= 2 ? ` · ${ic('flame', '🔥')} ${tr('Win streak: {0}', ws)}` : ''}</small></div></div>`;
   }
@@ -593,7 +594,7 @@
     if (!el) {
       el = document.createElement('div');
       el.id = 'shop-card';
-      $('daily').insertAdjacentElement('afterend', el);
+      $('rewards-body').appendChild(el);
     }
     const have = store.owned || ['classic'], owned = have.length;
     const next = PACKS.find((x) => !x.iap && !have.includes(x.id)) || PACKS.find((x) => !have.includes(x.id));

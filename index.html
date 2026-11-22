@@ -396,6 +396,16 @@
   body.rtl .toast { text-align: right; }
   body.lang-he, body.lang-ru { letter-spacing: 0 !important; }
   body.lang-he .suspect .nm, body.lang-he .diff-btn, body.lang-he .tool, body.lang-he .primary, body.lang-he .secondary, body.lang-he h1, body.lang-he h2, body.lang-he .lvl-badge { text-transform: none; }
+  .fold { width: min(380px, 100%); margin: 12px auto 0; text-align: center; }
+  .fold > summary { cursor: pointer; list-style: none; padding: 11px 16px; border-radius: 14px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.25); font-size: 15px; font-weight: 700; }
+  .fold > summary::-webkit-details-marker { display: none; }
+  .fold > summary::after { content: " \25BE"; opacity: .7; } .fold[open] > summary::after { content: " \25B4"; }
+  .home-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .home-links .link-btn { margin: 0; padding: 9px 14px; }
+  .home-more { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 14px; margin-top: 10px; }
+  .home-more .link-btn { margin: 0; border: none; padding: 6px 4px; font-size: 14px; opacity: .8; text-decoration: underline; }
+  .fold #diffs { margin-top: 8px; }
+  #home .greet { padding: 8px 14px; font-size: 14px; margin: 14px auto 0; } #home .greet small { display: none; }
 </style>
 </head>
 <body>
@@ -405,18 +415,24 @@
   <h1>Crime Grid</h1>
   <div class="tag" data-t="Sudoku meets murder mystery">Sudoku meets murder mystery</div>
   <div class="coins-pill" id="coins-pill"></div>
-  <div class="greet" id="greet"></div>
   <div id="journey"></div>
   <div id="daily"></div>
-  <div class="section-h" data-t="Free play">Free play</div>
-  <div id="diffs"></div>
+  <div class="greet" id="greet"></div>
+  <details class="fold" id="rewards-fold"><summary id="rewards-sum"></summary><div id="rewards-body"></div></details>
+  <details class="fold" id="free-fold"><summary data-t="Free play">Free play</summary>
+    <div id="diffs"></div>
   <div class="themes-row">🏚️🚢🌲🚀🏛️🚂🎪🏰🏔️</div>
-  <button class="link-btn" id="shop-btn"></button>
-  <button class="link-btn" id="settings-btn"></button>
-  <button class="link-btn" id="ach-btn"></button>
-  <button class="link-btn" id="tut-btn">🎓 <span data-t="Tutorial">Tutorial</span></button>
-  <button class="link-btn" id="howto-home" data-t="How to play">How to play</button>
-  <button class="link-btn" id="install-btn" hidden>📲 <span data-t="Install app">Install app</span></button>
+  </details>
+  <div class="home-links">
+    <button class="link-btn" id="shop-btn"></button>
+    <button class="link-btn" id="ach-btn"></button>
+    <button class="link-btn" id="settings-btn"></button>
+  </div>
+  <div class="home-more">
+    <button class="link-btn" id="tut-btn">🎓 <span data-t="Tutorial">Tutorial</span></button>
+    <button class="link-btn" id="howto-home" data-t="How to play">How to play</button>
+    <button class="link-btn" id="install-btn" hidden>📲 <span data-t="Install app">Install app</span></button>
+  </div>
 </section>
 
 <section id="game" class="screen">
