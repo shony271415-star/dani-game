@@ -752,6 +752,147 @@ body.lang-he .home-nav button, body.lang-ru .home-nav button { letter-spacing: 0
 @media (max-height: 700px) { body.noir #home .logo { margin-top: 24px; } body.noir #home .logo svg { width: 70px; height: 70px; } body.noir #home h1 { font-size: 40px; margin-top: 4px; }
   .tape { margin: 12px -40px 14px; } body.noir .daily-card { margin-top: 22px; } body.noir .play-card { min-height: 88px; } body.noir #home > .hb-sky { top: 92px; } }
 </style>
+
+<style>
+/* ---------- v2 game screen: lamp light, progress meter, big tool dock, evidence-card stamps ---------- */
+body.noir .topbar { position: sticky; }
+body.noir .topbar .tb-right { display: flex; align-items: center; gap: 2px; flex: 0 0 auto; }
+body.noir .topbar #back { flex: 0 0 auto; min-width: 44px; min-height: 44px; }
+body.noir .topbar #howto-game { min-width: 44px; min-height: 44px; }
+body.noir .topbar .title { flex: 1 1 auto; padding: 0 2px; }
+body.noir .topbar .title div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.noir .meter-n { font: 700 12px/1 "Courier Prime", monospace; color: var(--gold); border: 1.5px solid rgba(217,164,65,.7); border-radius: 10px; padding: 4px 6px; white-space: nowrap; background: rgba(217,164,65,.08); direction: ltr; unicode-bidi: isolate; }
+body.noir .meter-n.full { background: var(--gold); color: #1c1822; }
+body.noir .meter { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255,255,255,.08); direction: ltr; }
+body.noir .meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #b8822a, #f0c15a); box-shadow: 0 0 8px rgba(240,193,90,.7); transition: width .35s ease; }
+/* soft desk-lamp light around the board (behind it, so the board stays fully readable) */
+body.noir .board-wrap { position: relative; }
+body.noir .board-wrap::before { content: ""; position: absolute; left: 0; right: 0; top: -6%; bottom: -6%; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 45%, rgba(255,205,120,.20), rgba(255,170,80,.07) 45%, transparent 70%); }
+body.noir .board { position: relative; box-shadow: 0 0 0 1px rgba(217,164,65,.5), 0 0 26px rgba(240,180,90,.22), 0 14px 30px rgba(0,0,0,.7); }
+body.noir .board-wrap .board { z-index: 1; }
+/* tool dock: always visible under the board, 44px+ touch targets */
+body.noir .tools { gap: 5px; margin: 8px 6px 0; padding: 6px; background: linear-gradient(#1d1726, #15111c); border: 1px solid rgba(217,164,65,.38); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.05); }
+body.noir .tool { flex: 1 1 0; min-width: 44px; min-height: 46px; padding: 3px 2px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; font-size: 11.5px; line-height: 1.1; border-radius: 9px; }
+body.noir .tool.icon-only { flex: 0 0 46px; }
+body.noir .tool .ic { display: inline-flex; }
+body.noir .tool .ic svg { width: 24px; height: 24px; }
+body.noir .tool span[data-t], body.noir .tool > span:last-child:not(.ic) { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.noir #hint { border-color: rgba(240,193,90,.9); }
+body.noir .tool.on { box-shadow: 0 0 12px rgba(240,193,90,.45); }
+body.noir .status { margin-top: 5px; min-height: 18px; font-size: 12.5px; }
+@media (max-width: 400px) { body.noir .tools { margin: 6px 3px 0; gap: 3px; padding: 4px; } body.noir .tool { font-size: 10.5px; } body.noir .tool .ic svg { width: 22px; height: 22px; } }
+/* suspect cards: colour tab on the edge, clear FILED stamp when placed */
+body.noir .suspect { padding-inline-start: 14px; }
+body.noir .suspect::before { content: ""; position: absolute; top: 0; bottom: 0; inset-inline-start: 0; width: 7px; background: var(--sc, #888); border-radius: 3px 0 0 3px; }
+body.rtl.noir .suspect::before { border-radius: 0 3px 3px 0; }
+body.noir .suspect.placed { opacity: 1; }
+body.noir .suspect.placed > div { opacity: .5; }
+body.noir .suspect.placed .face { filter: grayscale(.9) brightness(.9); }
+body.noir .suspect.placed::after { content: attr(data-stamp); top: 6px; bottom: auto; right: 8px; left: auto; font-size: 12.5px; letter-spacing: 1.5px; padding: 0 6px; transform: rotate(-9deg); border: 2.5px solid var(--crimson); border-radius: 3px; color: var(--crimson); background: rgba(248,231,196,.55); font-weight: 700; text-transform: uppercase; z-index: 2; }
+body.rtl.noir .suspect.placed::after { right: auto; left: 8px; letter-spacing: 0; }
+body.noir .suspect.sel { transform: scale(1.015); }
+</style>
+
+<style>
+/* ---------- case closed cinematic + share card ---------- */
+.closed-ov { position: fixed; inset: 0; z-index: 40; background: radial-gradient(circle at 50% 42%, #2a2234 0%, #0a0810 75%); overflow: hidden; display: flex; align-items: center; justify-content: center; direction: ltr; animation: coFade .25s ease-out; }
+.closed-ov.out { opacity: 0; transition: opacity .35s; pointer-events: none; }
+@keyframes coFade { from { opacity: 0; } }
+.co-tape { position: absolute; left: -10%; width: 120%; height: 34px; background: repeating-linear-gradient(45deg, #f4c430 0 22px, #15121c 22px 44px); box-shadow: 0 4px 14px rgba(0,0,0,.6); display: flex; align-items: center; overflow: hidden; }
+.co-tape div { display: flex; gap: 28px; white-space: nowrap; background: #f4c430; color: #15121c; font: 700 13px/22px "Oswald", sans-serif; letter-spacing: 2px; padding: 0 14px; text-transform: uppercase; }
+.co-tape.t1 { top: 14%; transform: rotate(-8deg) translateX(-120%); animation: coTape .6s .1s cubic-bezier(.2,.8,.3,1) forwards; }
+.co-tape.t2 { bottom: 16%; transform: rotate(6deg) translateX(120%); animation: coTape2 .6s .25s cubic-bezier(.2,.8,.3,1) forwards; }
+@keyframes coTape { to { transform: rotate(-8deg) translateX(0); } }
+@keyframes coTape2 { to { transform: rotate(6deg) translateX(0); } }
+.co-spot { position: absolute; left: 50%; top: 0; width: 260px; height: 75%; transform: translateX(-50%); background: linear-gradient(rgba(255,230,170,.22), transparent); clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); opacity: 0; animation: coIn .5s .4s forwards; }
+@keyframes coIn { to { opacity: 1; } }
+.co-card { position: relative; background: #f1e5c8; padding: 12px 12px 14px; border-radius: 3px; width: 190px; text-align: center; box-shadow: 0 16px 40px rgba(0,0,0,.7); transform: translateY(40px) rotate(-3deg); opacity: 0; animation: coCard .6s .5s cubic-bezier(.2,.9,.3,1) forwards; }
+@keyframes coCard { to { transform: translateY(0) rotate(-3deg); opacity: 1; } }
+.co-photo { position: relative; background: #d9d2c4; height: 150px; display: flex; align-items: center; justify-content: center; }
+.co-photo svg { width: 140px; height: 140px; filter: brightness(0) contrast(1.2); transition: filter .5s; }
+.co-q { position: absolute; font: 900 70px/1 "Playfair Display", serif; color: #f1e5c8; text-shadow: 0 0 10px #000; transition: opacity .3s; }
+.closed-ov.rev .co-photo svg { filter: none; }
+.closed-ov.rev .co-q { opacity: 0; }
+.closed-ov.rev .co-card { animation: coCard .01s forwards, coFlash .6s; }
+@keyframes coFlash { 0% { box-shadow: 0 0 0 0 #fff, 0 16px 40px rgba(0,0,0,.7); } 30% { box-shadow: 0 0 80px 30px rgba(255,255,255,.9), 0 16px 40px rgba(0,0,0,.7); } }
+.co-label { margin-top: 8px; font: 700 12px/1 "Oswald", sans-serif; letter-spacing: 2px; text-transform: uppercase; color: #8e2f22; opacity: 0; transition: opacity .3s .1s; }
+.co-name { font: 900 24px/1.2 "Playfair Display", serif; color: #1c1822; opacity: 0; transition: opacity .3s .2s; }
+.closed-ov.rev .co-label, .closed-ov.rev .co-name { opacity: 1; }
+.co-stamp { position: absolute; left: 50%; top: 52%; font: 900 58px/1 "Special Elite", "Oswald", monospace; letter-spacing: 6px; color: #d8283d; border: 7px solid #d8283d; padding: 2px 16px; border-radius: 6px; background: rgba(10,8,16,.35); text-shadow: 0 0 2px #000; transform: translate(-50%, -50%) rotate(-14deg) scale(3.2); opacity: 0; pointer-events: none; text-transform: uppercase; }
+.closed-ov.stamped .co-stamp { animation: coStamp .3s cubic-bezier(.3,1.6,.5,1) forwards; }
+.closed-ov.stamped { animation: coShake .25s; }
+@keyframes coStamp { to { transform: translate(-50%, -50%) rotate(-14deg) scale(1); opacity: .95; } }
+@keyframes coShake { 25% { transform: translate(5px, -4px); } 50% { transform: translate(-5px, 3px); } 75% { transform: translate(3px, 2px); } }
+.co-skip { position: absolute; bottom: calc(18px + env(safe-area-inset-bottom)); left: 0; right: 0; text-align: center; font: 12px "Courier Prime", monospace; color: rgba(243,230,200,.55); }
+.closed-ov.calm * { animation-duration: .01s !important; animation-delay: 0s !important; transition: none !important; }
+.share-card { margin: 8px auto; max-width: 260px; background: #15121c; color: #f3e6c8; border: 1px solid rgba(217,164,65,.6); border-radius: 8px; padding: 10px 12px; box-shadow: 0 4px 0 rgba(0,0,0,.4); }
+.sc-h { font: 700 12px/1 "Oswald", sans-serif; letter-spacing: 3px; color: var(--gold, #d9a441); }
+.sc-sq { display: flex; justify-content: center; gap: 4px; margin: 8px 0 6px; flex-wrap: wrap; }
+.sc-sq i { width: 26px; height: 26px; border-radius: 4px; display: block; box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); animation: pop .3s both; }
+.sc-sq i:nth-child(2) { animation-delay: .05s; } .sc-sq i:nth-child(3) { animation-delay: .1s; } .sc-sq i:nth-child(4) { animation-delay: .15s; } .sc-sq i:nth-child(5) { animation-delay: .2s; } .sc-sq i:nth-child(n+6) { animation-delay: .25s; }
+.sc-meta { font: 13px/1.4 "Courier Prime", monospace; }
+body.noir .share-res .ic svg { width: 20px; height: 20px; vertical-align: -4px; }
+</style>
+
+<style>
+/* ---------- v2 tutorial: short steps, pictures, glow + arrow on what to tap ---------- */
+#game.tut .tools, #game.tut .status, #game.tut .intro { display: none; }
+body.noir .coach.coach2 { display: block; margin: 8px 8px 0; padding: 8px 10px 9px; text-align: start; }
+body.noir .coach.coach2::before { display: none; }
+.coach2 .coach-top { display: flex; align-items: center; gap: 8px; font: 700 12px/1 "Oswald", sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #8e2f22; }
+body.lang-he .coach2 .coach-top, body.lang-ru .coach2 .coach-top { letter-spacing: 0; text-transform: none; }
+.coach2 .coach-dots { display: flex; gap: 4px; flex: 1; }
+.coach2 .coach-dots i { width: 14px; height: 5px; border-radius: 3px; background: rgba(43,35,64,.22); }
+.coach2 .coach-dots i.done { background: #2e8b57; } .coach2 .coach-dots i.now { background: #d9a441; box-shadow: 0 0 6px rgba(217,164,65,.9); }
+.coach2 .coach-skip { background: none; border: 1.5px solid rgba(43,35,64,.45); color: var(--ink); border-radius: 14px; padding: 4px 10px; min-height: 30px; font: 700 12px "Oswald", sans-serif; }
+.coach2 .coach-tx { font-size: 14.5px; line-height: 1.4; margin-top: 6px; font-weight: 700; }
+.coach2 .coach-msg { min-height: 0; font: 700 13px/1.3 "Courier Prime", monospace; margin-top: 3px; }
+.coach2 .coach-msg:empty { display: none; }
+.coach2 .coach-msg.ok { color: #1f7a45; } .coach2 .coach-msg.bad { color: #b3441a; }
+.coach2 .coach-msg.pulse { animation: coMsg .5s; } @keyframes coMsg { 30% { transform: translateX(-4px); } 60% { transform: translateX(4px); } }
+.coach2 .coach-btns { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; }
+.coach2 .coach-btns:not(:has(button)) { display: none; }
+.coach2 .coach-btns button { min-height: 44px; min-width: 88px; padding: 6px 14px; }
+.coach2 .coach-btns .coach-next { margin-inline-start: auto; }
+.coach2 .coach-btns .coach-back { font-size: 14px; }
+/* arrows */
+.coach-arrow { position: absolute; width: 0; height: 0; border-left: 11px solid transparent; border-right: 11px solid transparent; border-top: 18px solid #ffb300; filter: drop-shadow(0 2px 2px rgba(0,0,0,.6)); pointer-events: none; z-index: 12; animation: arrowBob .8s ease-in-out infinite; }
+.suspect > .coach-arrow { top: -16px; inset-inline-end: 22px; }
+.cell-arrow { left: 50%; top: 6%; margin-left: -11px; }
+.acc-row button { position: relative; }
+.acc-row button > .coach-arrow { top: -18px; left: 50%; margin-left: -11px; }
+@keyframes arrowBob { 50% { transform: translateY(6px); } }
+body.noir .suspect.coach-hl, body.noir .acc-row button.coach-hl { box-shadow: 0 0 0 3px #ffb300, 0 0 16px 3px rgba(255,179,0,.7); }
+body.noir .cell.coach-hl { box-shadow: inset 0 0 0 4px #ffb300, inset 0 0 14px rgba(255,179,0,.6); }
+/* illustrations */
+.ill { margin: 6px auto 0; display: flex; justify-content: center; align-items: center; }
+.ill-rows { display: grid; grid-template-columns: repeat(4, 30px); grid-template-rows: repeat(4, 30px); gap: 2px; padding: 4px; background: #1c1822; border-radius: 6px; width: max-content; }
+.ill-rows i { background: #e9dcc0; display: flex; align-items: center; justify-content: center; position: relative; }
+.ill-rows i.hl { background: #f6e3a1; animation: rowsGlow 2.4s var(--d) infinite; }
+.ill-rows i s { text-decoration: none; color: #c0392b; font-weight: 900; font-size: 18px; opacity: 0; animation: xIn 2.4s var(--d) infinite; }
+.ill-rows i.me svg { width: 28px; height: 28px; animation: pop .4s; }
+@keyframes rowsGlow { 0%, 15% { background: #e9dcc0; } 35%, 85% { background: #f6e3a1; } 100% { background: #e9dcc0; } }
+@keyframes xIn { 0%, 20% { opacity: 0; transform: scale(.3); } 40%, 85% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+.ill-objs { gap: 5px; }
+.ill-objs .ob { position: relative; width: 44px; height: 46px; background: #e9dcc0; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; }
+.ill-objs .ob.yes { border-color: #2e8b57; } .ill-objs .ob.no { border-color: #c0392b; opacity: .92; }
+.ill-objs .ob span svg { width: 30px; height: 30px; display: block; }
+.ill-objs .ob b { position: absolute; right: -4px; bottom: -6px; width: 18px; height: 18px; border-radius: 50%; color: #fff; font-size: 12px; line-height: 18px; text-align: center; }
+.ill-objs .yes b { background: #2e8b57; } .ill-objs .no b { background: #c0392b; }
+.ill-objs .ob { animation: pop .35s both; } .ill-objs .ob:nth-child(2) { animation-delay: .08s; } .ill-objs .ob:nth-child(3) { animation-delay: .16s; } .ill-objs .ob:nth-child(4) { animation-delay: .24s; } .ill-objs .ob:nth-child(5) { animation-delay: .32s; } .ill-objs .ob:nth-child(6) { animation-delay: .4s; }
+.rugp { display: block; width: 28px; height: 20px; border-radius: 3px; background: repeating-linear-gradient(45deg, #b85a5a 0 4px, #f1d4d4 4px 8px); border: 1.5px dashed #8e3a3a; }
+.ill-room { gap: 8px; }
+.ill-room .rm { display: flex; align-items: center; gap: 4px; padding: 6px 8px; background: #f6e3a1; border: 3px solid #1c1822; border-radius: 6px; }
+.ill-room .rm.out { background: #cfd8e6; opacity: .55; }
+.ill-room .wl { width: 4px; height: 44px; background: #1c1822; border-radius: 2px; }
+.ill-room .f svg { width: 38px; height: 38px; display: block; border-radius: 50%; background: #fff; border: 2px solid #1c1822; }
+.ill-room .f.k svg { border-color: #d8283d; animation: killer 1.2s ease-in-out infinite; }
+.ill-room .f.v svg { filter: grayscale(.7); }
+.ill-room .kn svg { width: 22px; height: 22px; display: block; }
+@keyframes killer { 50% { box-shadow: 0 0 0 5px rgba(216,40,61,.45); } }
+@media (max-height: 700px) { .ill-rows { grid-template-columns: repeat(4, 22px); grid-template-rows: repeat(4, 22px); } .ill-rows i s { font-size: 14px; } .ill-rows i.me svg { width: 20px; height: 20px; } .ill-objs .ob { width: 40px; height: 40px; } .ill-room .f svg { width: 32px; height: 32px; } .ill-room .wl { height: 38px; } }
+</style>
 </head>
 <body class="art noir">
 
@@ -801,7 +942,8 @@ body.lang-he .home-nav button, body.lang-ru .home-nav button { letter-spacing: 0
   <div class="topbar" id="topbar">
     <button id="back" aria-label="Back" data-t-label="Back">←</button>
     <div class="title"><b id="case-title"></b><div id="case-sub"></div></div>
-    <button id="howto-game" aria-label="Help" data-t-label="Help">?</button>
+    <div class="tb-right"><span class="meter-n" id="meter-n" hidden></span><button id="howto-game" aria-label="Help" data-t-label="Help">?</button></div>
+    <div class="meter" id="meter" hidden><i id="meter-fill"></i></div>
   </div>
   <div class="intro" id="intro"></div>
   <div class="play-area" id="play-area">
@@ -810,9 +952,9 @@ body.lang-he .home-nav button, body.lang-ru .home-nav button { letter-spacing: 0
       <button class="tool on" id="mode-place" data-ic="hand"><span data-t="Place">Place</span></button>
       <button class="tool" id="mode-draft" data-ic="pencil"><span data-t="Draft">Draft</span></button>
       <button class="tool" id="mode-x" data-ic="cross"><span data-t="Mark">Mark</span></button>
-      <button class="tool" id="undo" aria-label="Undo" data-t-label="Undo" data-ic="undo"></button>
+      <button class="tool icon-only" id="undo" aria-label="Undo" data-t-label="Undo" data-ic="undo"></button>
       <button class="tool" id="hint" data-ic="bulb"><span data-t="Help">Help</span></button>
-      <button class="tool" id="reset" aria-label="Clear" data-t-label="Clear" data-ic="trash"></button>
+      <button class="tool icon-only" id="reset" aria-label="Clear" data-t-label="Clear" data-ic="trash"></button>
     </div>
     <div class="status" id="status"></div>
     <div class="coach" id="coach" hidden></div>

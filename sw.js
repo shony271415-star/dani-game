@@ -1,5 +1,5 @@
 /* Offline support: try the network first (to get updates), fall back to the cache */
-const CACHE = 'mystery-grid-v33';
+const CACHE = 'mystery-grid-v37';
 const FILES = ['./', 'index.html', 'engine.js', 'app.js', 'i18n.js', 'i18n-he.js', 'i18n-ru.js', 'i18n-es.js', 'worker.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
 
