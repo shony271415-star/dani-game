@@ -1615,6 +1615,7 @@
   let modalActions = {}, modalSticky = false;
   function modal(html, actions, sticky) {
     $('modal-body').innerHTML = html;
+    $('modal-body').className = 'modal';
     modalActions = actions || {};
     modalSticky = !!sticky;
     $('modal').classList.add('show');
@@ -1756,7 +1757,38 @@
     const levelTxt = S.slot === 'journey' ? `<div class="lvl-done">${tr('Level {0} complete!', S.caseNum)}</div>` : '';
     const helpTxt = [S.helps ? '🧾 ' + trp(S.helps, '1 clue/check', '{0} clues/checks') : '', S.hints ? '👁️ ' + trp(S.hints, '1 reveal', '{0} reveals') : ''].filter(Boolean).join(' · ');
     const lockLine = m.g === 'm' ? tr("He's on the way to jail.") : tr("She's on the way to jail.");
-    modal(`<div class="big">${ART ? `<span class="ic win-face">${face(m)}</span><span class="ic">${ART.ui('siren')}</span>` : m.emoji + '🚔'}</div><h2>${tr('Case closed!')}</h2>
+    const hasNext = S.slot !== 'daily' && S.slot !== 'challenge';
+    if (ART) {
+      const bestSec = isBest ? S.elapsed : (store[S.diff] && store[S.diff].best);
+      const stat = (cls, html) => `<span class="w-stat ${cls}">${html}</span>`;
+      const stats = [stat('', `⏱ ${fmtTime(S.elapsed)}`),
+        bestSec != null ? stat(isBest ? 'hot' : '', `${ic('trophy', '🏆')} ${isBest ? tr('New personal best!') : tr('Best {0}', fmtTime(bestSec))}`) : '',
+        stat('', esc(dname(S.diff)))].filter(Boolean).join('<i>·</i>');
+      const hdr = S.slot === 'journey' ? tr('Level {0} complete!', S.caseNum) : tr('Case closed!');
+      const extra = ret.lines.length ? `<details class="w-more"><summary>${ic('gift', '🎁')} ${tr('Bonuses ({0})', ret.lines.length)}</summary><div class="ret-lines">${ret.lines.map((l) => `<div>${l}</div>`).join('')}</div></details>` : '';
+      modal(`<div class="win2">
+        <div class="w-h">${esc(hdr)}</div>
+        <div class="w-polaroid"><div class="w-photo">${face(m)}</div><div class="w-name">${esc(m.name)}</div><div class="w-stamp">${tr('CLOSED')}</div></div>
+        <p class="w-story">${tr('<b>{0}</b> was alone with {1} {2}.', esc(m.name), esc(v.name), esc(zone.in))} ${lockLine} ${ic('lock', '🔒')}</p>
+        <div class="w-stars" dir="ltr">${[1, 2, 3].map((k) => `<span class="ic w-star${k <= nStars ? ' on' : ''}" style="--i:${k}">${ART.ui(k <= nStars ? 'star' : 'starOff')}</span>`).join('')}</div>
+        <div class="w-coins">${coinIc()} <span>+<b id="earned">0</b></span></div>
+        <div class="w-stats">${stats}</div>
+        ${dailyTxt ? `<div class="w-note">${dailyTxt.replace(/^<br>/, '')}</div>` : ''}
+        ${shareCardHtml(nStars)}
+        ${extra}
+        <div class="w-actions">
+          <button class="primary w-main" data-act="${hasNext ? 'next' : 'shareres'}">${hasNext ? (S.slot === 'journey' ? tr('Level {0} →', S.caseNum + 1) : tr('Next case →')) : `${ic('share', '📤')} ${tr('Share result')}`}</button>
+          ${hasNext ? `<button class="secondary w-sec share-res" data-act="shareres">${ic('share', '📤')} ${tr('Share result')}</button>` : ''}
+          <div class="w-links"><button data-act="home">${tr('Menu')}</button><button data-act="duel">${ic('knife', '⚔️')} ${S.slot === 'challenge' ? tr('Challenge back') : tr('Challenge a friend')}</button></div>
+        </div></div>`, {
+      next: nextCase,
+      shareres: () => shareResult(nStars),
+      duel: () => share(tr('I solved "{0}" in {1} on Crime Grid. Can you beat my time?', caseText().title, fmtTime(S.elapsed)), challengeLink()),
+      home: () => { closeModal(); showHome(); },
+    });
+      $('modal-body').classList.add('win-modal');
+    } else {
+      modal(`<div class="big">${ART ? `<span class="ic win-face">${face(m)}</span><span class="ic">${ART.ui('siren')}</span>` : m.emoji + '🚔'}</div><h2>${tr('Case closed!')}</h2>
       <p>${tr('<b>{0}</b> was alone with {1} {2}.', esc(m.name), esc(v.name), esc(zone.in))}<br>${lockLine} ${ic('lock', '🔒')}</p>
       ${levelTxt}<p class="stars-row" style="font-size:28px;margin:6px 0">${stars(nStars)}</p>
       <p class="earned">${coinIc()} ${tr('+{0} coins', '<b id="earned">0</b>')}</p>
@@ -1771,13 +1803,18 @@
       duel: () => share(tr('I solved "{0}" in {1} on Crime Grid. Can you beat my time?', caseText().title, fmtTime(S.elapsed)), challengeLink()),
       home: () => { closeModal(); showHome(); },
     });
+    }
     // count the coins up, then hand out any new trophies
     let shown = 0;
-    const tick = setInterval(() => {
-      shown = Math.min(earned, shown + Math.ceil(earned / 18));
-      const el = $('earned'); if (el) el.textContent = shown;
-      if (shown >= earned) { clearInterval(tick); sfx('coin'); }
-    }, 45);
+    const calmWin = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const runTick = () => {
+      const tick = setInterval(() => {
+        shown = Math.min(earned, shown + Math.ceil(earned / 18));
+        const el = $('earned'); if (el) el.textContent = shown;
+        if (shown >= earned) { clearInterval(tick); sfx('coin'); }
+      }, 45);
+    };
+    if (ART && !calmWin) setTimeout(runTick, 1000); else runTick();
     checkAchievements({ diff: S.diff, clean: !S.hints && !S.helps, time: S.elapsed });
     };
     if (ART) closedAnimation(m, showResult); else showResult();
@@ -1797,7 +1834,7 @@
   }
   function shareCardHtml(nStars) {
     const sq = resultSquares();
-    return `<div class="share-card" dir="ltr"><div class="sc-h">CRIME GRID</div><div class="sc-sq">${sq.map((c) => `<i class="sq-${c}"></i>`).join('')}</div><div class="sc-key" dir="auto">${esc(tr('🟩 alone · 🟨 with a hint · 🟥 revealed'))}</div>
+    return `<div class="share-card" dir="ltr"><div class="sc-h">CRIME GRID</div><div class="sc-sq">${sq.map((c) => `<i class="sq-${c}"></i>`).join('')}</div><div class="sc-key" dir="auto">${tr('🟩 alone · 🟨 with a hint · 🟥 revealed').split(' · ').map((x) => `<span>${esc(x)}</span>`).join(' · ')}</div>
       <div class="sc-meta">${esc(resultLabel())}</div><div class="sc-meta">${fmtTime(S.elapsed)} · ${'★'.repeat(nStars)}${'☆'.repeat(3 - nStars)}</div></div>`;
   }
   function shareResult(nStars) {

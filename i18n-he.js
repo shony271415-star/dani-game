@@ -86,6 +86,8 @@
  "Not them. Who else was in the same room? Try the glowing one 🙂": "לא הם. מי עוד היה באותו חדר? נסו את המאיר 🙂",
  "POLICE LINE · DO NOT CROSS": "קו משטרה · אין לעבור",
  "CLOSED": "נסגר",
+ "Best {0}": "שיא: {0}",
+ "Bonuses ({0})": "בונוסים ({0})",
  "🟩 alone · 🟨 with a hint · 🟥 revealed": "🟩 לבד · 🟨 עם רמז · 🟥 נחשף",
  "The killer": "הרוצח/ת",
  "Tap to skip": "הקשו לדילוג",

@@ -90,6 +90,8 @@
  "Not them. Who else was in the same room? Try the glowing one 🙂": "Él no. ¿Quién más estaba en la misma habitación? Prueba al que brilla 🙂",
  "POLICE LINE · DO NOT CROSS": "LÍNEA POLICIAL · NO CRUZAR",
  "CLOSED": "CERRADO",
+ "Best {0}": "Récord: {0}",
+ "Bonuses ({0})": "Bonos ({0})",
  "🟩 alone · 🟨 with a hint · 🟥 revealed": "🟩 solo · 🟨 con pista · 🟥 revelado",
  "The killer": "El asesino",
  "Tap to skip": "Toca para saltar",
