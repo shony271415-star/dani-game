@@ -145,7 +145,7 @@
     };
     return E.finishCustom(P);
   }
-  const TUTORIAL = [
+  const TUTORIAL_OLD = [
     { text: '👋 Welcome, detective! I\'ll walk you through your very first case. Tap <b>Next</b>.', next: true },
     { text: 'This is the <b>crime scene</b>. Thick lines are walls: they split the house into rooms. You <b>can</b> stand on chairs, beds and rugs, but <b>not</b> on tables, plants or TVs.', next: true },
     { text: 'The golden rule: every person was in a <b>different row</b> and a <b>different column</b>, just like sudoku.', next: true },
@@ -156,6 +156,21 @@
     { text: 'The victim is always in the <b>last free square</b>: only one row and one column are left. Place <b>Victor</b> there.', expect: { p: 3, cell: 10 }, card: 3, cells: [10] },
     { text: 'Everyone is in place! Victor was found in the <b>Bedroom</b>. Who else was in the Bedroom? That person is the murderer!' },
   ];
+
+  // v2 tutorial: 8 small units shown as 6 steps (steps 1-3 teach the rules with a picture, 4-5 place the suspects, 6 accuses)
+  const TUT2 = [
+    { n: 1, ill: 'rows', next: true, text: () => tr('Rule 1: every suspect has a row and a column all to themselves.') },
+    { n: 2, ill: 'objs', next: true, text: () => tr('Rule 2: you can stand on chairs, beds and rugs, but not on tables, plants or TVs.') },
+    { n: 3, ill: 'room', next: true, text: () => tr('Rule 3: the victim is in the last free square, and whoever is alone with them in that room did it.') },
+    { n: 4, expect: { p: 0, cell: 5 }, card: 0, cells: [5], text: (P) => tr('{0} sat on a chair: tap her card, then the glowing chair.', P.people[0].name) },
+    { n: 5, expect: { p: 1, cell: 12 }, card: 1, cells: [12, 13], text: (P) => tr('{0} lay on a bed. Only one bed square is left, so place him there.', P.people[1].name) },
+    { n: 5, expect: { p: 2, cell: 3 }, card: 2, cells: [3], text: (P) => tr('{0} was in the Kitchen, by a window: only one square fits.', P.people[2].name) },
+    { n: 5, expect: { p: 3, cell: 10 }, card: 3, cells: [10], text: (P) => tr('{0}, the victim, goes in the last free square.', P.people[3].name) },
+    { n: 6, accuse: true, text: (P, zone) => tr('{0} was found {1}. Who was alone with him? Tap the killer!', P.people[3].name, zone.in) },
+  ];
+  const TUTORIAL = ART ? TUT2 : TUTORIAL_OLD;
+  const TUT_STEPS = 6;
+  const PRAISE = () => [tr('Nice!'), tr('Great!'), tr('Exactly right!'), tr('Sharp eye, detective!')];
 
   /* ---------- journey: one endless path of levels that slowly gets harder ---------- */
   const JOURNEY_SEED = 2000000;
@@ -1013,14 +1028,83 @@
     updateSub();
   }
 
+  function tutIllustration(kind) {
+    const P = S.P;
+    if (kind === 'rows') {
+      let g = '';
+      for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) {
+        const inRow = r === 1, inCol = c === 1, me = r === 1 && c === 1;
+        g += `<i class="${inRow || inCol ? 'hl' : ''}${me ? ' me' : ''}" style="--d:${(inRow ? Math.abs(c - 1) : Math.abs(r - 1)) * 0.25 + 0.5}s">${me ? face(P.people[0]) : (inRow || inCol ? '<s>✕</s>' : '')}</i>`;
+      }
+      return `<div class="ill ill-rows" dir="ltr">${g}</div>`;
+    }
+    if (kind === 'objs') {
+      const it = (name, ok, inner) => `<div class="ob ${ok ? 'yes' : 'no'}"><span>${inner}</span><b>${ok ? '✓' : '✕'}</b></div>`;
+      return `<div class="ill ill-objs" dir="ltr">${it('chair', 1, ART.icon('chair'))}${it('bed', 1, ART.icon('bed'))}${it('rug', 1, '<u class="rugp"></u>')}${it('table', 0, ART.icon('table'))}${it('plant', 0, ART.icon('plant'))}${it('tv', 0, ART.icon('tv'))}</div>`;
+    }
+    if (kind === 'room') {
+      return `<div class="ill ill-room" dir="ltr"><div class="rm"><span class="f k">${face(P.people[1])}</span><span class="kn">${ART.ui('knife')}</span><span class="f v">${face(P.people[3])}</span></div><div class="wl"></div><div class="rm out"><span class="f">${face(P.people[0])}</span><span class="f">${face(P.people[2])}</span></div></div>`;
+    }
+    return '';
+  }
+
+  function tutMsg(text, bad) {
+    S.tmsg = text ? { text, bad: !!bad } : null;
+    const el = $('coach-msg');
+    if (!el) return;
+    el.textContent = text || '';
+    el.className = 'coach-msg' + (text ? (bad ? ' bad' : ' ok') : '');
+    if (text) { void el.offsetWidth; el.classList.add('pulse'); }
+    if (bad) sfx('wrong');
+  }
+
   function renderCoach() {
     const el = $('coach');
     if (!S || S.tut < 0) { el.hidden = true; return; }
     const step = TUTORIAL[S.tut];
     el.hidden = false;
+    if (ART) {
+      const P = S.P, zone = I.zone(P.zones[P.zoneOf[P.solution[P.victim]]].name);
+      const dots = Array.from({ length: TUT_STEPS }, (_, k) => `<i class="${k + 1 < step.n ? 'done' : k + 1 === step.n ? 'now' : ''}"></i>`).join('');
+      el.classList.add('coach2');
+      el.innerHTML = `<div class="coach-top"><span class="coach-step">${tr('Step {0} of {1}', step.n, TUT_STEPS)}</span><span class="coach-dots" aria-hidden="true">${dots}</span><button class="coach-skip" id="coach-skip">${tr('Skip')}</button></div>
+        ${step.ill ? tutIllustration(step.ill) : ''}
+        <div class="coach-tx">${plain(step.text(P, zone))}</div>
+        <div class="coach-msg${S.tmsg ? (S.tmsg.bad ? ' bad' : ' ok') : ''}" id="coach-msg" aria-live="polite">${S.tmsg ? esc(S.tmsg.text) : ''}</div>
+        <div class="coach-btns">${S.tut > 0 ? `<button class="secondary coach-back" id="coach-back">${tr('Back')}</button>` : '<span></span>'}${step.next ? `<button class="primary coach-next" id="coach-next">${tr('Next')}</button>` : ''}</div>`;
+      $('coach-skip').addEventListener('click', skipTutorial);
+      if (S.tut > 0) $('coach-back').addEventListener('click', tutBack);
+      if (step.next) $('coach-next').addEventListener('click', () => { S.tmsg = null; S.tut++; renderCoach(); render(); });
+      return;
+    }
     el.innerHTML = `<div class="coach-face">${ART ? ART.ui('logo') : '🕵️'}</div><div class="coach-tx">${plain(tr(step.text))}</div>
       ${step.next ? `<button class="primary coach-next" id="coach-next">${tr('Next')}</button>` : ''}`;
     if (step.next) $('coach-next').addEventListener('click', () => { S.tut++; renderCoach(); render(); });
+  }
+
+  // one step back: undo whatever the previous step did, so the player can always retry
+  function tutBack() {
+    if (!S || S.tut <= 0) return;
+    S.tut--;
+    const prev = TUTORIAL[S.tut];
+    if (prev.expect) S.place[prev.expect.p] = -1;
+    for (let k = S.tut + 1; k < TUTORIAL.length; k++) if (TUTORIAL[k].expect) S.place[TUTORIAL[k].expect.p] = -1;
+    S.sel = -1; S.tmsg = null; S.solvedGrid = false; S.wrongAccuse = [];
+    renderCoach(); render();
+  }
+  function skipTutorial() {
+    store.tutorialDone = true; store.seenHowto = true; save();
+    if (S) S.tut = -1;
+    renderCoach();
+    showHome();
+  }
+  // the player tapped the right square (with or without picking the card first)
+  function tutPlace(p, cell) {
+    S.place[p] = cell; S.sel = -1; sfx('place');
+    const words = PRAISE();
+    S.tmsg = { text: words[S.tut % words.length], bad: false };
+    S.tut++;
+    renderCoach(); render(); checkDone(false);
   }
 
   function persist() {
@@ -1127,6 +1211,13 @@
       if (list.length) S.draft[i] = list; else delete S.draft[i];
       sfx('tick');
       render(); persist();
+      return;
+    }
+    if (S.tut >= 0 && ART) {
+      const step = TUTORIAL[S.tut];
+      if (!step.expect) { tutMsg(step.next ? tr('Tap Next to continue 🙂') : tr('Pick the killer below 👇'), true); return; }
+      if (i === step.expect.cell) return tutPlace(step.expect.p, i);
+      tutMsg(S.sel >= 0 && S.sel !== step.expect.p ? tr('Not that card. Tap the glowing card, then the glowing square.') : tr('Not that square. Tap the glowing one 🙂'), true);
       return;
     }
     if (S.tut >= 0) {
@@ -1258,6 +1349,7 @@
       if (ART) cell.classList.add('fl-' + ART.floor(P.theme.id, P.zoneOf[i]));
       const step = S.tut >= 0 ? TUTORIAL[S.tut] : null;
       if (step && step.cells && step.cells.includes(i)) cell.classList.add('coach-hl');
+      if (ART && step && step.expect && i === step.expect.cell && S.place[step.expect.p] < 0 && S.sel === step.expect.p) cell.insertAdjacentHTML('beforeend', '<div class="coach-arrow cell-arrow"></div>');
       const w = P.walls[i];
       ['n', 's', 'e', 'w'].forEach((s) => { if (w[s] && !isOuter(N, i, s)) cell.classList.add('wall-' + s); });
       const o = P.obj[i], def = o && E.OBJECTS[o];
@@ -1327,6 +1419,7 @@
       if (ART && S.place[p] >= 0) card.dataset.stamp = tr('FILED');
       card.innerHTML = `<div class="face">${face(person)}<span class="lt" style="background:${person.color}">${person.letter}</span></div>
         <div><div class="nm">${esc(person.name)}${person.isVictim ? (ART ? ` <span class="rip">${tr('rip')}</span>` : ' ☠️') : ''}</div><div class="cl">${clues}</div></div>`;
+      if (ART && S.tut >= 0 && TUTORIAL[S.tut].card === p && S.place[p] < 0 && S.sel !== p) card.insertAdjacentHTML('beforeend', '<div class="coach-arrow"></div>');
       card.addEventListener('click', () => onSuspect(p));
       list.appendChild(card);
     });
@@ -1563,6 +1656,7 @@
         if (!S.wrongAccuse.includes(p)) S.wrongAccuse.push(p);
         persist(); renderAccuse();
         $('acc-msg').textContent = tr("{0} wasn't alone with {1} {2}! Look again.", P.people[p].name, P.people[P.victim].name, zone.in);
+        if (ART && S.tut >= 0) tutMsg(tr('Not them. Who else was in the same room? Try the glowing one 🙂'), true);
         shake(el); sfx('wrong');
       });
     }
@@ -1582,6 +1676,10 @@
       `<button data-p="${p}" class="${S.wrongAccuse.includes(p) ? 'nope' : ''}"><span class="af">${face(person)}</span>${esc(person.name)}</button>`).join('');
     el.innerHTML = `<div class="acc-t">${ic('knife', '🔪')} <b>${tr('Who did it?')}</b> ${v.g === 'm' ? tr('{0} was found {1} (highlighted). Who was alone with him?', esc(v.name), `<b>${esc(zone.in)}</b>`) : tr('{0} was found {1} (highlighted). Who was alone with her?', esc(v.name), `<b>${esc(zone.in)}</b>`)}</div>
       <div class="acc-row">${btns}</div><div class="acc-msg" id="acc-msg"></div>`;
+    if (ART && S.tut >= 0) {
+      const b = el.querySelector(`button[data-p="${P.murderer}"]`);
+      if (b) { b.classList.add('coach-hl'); b.insertAdjacentHTML('beforeend', '<div class="coach-arrow"></div>'); }
+    }
   }
 
   function win() {
