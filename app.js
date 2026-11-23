@@ -917,6 +917,25 @@
     $('cal-btn').addEventListener('click', showCalendar);
   }
 
+  // Daily tab: a small menu (today's case, streak, calendar) instead of jumping straight into the level
+  function showDailyMenu() {
+    const t = today(), diff = DAILY_DIFF[t.weekday], d = DIFF[diff];
+    const done = dailyLog()[t.num], p = prog('daily'), streak = dailyStreak();
+    const resume = !done && p.cur && p.cur.caseNum === t.num;
+    const info = [I.weekday(t.weekday), tr(d.name), tr(d.sub).split(' · ')[0]].join(' · ');
+    const streakLine = streak ? `${ic('flame', '🔥')} ${done ? tr('{0}-day streak', streak) : tr('{0}-day streak, solve today to keep it!', streak)}` : tr('A new case every day. Same one for everyone!');
+    modal(`<div class="big">${ic('calendar', '📅')}</div><h2>${tr('Daily Case')}</h2>
+      <p>${esc(info)}</p>
+      <p>${done ? `<b>${tr('SOLVED')}</b> ✓ ${fmtTime(done.t)}` : ''}</p>
+      <p>${streakLine}</p>
+      <div class="row">${done ? '' : `<button class="primary" data-act="play">${resume ? tr('Continue') : tr('Play')}</button>`}
+      <button class="secondary" data-act="cal">${tr('Calendar')}</button>
+      <button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
+      play: () => { closeModal(); startDaily(); },
+      cal: () => { closeModal(); showCalendar(); },
+    });
+  }
+
   let pendingLink = null;
   function handleLink() {
     const h = pendingLink || location.hash;
@@ -1583,7 +1602,7 @@
       (free ? $('free-fold') : more).scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
     navBtns.cases.addEventListener('click', () => { if (!more.hidden && $('free-fold').open) { more.hidden = true; $('free-fold').open = false; mark('cases'); window.scrollTo({ top: 0, behavior: 'smooth' }); } else openMore(true); });
-    navBtns.daily.addEventListener('click', startDaily);
+    navBtns.daily.addEventListener('click', showDailyMenu);
     navBtns.shop.addEventListener('click', showShop);
     navBtns.friends.addEventListener('click', showFriends);
     navBtns.more.addEventListener('click', () => { if (!more.hidden && !$('free-fold').open) { more.hidden = true; mark('cases'); } else openMore(false); });
