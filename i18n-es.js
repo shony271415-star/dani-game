@@ -324,6 +324,7 @@
  "New personal best!": "¡Nuevo récord personal!",
  "Challenge back": "Devolver el desafío",
  "Challenge a friend": "Desafiar a un amigo",
+ "Can you solve it?": "¿Puedes resolverlo?",
  "I solved \"{0}\" in {1} on Crime Grid. Can you beat my time?": "Resolví «{0}» en {1} en Crime Grid. ¿Puedes superar mi tiempo?",
  "Install on iPhone": "Instalar en iPhone",
  "Open this page in <b>Safari</b>.": "Abre esta página en <b>Safari</b>.",
