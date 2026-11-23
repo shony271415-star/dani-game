@@ -532,9 +532,11 @@
   /* ---------- home ---------- */
   function showHome() {
     stopTimer();
+    const wasHome = $('home').classList.contains('active');
     $('map').classList.remove('active');
     $('home').classList.add('active');
     $('game').classList.remove('active');
+    if (!wasHome && window.__resetHomeNav) window.__resetHomeNav();
     renderGreet();
     renderCoins();
     renderJourney();
@@ -563,19 +565,19 @@
     const from = prev ? prev[0] : 1, pct = tier ? Math.round(((n - from) / (tier[0] - from)) * 100) : 100;
     const going = p.cur && p.cur.caseNum === n;
     $('journey').innerHTML = `<button class="play-card${isBoss(n) ? ' boss' : ''}" id="play-btn">
-        <span class="pc-ic">${ic('play', '▶️')}</span>
+        <span class="pc-ic">${document.body.classList.contains('noir') ? '<svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M8 3.5l15 9.5-15 9.5z" fill="#fff" stroke="#1a1a2e" stroke-width="2" stroke-linejoin="round"/></svg>' : ic('play', '▶️')}</span>
         <span class="pc-tx"><b>${going ? tr('Continue') : tr('Play')}</b><small>${tr('Level {0}', n)} · ${tr(d.name)}${isBoss(n) ? ' · ' + tr('BOSS') : ''}</small></span>
         <span class="lvl-badge">${n}</span>
       </button>
       <div class="journey-bar"><div style="width:${pct}%"></div></div>
-      <div class="streak">${tier ? trp(tier[0] - n, '1 level to {1}', '{0} levels to {1}', tr(tier[1])) : tr('Boss levels every 5 · how far can you go?')} · <button class="mini-link" id="map-btn">${(store.friends || []).length ? trp((store.friends || []).length, 'Map & 1 friend', 'Map & {0} friends') : tr('Map')}</button></div>`;
+      <div class="streak">${tier ? trp(tier[0] - n, '1 level to {1}', '{0} levels to {1}', tr(tier[1])) : tr('Boss levels every 5 · how far can you go?')} <span class="nb">· <button class="mini-link" id="map-btn">${(store.friends || []).length ? trp((store.friends || []).length, 'Map & 1 friend', 'Map & {0} friends') : tr('Map')}</button></span></div>`;
     $('play-btn').addEventListener('click', startJourney);
     $('map-btn').addEventListener('click', showMap);
   }
 
   function renderStorageNote() {
     let el = $('storage-note');
-    if (!el) { el = document.createElement('div'); el.id = 'storage-note'; $('greet').insertAdjacentElement('afterend', el); }
+    if (!el) { el = document.createElement('div'); el.id = 'storage-note'; $('daily').insertAdjacentElement('afterend', el); }
     const installed = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
     let msg = '';
@@ -883,13 +885,19 @@
   function renderDaily() {
     const t = today(), diff = DAILY_DIFF[t.weekday], d = DIFF[diff];
     const done = dailyLog()[t.num], p = prog('daily'), streak = dailyStreak();
-    const status = done ? `<span class="dc-done">✓ ${fmtTime(done.t)}</span>` : p.cur && p.cur.caseNum === t.num ? tr('Continue') : tr('Play');
-    $('daily').innerHTML = `<button class="daily-card" id="daily-btn">
+    const noir = document.body.classList.contains('noir');
+    const status = noir ? (done ? tr('SOLVED') : tr('OPEN'))
+      : done ? `<span class="dc-done">✓ ${fmtTime(done.t)}</span>` : p.cur && p.cur.caseNum === t.num ? tr('Continue') : tr('Play');
+    const parts = [I.weekday(t.weekday), tr(d.name), tr(d.sub).split(' · ')[0]];
+    if (noir && done) parts.push(`✓ ${fmtTime(done.t)}`);
+    const info = parts.map((x, i) => `<span style="white-space:nowrap">${x}${i < parts.length - 1 ? ' ·' : ''}</span>`).join(' ');
+    $('daily').innerHTML = `<button class="daily-card" id="daily-btn" data-tab="${esc(tr('CASE FILE'))}">
+        ${noir ? '<span class="clip" aria-hidden="true"></span>' : ''}
         <span class="dc-ic">${ic('calendar', '📅')}</span>
-        <span class="dc-tx"><b>${tr('Daily Case')}</b><small>${I.weekday(t.weekday)} · ${tr(d.name)} · ${tr(d.sub).split(' · ')[0]}</small></span>
-        <span class="badge">${status}</span>
+        <span class="dc-tx"><b>${tr('Daily Case')}</b><small>${info}</small></span>
+        <span class="badge${noir && done ? ' solved' : ''}">${status}</span>
       </button>
-      <div class="streak">${streak ? `${ic('flame', '🔥')} ${done ? tr('{0}-day streak', streak) : tr('{0}-day streak, solve today to keep it!', streak)}` : tr('A new case every day. Same one for everyone!')} · <button class="mini-link" id="cal-btn">${tr('Calendar')}</button></div>`;
+      <div class="streak">${streak ? `${ic('flame', '🔥')} ${done ? tr('{0}-day streak', streak) : tr('{0}-day streak, solve today to keep it!', streak)}` : tr('A new case every day. Same one for everyone!')} <span class="nb">· <button class="mini-link" id="cal-btn">${tr('Calendar')}</button></span></div>`;
     $('daily-btn').addEventListener('click', startDaily);
     $('cal-btn').addEventListener('click', showCalendar);
   }
@@ -1458,6 +1466,22 @@
   $('map-friends').addEventListener('click', showFriends);
   window.addEventListener('hashchange', handleLink);
   $('coins-pill').addEventListener('click', showShop);
+  // bottom navigation on the home screen (v2 only): the page has no #home-nav in the emoji edition
+  if ($('home-nav')) {
+    const more = $('more-panel'), navBtns = ['cases', 'daily', 'shop', 'friends', 'more'].reduce((o, k) => (o[k] = $('nav-' + k), o), {});
+    const mark = (k) => Object.entries(navBtns).forEach(([n, b]) => { b.classList.toggle('on', n === k); if (n === k) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+    const openMore = (free) => {
+      more.hidden = false; $('free-fold').open = !!free; mark(free ? 'cases' : 'more');
+      (free ? $('free-fold') : more).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    navBtns.cases.addEventListener('click', () => { if (!more.hidden && $('free-fold').open) { more.hidden = true; $('free-fold').open = false; mark('cases'); window.scrollTo({ top: 0, behavior: 'smooth' }); } else openMore(true); });
+    navBtns.daily.addEventListener('click', startDaily);
+    navBtns.shop.addEventListener('click', showShop);
+    navBtns.friends.addEventListener('click', showFriends);
+    navBtns.more.addEventListener('click', () => { if (!more.hidden && !$('free-fold').open) { more.hidden = true; mark('cases'); } else openMore(false); });
+    const resetNav = () => { more.hidden = true; $('free-fold').open = false; mark('cases'); };
+    window.__resetHomeNav = resetNav;
+  }
 
 
   /* ---------- modals ---------- */
