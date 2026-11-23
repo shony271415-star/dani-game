@@ -320,6 +320,7 @@
  "New personal best!": "שיא אישי חדש!",
  "Challenge back": "אתגר חזרה",
  "Challenge a friend": "לאתגר חבר",
+ "Can you solve it?": "מצליחים לפתור?",
  "I solved \"{0}\" in {1} on Crime Grid. Can you beat my time?": "פתרתי את \"{0}\" תוך {1} ב-Crime Grid. תצליחו לנצח את הזמן שלי?",
  "Install on iPhone": "התקנה באייפון",
  "Open this page in <b>Safari</b>.": "פתחו את הדף הזה ב-<b>Safari</b>.",

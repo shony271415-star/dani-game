@@ -1832,14 +1832,10 @@
     const dn = dname(S.diff);
     return S.slot === 'journey' ? tr('Level {0}', S.caseNum) + ' · ' + dn : S.slot === 'daily' ? tr('Daily') + ' · ' + dn : S.slot === 'challenge' ? tr('Challenge') + ' · ' + dn : tr('Level {0}', S.caseNum) + ' · ' + dn;
   }
-  function shareCardHtml(nStars) {
-    const sq = resultSquares();
-    return `<div class="share-card" dir="ltr"><div class="sc-h">CRIME GRID</div><div class="sc-sq">${sq.map((c) => `<i class="sq-${c}"></i>`).join('')}</div><div class="sc-key" dir="auto">${tr('🟩 alone · 🟨 with a hint · 🟥 revealed').split(' · ').map((x) => `<span>${esc(x)}</span>`).join(' · ')}</div>
-      <div class="sc-meta">${esc(resultLabel())}</div><div class="sc-meta">${fmtTime(S.elapsed)} · ${'★'.repeat(nStars)}${'☆'.repeat(3 - nStars)}</div></div>`;
-  }
+  // the result screen already shows level, time and stars once, so there is no separate result card any more
+  function shareCardHtml() { return ''; }
   function shareResult(nStars) {
-    const squares = resultSquares().map((c) => SQ_EMOJI[c]).join('');
-    const text = `Crime Grid · ${resultLabel()}\n${squares}\n⏱ ${fmtTime(S.elapsed)} · ${'⭐'.repeat(nStars)}\n${GAME_URL}`;
+    const text = `🕵️ Crime Grid · ${resultLabel()}\n⏱ ${fmtTime(S.elapsed)} · ${'⭐'.repeat(nStars)}\n${tr('Can you solve it?')}\n${GAME_URL}`;
     return shareText(text);
   }
   async function shareText(text) {

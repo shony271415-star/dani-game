@@ -319,6 +319,7 @@
  "New personal best!": "Новый личный рекорд!",
  "Challenge back": "Ответный вызов",
  "Challenge a friend": "Бросить вызов другу",
+ "Can you solve it?": "Сможешь решить?",
  "I solved \"{0}\" in {1} on Crime Grid. Can you beat my time?": "Я раскрыл(а) дело «{0}» за {1} в Crime Grid. Сможешь быстрее?",
  "Install on iPhone": "Установка на iPhone",
  "Open this page in <b>Safari</b>.": "Откройте эту страницу в <b>Safari</b>.",
