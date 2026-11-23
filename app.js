@@ -24,22 +24,22 @@
   /* ---------- skin packs sold in the coin shop ---------- */
   const PACKS = [
     { id: 'classic', name: 'Classic Detectives', price: 0, rarity: 'Basic', desc: 'The original cast.', emoji: null },
-    { id: 'chefs', name: 'Kitchen Crew', price: 10, rarity: 'Common', desc: 'Chef hats, curly mustaches and a pinch of suspicion.', emoji: ['👨‍🍳', '👩‍🍳', '🧑‍🍳'] },
-    { id: 'clowns', name: 'Circus Clowns', price: 15, rarity: 'Common', desc: 'Red noses, wild hair. Nobody trusts a clown.', emoji: ['🤡', '🎪', '🎈', '🤹'] },
-    { id: 'cowboys', name: 'Wild West', price: 20, rarity: 'Common', desc: 'Cowboy hats, bandanas and a shiny sheriff star.', emoji: ['🤠', '🐴', '🌵', '⭐'] },
-    { id: 'robots', name: 'Robo Squad', price: 20, rarity: 'Common', desc: 'Beep boop. Box heads with glowing LED eyes.', emoji: ['🤖', '🦾', '🔋', '⚙️'] },
-    { id: 'pirates', name: 'Pirate Crew', price: 25, rarity: 'Rare', desc: 'Eye patches, tricorns and gold earrings. Arr!', emoji: ['🏴‍☠️', '🦜', '⚓', '🗺️', '💰'] },
-    { id: 'ninjas', name: 'Shadow Ninjas', price: 25, rarity: 'Rare', desc: 'Silent hoods, colourful headbands, one throwing star.', emoji: ['🥷', '🗡️', '🌙', '🎋'] },
-    { id: 'wizards', name: 'Wizard Academy', price: 30, rarity: 'Rare', desc: 'Starry hats, long beards and glowing wands.', emoji: ['🧙', '🧙‍♀️', '🧙‍♂️', '🪄', '🔮'] },
-    { id: 'dinos', name: 'Dino Hoodies', price: 30, rarity: 'Rare', desc: 'Everyone in a dinosaur onesie. Rawr.', emoji: ['🦖', '🦕', '🐊', '🐉'] },
-    { id: 'heroes', name: 'Super Squad', price: 35, rarity: 'Epic', desc: 'Masks, capes and big shiny emblems.', emoji: ['🦸', '🦸‍♀️', '🦸‍♂️', '⚡', '🛡️'] },
-    { id: 'sea', name: 'Deep Sea Gang', price: 40, rarity: 'Epic', desc: 'Octopus, shark, pufferfish, crab, jellyfish and a whale.', emoji: ['🐙', '🦈', '🐡', '🦀', '🪼', '🐳'] },
-    { id: 'pets', name: 'Pet Detectives', price: 300, rarity: 'Common', desc: 'Cats, dogs, foxes, owls and more. Paws off the evidence!', emoji: ['🐱', '🐶', '🦊', '🐰', '🐻', '🐼', '🦉', '🐸', '🐯', '🐨'] },
-    { id: 'gangsters', name: 'Noir Gangsters', price: 600, rarity: 'Rare', desc: 'Fedoras, trench coats and very dark sunglasses.', emoji: ['🕴️', '🤵', '🤵‍♀️', '🧔‍♂️', '👩‍🦰', '🧑‍💼', '👨‍💼', '👩‍💼'] },
-    { id: 'monsters', name: 'Monster Mash', price: 1000, rarity: 'Rare', desc: 'Vampires, mummies, ghosts and one very polite werewolf.', emoji: ['🧛', '🧟', '👻', '🧙', '🧌', '🐺', '🎃', '💀', '🧞'] },
-    { id: 'royals', name: 'Royal Court', price: 1600, rarity: 'Epic', desc: 'Crowns, jewels and ermine, in a shimmering gold frame.', emoji: ['🤴', '👸', '🫅', '👑', '🦄', '💎'] },
-    { id: 'space', name: 'Space Crew', price: 2500, rarity: 'Epic', desc: 'Astronauts and aliens, framed by the stars.', emoji: ['👩‍🚀', '🧑‍🚀', '👨‍🚀', '👽', '🤖', '👾', '🛸'] },
-    { id: 'neon', name: 'Neon Legends', price: 4000, rarity: 'Legendary', desc: 'Glowing neon characters in a pulsing frame.', emoji: ['🌟', '💫', '⚡', '🔮', '🌈', '🪩', '✨'] },
+    { id: 'chefs', name: 'Kitchen Crew', price: 90, rarity: 'Common', desc: 'Chef hats, curly mustaches and a pinch of suspicion.', emoji: ['👨‍🍳', '👩‍🍳', '🧑‍🍳'] },
+    { id: 'clowns', name: 'Circus Clowns', price: 100, rarity: 'Common', desc: 'Red noses, wild hair. Nobody trusts a clown.', emoji: ['🤡', '🎪', '🎈', '🤹'] },
+    { id: 'cowboys', name: 'Wild West', price: 110, rarity: 'Common', desc: 'Cowboy hats, bandanas and a shiny sheriff star.', emoji: ['🤠', '🐴', '🌵', '⭐'] },
+    { id: 'pets', name: 'Pet Detectives', price: 120, rarity: 'Common', desc: 'Cats, dogs, foxes, owls and more. Paws off the evidence!', emoji: ['🐱', '🐶', '🦊', '🐰', '🐻', '🐼', '🦉', '🐸', '🐯', '🐨'] },
+    { id: 'robots', name: 'Robo Squad', price: 120, rarity: 'Common', desc: 'Beep boop. Box heads with glowing LED eyes.', emoji: ['🤖', '🦾', '🔋', '⚙️'] },
+    { id: 'pirates', name: 'Pirate Crew', price: 150, rarity: 'Rare', desc: 'Eye patches, tricorns and gold earrings. Arr!', emoji: ['🏴‍☠️', '🦜', '⚓', '🗺️', '💰'] },
+    { id: 'ninjas', name: 'Shadow Ninjas', price: 180, rarity: 'Rare', desc: 'Silent hoods, colourful headbands, one throwing star.', emoji: ['🥷', '🗡️', '🌙', '🎋'] },
+    { id: 'dinos', name: 'Dino Hoodies', price: 210, rarity: 'Rare', desc: 'Everyone in a dinosaur onesie. Rawr.', emoji: ['🦖', '🦕', '🐊', '🐉'] },
+    { id: 'wizards', name: 'Wizard Academy', price: 250, rarity: 'Rare', desc: 'Starry hats, long beards and glowing wands.', emoji: ['🧙', '🧙‍♀️', '🧙‍♂️', '🪄', '🔮'] },
+    { id: 'gangsters', name: 'Noir Gangsters', price: 280, rarity: 'Rare', desc: 'Fedoras, trench coats and very dark sunglasses.', emoji: ['🕴️', '🤵', '🤵‍♀️', '🧔‍♂️', '👩‍🦰', '🧑‍💼', '👨‍💼', '👩‍💼'] },
+    { id: 'heroes', name: 'Super Squad', price: 400, rarity: 'Epic', desc: 'Masks, capes and big shiny emblems.', emoji: ['🦸', '🦸‍♀️', '🦸‍♂️', '⚡', '🛡️'] },
+    { id: 'sea', name: 'Deep Sea Gang', price: 480, rarity: 'Epic', desc: 'Octopus, shark, pufferfish, crab, jellyfish and a whale.', emoji: ['🐙', '🦈', '🐡', '🦀', '🪼', '🐳'] },
+    { id: 'monsters', name: 'Monster Mash', price: 560, rarity: 'Epic', desc: 'Vampires, mummies, ghosts and one very polite werewolf.', emoji: ['🧛', '🧟', '👻', '🧙', '🧌', '🐺', '🎃', '💀', '🧞'] },
+    { id: 'royals', name: 'Royal Court', price: 650, rarity: 'Epic', desc: 'Crowns, jewels and ermine, in a shimmering gold frame.', emoji: ['🤴', '👸', '🫅', '👑', '🦄', '💎'] },
+    { id: 'space', name: 'Space Crew', price: 800, rarity: 'Epic', desc: 'Astronauts and aliens, framed by the stars.', emoji: ['👩‍🚀', '🧑‍🚀', '👨‍🚀', '👽', '🤖', '👾', '🛸'] },
+    { id: 'neon', name: 'Neon Legends', price: 1500, rarity: 'Legendary', desc: 'Glowing neon characters in a pulsing frame.', emoji: ['🌟', '💫', '⚡', '🔮', '🌈', '🪩', '✨'] },
     { id: 'masquerade', name: 'Masquerade Ball', iap: 'skin_masquerade', usd: '$1.99', rarity: 'Premium', desc: 'Venetian masks, feathers and velvet. Comes with a gilded frame.', emoji: ['🎭', '🦚', '🪶', '💃', '🕺', '🎩'] },
     { id: 'cyber', name: 'Cyber Agents', iap: 'skin_cyber', usd: '$2.99', rarity: 'Premium', desc: 'Glowing visors and live scan lines. The flashiest look in the game.', emoji: ['🦾', '🤖', '🕶️', '👾', '💿', '🛰️'] },
   ];
@@ -244,7 +244,7 @@
     store.chestStars = (store.chestStars || 0) + c.stars;
     while (store.chestStars >= CHEST_GOAL) {
       store.chestStars -= CHEST_GOAL;
-      const cheap = PACKS.filter((x) => !x.iap && x.price > 0 && x.price <= 40 && !(store.owned || ['classic']).includes(x.id));
+      const cheap = PACKS.filter((x) => !x.iap && x.price > 0 && x.price <= 120 && !(store.owned || ['classic']).includes(x.id));
       if (cheap.length && Math.random() < 0.3) {
         const x = cheap[Math.floor(Math.random() * cheap.length)];
         store.owned = [...(store.owned || ['classic']), x.id];
@@ -481,7 +481,7 @@
 
   /* ---------- profile ---------- */
   function totalSolved() { return DIFFS.reduce((n, d) => n + prog(d.key).solved, 0) + prog('journey').solved + Object.keys(store.dailyLog || {}).length; }
-  function coins() { if (typeof store.coins !== 'number') store.coins = 100; return store.coins; }
+  function coins() { if (typeof store.coins !== 'number') store.coins = 30; return store.coins; }
   function addCoins(n) { coins(); store.coins += n; save(); renderCoins(); }
   function renderCoins() { const el = $('coins-pill'); if (el) el.innerHTML = `${coinIc()} <b>${I.num(coins())}</b><span class="cp-shop">${tr('SHOP')}</span>`; }
   function checkAchievements(ctx) {
