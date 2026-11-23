@@ -1785,32 +1785,23 @@
 
   /* ---------- "case closed" cinematic (v2) and the Wordle-style result card ---------- */
   const GAME_URL = 'https://shony271415-star.github.io/dani-game/v2/';
-  // one coloured square per person: nearest of nine emoji squares (no hint about who did it)
-  function squareOf(hex) {
-    const n = parseInt(hex.slice(1), 16), r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
-    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
-    if (mx < 0.3) return ['⬛', '#2b2b33'];
-    if (d < 0.12) return mx > 0.8 ? ['⬜', '#eeeeee'] : ['⬛', '#2b2b33'];
-    let h = mx === r ? ((g - b) / d + 6) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60;
-    if (h >= 15 && h < 50 && mx < 0.65) return ['🟫', '#8a5a32'];
-    if (h < 15 || h >= 335) return ['🟥', '#e0453a'];
-    if (h < 42) return ['🟧', '#f08c00'];
-    if (h < 70) return ['🟨', '#f4c430'];
-    if (h < 170) return ['🟩', '#3aa65a'];
-    if (h < 262) return ['🟦', '#2f6fd8'];
-    return ['🟪', '#8a4fd6'];
+  // one square per suspect (no spoilers): green = solved by logic alone, yellow = used a clue/check, red = a suspect was revealed
+  function resultSquares() {
+    const n = S.P.people.length, red = Math.min(S.hints || 0, n), yellow = Math.min(S.helps || 0, n - red);
+    return [].concat(Array(n - red - yellow).fill('g'), Array(yellow).fill('y'), Array(red).fill('r'));
   }
+  const SQ_EMOJI = { g: '🟩', y: '🟨', r: '🟥' };
   function resultLabel() {
     const dn = dname(S.diff);
     return S.slot === 'journey' ? tr('Level {0}', S.caseNum) + ' · ' + dn : S.slot === 'daily' ? tr('Daily') + ' · ' + dn : S.slot === 'challenge' ? tr('Challenge') + ' · ' + dn : tr('Level {0}', S.caseNum) + ' · ' + dn;
   }
   function shareCardHtml(nStars) {
-    const sq = S.P.people.map((p) => squareOf(p.color)[1]);
-    return `<div class="share-card" dir="ltr"><div class="sc-h">CRIME GRID</div><div class="sc-sq">${sq.map((c) => `<i style="background:${c}"></i>`).join('')}</div>
+    const sq = resultSquares();
+    return `<div class="share-card" dir="ltr"><div class="sc-h">CRIME GRID</div><div class="sc-sq">${sq.map((c) => `<i class="sq-${c}"></i>`).join('')}</div><div class="sc-key" dir="auto">${esc(tr('🟩 alone · 🟨 with a hint · 🟥 revealed'))}</div>
       <div class="sc-meta">${esc(resultLabel())}</div><div class="sc-meta">${fmtTime(S.elapsed)} · ${'★'.repeat(nStars)}${'☆'.repeat(3 - nStars)}</div></div>`;
   }
   function shareResult(nStars) {
-    const squares = S.P.people.map((p) => squareOf(p.color)[0]).join('');
+    const squares = resultSquares().map((c) => SQ_EMOJI[c]).join('');
     const text = `Crime Grid · ${resultLabel()}\n${squares}\n⏱ ${fmtTime(S.elapsed)} · ${'⭐'.repeat(nStars)}\n${GAME_URL}`;
     return shareText(text);
   }

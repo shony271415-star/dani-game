@@ -85,6 +85,7 @@
  "Not them. Who else was in the same room? Try the glowing one 🙂": "Не он. Кто ещё был в той же комнате? Попробуйте светящегося 🙂",
  "POLICE LINE · DO NOT CROSS": "ПОЛИЦЕЙСКОЕ ОГРАЖДЕНИЕ · НЕ ПЕРЕХОДИТЬ",
  "CLOSED": "ЗАКРЫТО",
+ "🟩 alone · 🟨 with a hint · 🟥 revealed": "🟩 сам · 🟨 с подсказкой · 🟥 раскрыт",
  "The killer": "Убийца",
  "Tap to skip": "Нажмите, чтобы пропустить",
  "Share result": "Поделиться результатом",
