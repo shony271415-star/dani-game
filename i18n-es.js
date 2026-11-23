@@ -69,6 +69,11 @@
   I.packs.es = {
     name: "Español",
     ui: {
+ "POLICE LINE · DO NOT CROSS": "LÍNEA POLICIAL · NO CRUZAR",
+ "CLOSED": "CERRADO",
+ "The killer": "El asesino",
+ "Tap to skip": "Toca para saltar",
+ "Share result": "Compartir resultado",
  "FILED": "ARCHIVADO",
  "{0}/{1} placed": "{0}/{1} colocados",
  "+{0} coins": "+{0} monedas",

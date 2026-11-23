@@ -1634,6 +1634,7 @@
       if (isBest) pg.best = S.elapsed;
     }
     save();
+    const showResult = () => {
     sfx('win'); confetti();
     const levelTxt = S.slot === 'journey' ? `<div class="lvl-done">${tr('Level {0} complete!', S.caseNum)}</div>` : '';
     const helpTxt = [S.helps ? '🧾 ' + trp(S.helps, '1 clue/check', '{0} clues/checks') : '', S.hints ? '👁️ ' + trp(S.hints, '1 reveal', '{0} reveals') : ''].filter(Boolean).join(' · ');
@@ -1643,10 +1644,13 @@
       ${levelTxt}<p class="stars-row" style="font-size:28px;margin:6px 0">${stars(nStars)}</p>
       <p class="earned">${coinIc()} ${tr('+{0} coins', '<b id="earned">0</b>')}</p>
       <p>${ART ? '' : '⏱ '}${fmtTime(S.elapsed)}${helpTxt ? ' · ' + plain(helpTxt) : ''}${isBest ? '<br>' + tr('New personal best!') : ''}${dailyTxt}</p>
+      ${ART ? shareCardHtml(nStars) : ''}
       ${ret.lines.length ? `<div class="ret-lines">${ret.lines.map((l) => `<div>${l}</div>`).join('')}</div>` : ''}
       <div class="row">${S.slot === 'daily' || S.slot === 'challenge' ? '' : `<button class="primary" data-act="next">${S.slot === 'journey' ? tr('Level {0} →', S.caseNum + 1) : tr('Next case →')}</button>`}<button class="${S.slot === 'daily' || S.slot === 'challenge' ? 'primary' : 'secondary'}" data-act="home">${tr('Menu')}</button></div>
+      ${ART ? `<div class="row"><button class="primary share-res" data-act="shareres">${ic('share', '📤')} ${tr('Share result')}</button></div>` : ''}
       <div class="row"><button class="secondary duel-btn" data-act="duel">${ic('knife', '⚔️')} ${S.slot === 'challenge' ? tr('Challenge back') : tr('Challenge a friend')}</button></div>`, {
       next: nextCase,
+      shareres: () => shareResult(nStars),
       duel: () => share(tr('I solved "{0}" in {1} on Crime Grid. Can you beat my time?', caseText().title, fmtTime(S.elapsed)), challengeLink()),
       home: () => { closeModal(); showHome(); },
     });
@@ -1658,6 +1662,64 @@
       if (shown >= earned) { clearInterval(tick); sfx('coin'); }
     }, 45);
     checkAchievements({ diff: S.diff, clean: !S.hints && !S.helps, time: S.elapsed });
+    };
+    if (ART) closedAnimation(m, showResult); else showResult();
+  }
+
+  /* ---------- "case closed" cinematic (v2) and the Wordle-style result card ---------- */
+  const GAME_URL = 'https://shony271415-star.github.io/dani-game/v2/';
+  // one coloured square per person: nearest of nine emoji squares (no hint about who did it)
+  function squareOf(hex) {
+    const n = parseInt(hex.slice(1), 16), r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+    if (mx < 0.3) return ['⬛', '#2b2b33'];
+    if (d < 0.12) return mx > 0.8 ? ['⬜', '#eeeeee'] : ['⬛', '#2b2b33'];
+    let h = mx === r ? ((g - b) / d + 6) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60;
+    if (h >= 15 && h < 50 && mx < 0.65) return ['🟫', '#8a5a32'];
+    if (h < 15 || h >= 335) return ['🟥', '#e0453a'];
+    if (h < 42) return ['🟧', '#f08c00'];
+    if (h < 70) return ['🟨', '#f4c430'];
+    if (h < 170) return ['🟩', '#3aa65a'];
+    if (h < 262) return ['🟦', '#2f6fd8'];
+    return ['🟪', '#8a4fd6'];
+  }
+  function resultLabel() {
+    const dn = dname(S.diff);
+    return S.slot === 'journey' ? tr('Level {0}', S.caseNum) + ' · ' + dn : S.slot === 'daily' ? tr('Daily') + ' · ' + dn : S.slot === 'challenge' ? tr('Challenge') + ' · ' + dn : tr('Level {0}', S.caseNum) + ' · ' + dn;
+  }
+  function shareCardHtml(nStars) {
+    const sq = S.P.people.map((p) => squareOf(p.color)[1]);
+    return `<div class="share-card" dir="ltr"><div class="sc-h">CRIME GRID</div><div class="sc-sq">${sq.map((c) => `<i style="background:${c}"></i>`).join('')}</div>
+      <div class="sc-meta">${esc(resultLabel())}</div><div class="sc-meta">${fmtTime(S.elapsed)} · ${'★'.repeat(nStars)}${'☆'.repeat(3 - nStars)}</div></div>`;
+  }
+  function shareResult(nStars) {
+    const squares = S.P.people.map((p) => squareOf(p.color)[0]).join('');
+    const text = `Crime Grid · ${resultLabel()}\n${squares}\n⏱ ${fmtTime(S.elapsed)} · ${'⭐'.repeat(nStars)}\n${GAME_URL}`;
+    return shareText(text);
+  }
+  async function shareText(text) {
+    try { if (navigator.share) { await navigator.share({ title: 'Crime Grid', text }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+    try { await navigator.clipboard.writeText(text); toast(`<span class="ti">${ic('check', '✓')}</span><span><b>${tr('Link copied!')}</b><small>${tr('Paste it to your friend in any chat.')}</small></span>`); return; } catch (e) { /* fall through */ }
+    modal(`<h2>${tr('Send this to a friend')}</h2><textarea class="name-in share-box" readonly>${esc(text)}</textarea>
+      <div class="row"><button class="primary" data-act="close">${tr('Done')}</button></div>`);
+  }
+  function closedAnimation(m, done) {
+    const calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const tape = `<span>${tr('POLICE LINE · DO NOT CROSS')}</span>`.repeat(6);
+    const ov = document.createElement('div');
+    ov.className = 'closed-ov' + (calm ? ' calm' : '');
+    ov.innerHTML = `<div class="co-tape t1"><div>${tape}</div></div><div class="co-tape t2"><div>${tape}</div></div><div class="co-spot"></div>
+      <div class="co-card"><div class="co-photo">${face(m)}<b class="co-q">?</b></div><div class="co-label">${tr('The killer')}</div><div class="co-name">${esc(m.name)}</div></div>
+      <div class="co-stamp">${tr('CLOSED')}</div><div class="co-skip">${tr('Tap to skip')}</div>`;
+    document.body.appendChild(ov);
+    let over = false;
+    const timers = [];
+    const finish = () => { if (over) return; over = true; timers.forEach(clearTimeout); ov.classList.add('out'); setTimeout(() => ov.remove(), 400); done(); };
+    const at = (ms, fn) => timers.push(setTimeout(fn, calm ? ms / 3 : ms));
+    at(1500, () => { ov.classList.add('rev'); sfx('unlock'); });
+    at(2500, () => { ov.classList.add('stamped'); sfx('place'); if (navigator.vibrate) try { navigator.vibrate(40); } catch (e) { /* ignore */ } });
+    at(3900, finish);
+    ov.addEventListener('click', finish);
   }
 
   /* ---------- install as an app ---------- */

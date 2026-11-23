@@ -65,6 +65,11 @@
   I.packs.he = {
     name: "עברית",
     ui: {
+ "POLICE LINE · DO NOT CROSS": "קו משטרה · אין לעבור",
+ "CLOSED": "נסגר",
+ "The killer": "הרוצח/ת",
+ "Tap to skip": "הקשו לדילוג",
+ "Share result": "שיתוף התוצאה",
  "FILED": "הוצב",
  "{0}/{1} placed": "{0}/{1} הוצבו",
  "+{0} coins": "+{0} מטבעות",
