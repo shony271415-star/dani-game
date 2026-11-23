@@ -1044,7 +1044,7 @@
   function updateSub() {
     const dn = dname(S.diff);
     const kind = S.slot === 'challenge' ? tr('Challenge') + ' · ' + dn : S.slot === 'daily' ? tr('Daily') + ' · ' + dn : S.slot === 'tutorial' ? tr('Tutorial') : S.slot === 'journey' ? tr('Level {0}', S.caseNum) + ' · ' + dn + (isBoss(S.caseNum) ? ' · ' + tr('Boss') : '') : dn + ' · ' + tr('Level {0}', S.caseNum);
-    $('case-sub').textContent = `${I.themeName(S.P.theme.name)} · ${kind} · ${ART ? '' : '⏱ '}${fmtTime(S.elapsed)}`;
+    $('case-sub').textContent = ART ? `${fmtTime(S.elapsed)} · ${kind} · ${I.themeName(S.P.theme.name)}` : `${I.themeName(S.P.theme.name)} · ${kind} · ⏱ ${fmtTime(S.elapsed)}`;
   }
 
   function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
@@ -1323,12 +1323,27 @@
       const clues = person.isVictim
         ? `<div>${tr('<b>The victim.</b> Found in the last remaining square.')}</div>`
         : clueLines(person).map((c) => `<div>${rich(c)}</div>`).join('');
+      card.style.setProperty('--sc', person.color);
+      if (ART && S.place[p] >= 0) card.dataset.stamp = tr('FILED');
       card.innerHTML = `<div class="face">${face(person)}<span class="lt" style="background:${person.color}">${person.letter}</span></div>
         <div><div class="nm">${esc(person.name)}${person.isVictim ? (ART ? ` <span class="rip">${tr('rip')}</span>` : ' ☠️') : ''}</div><div class="cl">${clues}</div></div>`;
       card.addEventListener('click', () => onSuspect(p));
       list.appendChild(card);
     });
     renderAccuse();
+    updateMeter();
+  }
+
+  // progress: how many of the people are already placed on the board (v2 only)
+  function updateMeter() {
+    const n = $('meter-n'), m = $('meter'), f = $('meter-fill');
+    if (!n || !m || !S) return;
+    const total = S.P.people.length, done = S.place.filter((x) => x >= 0).length;
+    n.hidden = m.hidden = false;
+    n.textContent = `${done}/${total}`;
+    n.title = tr('{0}/{1} placed', done, total);
+    n.classList.toggle('full', done === total);
+    f.style.width = (100 * done / total) + '%';
   }
 
   // the clue lines of a suspect in the current language (English comes straight from the engine)

@@ -69,6 +69,8 @@
   I.packs.es = {
     name: "Español",
     ui: {
+ "FILED": "ARCHIVADO",
+ "{0}/{1} placed": "{0}/{1} colocados",
  "+{0} coins": "+{0} monedas",
  "{0} unlocked": "¡{0} desbloqueado!",
  "Available in the app": "Disponible en la app",

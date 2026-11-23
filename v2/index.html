@@ -752,6 +752,47 @@ body.lang-he .home-nav button, body.lang-ru .home-nav button { letter-spacing: 0
 @media (max-height: 700px) { body.noir #home .logo { margin-top: 24px; } body.noir #home .logo svg { width: 70px; height: 70px; } body.noir #home h1 { font-size: 40px; margin-top: 4px; }
   .tape { margin: 12px -40px 14px; } body.noir .daily-card { margin-top: 22px; } body.noir .play-card { min-height: 88px; } body.noir #home > .hb-sky { top: 92px; } }
 </style>
+
+<style>
+/* ---------- v2 game screen: lamp light, progress meter, big tool dock, evidence-card stamps ---------- */
+body.noir .topbar { position: sticky; }
+body.noir .topbar .tb-right { display: flex; align-items: center; gap: 2px; flex: 0 0 auto; }
+body.noir .topbar #back { flex: 0 0 auto; min-width: 44px; min-height: 44px; }
+body.noir .topbar #howto-game { min-width: 44px; min-height: 44px; }
+body.noir .topbar .title { flex: 1 1 auto; padding: 0 2px; }
+body.noir .topbar .title div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.noir .meter-n { font: 700 12px/1 "Courier Prime", monospace; color: var(--gold); border: 1.5px solid rgba(217,164,65,.7); border-radius: 10px; padding: 4px 6px; white-space: nowrap; background: rgba(217,164,65,.08); direction: ltr; unicode-bidi: isolate; }
+body.noir .meter-n.full { background: var(--gold); color: #1c1822; }
+body.noir .meter { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255,255,255,.08); direction: ltr; }
+body.noir .meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #b8822a, #f0c15a); box-shadow: 0 0 8px rgba(240,193,90,.7); transition: width .35s ease; }
+/* soft desk-lamp light around the board (behind it, so the board stays fully readable) */
+body.noir .board-wrap { position: relative; }
+body.noir .board-wrap::before { content: ""; position: absolute; left: 0; right: 0; top: -6%; bottom: -6%; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 45%, rgba(255,205,120,.20), rgba(255,170,80,.07) 45%, transparent 70%); }
+body.noir .board { position: relative; box-shadow: 0 0 0 1px rgba(217,164,65,.5), 0 0 26px rgba(240,180,90,.22), 0 14px 30px rgba(0,0,0,.7); }
+body.noir .board-wrap .board { z-index: 1; }
+/* tool dock: always visible under the board, 44px+ touch targets */
+body.noir .tools { gap: 5px; margin: 8px 6px 0; padding: 6px; background: linear-gradient(#1d1726, #15111c); border: 1px solid rgba(217,164,65,.38); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.05); }
+body.noir .tool { flex: 1 1 0; min-width: 44px; min-height: 46px; padding: 3px 2px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; font-size: 11.5px; line-height: 1.1; border-radius: 9px; }
+body.noir .tool.icon-only { flex: 0 0 46px; }
+body.noir .tool .ic { display: inline-flex; }
+body.noir .tool .ic svg { width: 24px; height: 24px; }
+body.noir .tool span[data-t], body.noir .tool > span:last-child:not(.ic) { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.noir #hint { border-color: rgba(240,193,90,.9); }
+body.noir .tool.on { box-shadow: 0 0 12px rgba(240,193,90,.45); }
+body.noir .status { margin-top: 5px; min-height: 18px; font-size: 12.5px; }
+@media (max-width: 400px) { body.noir .tools { margin: 6px 3px 0; gap: 3px; padding: 4px; } body.noir .tool { font-size: 10.5px; } body.noir .tool .ic svg { width: 22px; height: 22px; } }
+/* suspect cards: colour tab on the edge, clear FILED stamp when placed */
+body.noir .suspect { padding-inline-start: 14px; }
+body.noir .suspect::before { content: ""; position: absolute; top: 0; bottom: 0; inset-inline-start: 0; width: 7px; background: var(--sc, #888); border-radius: 3px 0 0 3px; }
+body.rtl.noir .suspect::before { border-radius: 0 3px 3px 0; }
+body.noir .suspect.placed { opacity: 1; }
+body.noir .suspect.placed > div { opacity: .5; }
+body.noir .suspect.placed .face { filter: grayscale(.9) brightness(.9); }
+body.noir .suspect.placed::after { content: attr(data-stamp); top: 6px; bottom: auto; right: 8px; left: auto; font-size: 12.5px; letter-spacing: 1.5px; padding: 0 6px; transform: rotate(-9deg); border: 2.5px solid var(--crimson); border-radius: 3px; color: var(--crimson); background: rgba(248,231,196,.55); font-weight: 700; text-transform: uppercase; z-index: 2; }
+body.rtl.noir .suspect.placed::after { right: auto; left: 8px; letter-spacing: 0; }
+body.noir .suspect.sel { transform: scale(1.015); }
+</style>
 </head>
 <body class="art noir">
 
@@ -801,7 +842,8 @@ body.lang-he .home-nav button, body.lang-ru .home-nav button { letter-spacing: 0
   <div class="topbar" id="topbar">
     <button id="back" aria-label="Back" data-t-label="Back">←</button>
     <div class="title"><b id="case-title"></b><div id="case-sub"></div></div>
-    <button id="howto-game" aria-label="Help" data-t-label="Help">?</button>
+    <div class="tb-right"><span class="meter-n" id="meter-n" hidden></span><button id="howto-game" aria-label="Help" data-t-label="Help">?</button></div>
+    <div class="meter" id="meter" hidden><i id="meter-fill"></i></div>
   </div>
   <div class="intro" id="intro"></div>
   <div class="play-area" id="play-area">
@@ -810,9 +852,9 @@ body.lang-he .home-nav button, body.lang-ru .home-nav button { letter-spacing: 0
       <button class="tool on" id="mode-place" data-ic="hand"><span data-t="Place">Place</span></button>
       <button class="tool" id="mode-draft" data-ic="pencil"><span data-t="Draft">Draft</span></button>
       <button class="tool" id="mode-x" data-ic="cross"><span data-t="Mark">Mark</span></button>
-      <button class="tool" id="undo" aria-label="Undo" data-t-label="Undo" data-ic="undo"></button>
+      <button class="tool icon-only" id="undo" aria-label="Undo" data-t-label="Undo" data-ic="undo"></button>
       <button class="tool" id="hint" data-ic="bulb"><span data-t="Help">Help</span></button>
-      <button class="tool" id="reset" aria-label="Clear" data-t-label="Clear" data-ic="trash"></button>
+      <button class="tool icon-only" id="reset" aria-label="Clear" data-t-label="Clear" data-ic="trash"></button>
     </div>
     <div class="status" id="status"></div>
     <div class="coach" id="coach" hidden></div>

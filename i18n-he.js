@@ -65,6 +65,8 @@
   I.packs.he = {
     name: "עברית",
     ui: {
+ "FILED": "הוצב",
+ "{0}/{1} placed": "{0}/{1} הוצבו",
  "+{0} coins": "+{0} מטבעות",
  "{0} unlocked": "{0} נפתח!",
  "Available in the app": "זמין באפליקציה",
