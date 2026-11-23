@@ -1615,7 +1615,7 @@
   let modalActions = {}, modalSticky = false;
   function modal(html, actions, sticky) {
     $('modal-body').innerHTML = html;
-    $('modal-body').className = 'modal';
+    $('modal-body').className = /class="(shop|ach|friend)-list/.test(html) ? 'modal long' : 'modal';
     modalActions = actions || {};
     modalSticky = !!sticky;
     $('modal').classList.add('show');
