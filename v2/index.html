@@ -394,6 +394,21 @@
   .zone-label.zl-l { left: 1px; transform: none; }
   .zone-label.zl-r { left: auto; right: 1px; transform: none; }
   @media (max-width: 400px) { .tools { gap: 3px; margin: 7px 2px 0; } .tool { padding: 5px 5px; font-size: 12px; } body.art .tool .ic svg { width: 16px; height: 16px; } }
+  /* online friends */
+  .my-id { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 6px 0; }
+  .my-id small { flex-basis: 100%; text-align: center; }
+  .id-code { font: 700 28px/1.1 "Courier Prime", monospace; letter-spacing: 5px; color: #d9a441; user-select: all; -webkit-user-select: all; }
+  .my-id button { min-height: 40px; padding: 4px 14px; }
+  .add-id { display: flex; gap: 8px; margin: 8px 0 2px; }
+  .add-id input { flex: 1; min-width: 0; margin: 0; text-transform: uppercase; text-align: center; font: 700 20px "Courier Prime", monospace; letter-spacing: 3px; }
+  .add-id button { flex: none; min-width: 80px; }
+  .id-msg { margin: 6px 0 14px; min-height: 1.2em; text-align: center; line-height: 1.45; } .id-msg small { display: block; line-height: 1.45; }
+  .add-id input::placeholder { font-size: 15px; letter-spacing: 0; text-transform: none; }
+  .on-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #3fd17a; box-shadow: 0 0 6px #3fd17a; vertical-align: middle; }
+  .mini-race { flex: none; width: 44px; height: 44px; border-radius: 10px; border: 1.5px solid #d9a441; background: rgba(217,164,65,.12); display: grid; place-items: center; padding: 0; }
+  .mini-race .ic svg { width: 22px; height: 22px; }
+  .other-ways { margin: 8px 0; text-align: start; } .other-ways summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
+  .forget { text-align: center; margin: 4px 0; } .linkish { background: none; border: none; text-decoration: underline; font-size: 13px; opacity: .75; color: inherit; min-height: 36px; }
   /* live race */
   .race-cta { display: flex; flex-direction: column; gap: 6px; margin: 8px 0 10px; text-align: center; }
   .race-diffs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }

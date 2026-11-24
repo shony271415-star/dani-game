@@ -92,5 +92,6 @@
     del: (p) => req('DELETE', p),
     query: (p, qs) => req('GET', p, undefined, qs),
     watch,
+    forget: () => { auth = null; try { localStorage.removeItem(AUTH_KEY); } catch (e) { /* ignore */ } },
   };
 })();

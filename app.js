@@ -743,28 +743,51 @@
   /* ---------- friends ---------- */
   function addFriend(card, quiet) {
     if (!card || !card.i || !card.n || card.i === myId()) return false;
+    if (card.u && NET && card.u === NET.uid()) return false;
     store.friends = store.friends || [];
-    const f = { i: String(card.i).slice(0, 12), n: String(card.n).slice(0, 18), l: Math.max(1, Math.min(1e7, +card.l || 1)), s: PACK[card.s] ? card.s : 'classic', d: +card.d || 0, t: +card.t || 0, at: today().num };
-    const k = store.friends.findIndex((x) => x.i === f.i);
+    const k = store.friends.findIndex((x) => x.i === String(card.i).slice(0, 12) || (card.u && x.u === card.u));
+    const old = k >= 0 ? store.friends[k] : {};
+    const f = { i: String(card.i).slice(0, 12), n: String(card.n).slice(0, 18), l: Math.max(1, Math.min(1e7, +card.l || old.l || 1)), s: PACK[card.s] ? card.s : old.s || 'classic', d: +card.d || old.d || 0, t: +card.t || old.t || 0, at: today().num };
+    const u = card.u || old.u;
+    if (u) f.u = String(u).slice(0, 40);
+    if (card.tag || old.tag) f.tag = String(card.tag || old.tag).slice(0, 6);
     if (k >= 0) store.friends[k] = f; else store.friends.push(f);
     save();
     if (!quiet) toast(`<span class="ti">${ic('hand', '🤝')}</span><span><b>${k >= 0 ? tr('{0} updated!', esc(f.n)) : tr('{0} added!', esc(f.n))}</b><small>${tr('Level {0} on the journey map.', f.l)}</small></span>`);
     return true;
   }
+  function friendRow(f, online) {
+    const fp = { name: f.n, g: 'f', letter: f.n[0], color: '#7aa7ff', emoji: '🙂' };
+    const age = today().num - (f.at || today().num);
+    const canRace = NET && f.u;
+    return `<div class="friend-row"><span class="pf skin-${f.s}">${face(fp, f.s)}</span><div><b>${esc(f.n)}${online ? ` <span class="on-dot" title="${esc(tr('Online now'))}"></span>` : ''}</b><small>${tr('Level {0} · {1} cases · {2}-day streak · updated {3}', f.l, f.t, f.d, age ? tr('{0}d ago', age) : tr('today'))}</small></div>
+      ${canRace ? `<button class="mini-race" data-act="racef" data-id="${f.i}" aria-label="${esc(tr('Race {0}', f.n))}">${ic('knife', '⚔️')}</button>` : ''}
+      <button class="mini-x" data-act="rm" data-id="${f.i}" aria-label="${esc(tr('Remove'))}">✕</button></div>`;
+  }
+  function friendListHtml(online) {
+    return (store.friends || []).sort((x, y) => y.l - x.l).map((f) => friendRow(f, online && online[f.u])).join('')
+      || `<p><small>${NET ? tr('No friends yet. Tell a friend your detective ID, or add theirs.') : tr('No friends yet. Send your link to a friend, and ask for theirs!')}</small></p>`;
+  }
   function showFriends() {
-    const list = (store.friends || []).sort((x, y) => y.l - x.l).map((f) => {
-      const fp = { name: f.n, g: 'f', letter: f.n[0], color: '#7aa7ff', emoji: '🙂' };
-      const age = today().num - (f.at || today().num);
-      return `<div class="friend-row"><span class="pf skin-${f.s}">${face(fp, f.s)}</span><div><b>${esc(f.n)}</b><small>${tr('Level {0} · {1} cases · {2}-day streak · updated {3}', f.l, f.t, f.d, age ? tr('{0}d ago', age) : tr('today'))}</small></div>
-        <button class="mini-x" data-act="rm" data-id="${f.i}" aria-label="${esc(tr('Remove'))}">✕</button></div>`;
-    }).join('') || `<p><small>${tr('No friends yet. Send your link to a friend, and ask for theirs!')}</small></p>`;
-    modal(`<div class="big">${ic('hand', '🤝')}</div><h2>${tr('Share with friends')}</h2>
-      <p><small>${tr("You're on level <b>{0}</b>. Send your link so friends see you on their map. Send it again whenever you want them to see your new progress.", prog('journey').caseNum)}</small></p>
+    const ids = NET && store.netOff ? `<div class="my-id"><button class="primary" data-act="getid">${tr('Get a detective ID')}</button></div><p class="id-msg"><small>${tr('Friends you add here can invite you to races right inside the game.')}</small></p>`
+      : NET ? `<div class="my-id"><small>${tr('Your detective ID')}</small><b class="id-code" id="my-id" dir="ltr">${esc(store.netTag || '······')}</b><button class="secondary" data-act="copyid">${tr('Copy')}</button></div>
+      <div class="add-id"><input class="name-in" id="id-in" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="${esc(tr("Friend's ID"))}" dir="ltr"><button class="primary" data-act="addid">${tr('Add')}</button></div>
+      <p class="id-msg" id="id-msg"><small>${tr('Friends you add here can invite you to races right inside the game.')}</small></p>` : '';
+    modal(`<div class="big">${ic('hand', '🤝')}</div><h2>${tr('Friends')}</h2>
+      ${ids}
+      <div class="friend-list" id="friend-list">${friendListHtml()}</div>
       ${NET ? `<div class="race-cta"><button class="primary" data-act="race">${ic('knife', '⚔️')} ${tr('Live race with a friend')}</button><small>${tr('New detective? You both get {0} coins and the exclusive Partners in Crime pack.', REF_COINS)}</small></div>` : ''}
-      <div class="friend-list">${list}</div>
-      <div class="row"><button class="primary" data-act="mine">${tr('Send my link')}</button><button class="secondary" data-act="add">${tr('Add a friend')}</button></div>
+      <details class="other-ways"${NET ? '' : ' open'}><summary>${tr('Other ways to add friends')}</summary>
+        <p><small>${tr("You're on level <b>{0}</b>. Send your link so friends see you on their map. Send it again whenever you want them to see your new progress.", prog('journey').caseNum)}</small></p>
+        <div class="row"><button class="secondary" data-act="mine">${tr('Send my link')}</button><button class="secondary" data-act="add">${tr('Add a friend')}</button></div></details>
+      ${NET && store.netTag ? `<p class="forget"><button class="linkish" data-act="forget">${tr('Delete my online ID')}</button></p>` : ''}
       <div class="row"><button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
       race: () => raceMenu(),
+      racef: (b) => { const f = (store.friends || []).find((x) => x.i === b.dataset.id); if (f) raceMenu(f); },
+      copyid: async (b) => { if (!store.netTag) return; try { await navigator.clipboard.writeText(store.netTag); b.textContent = tr('Copied!'); } catch (e) { b.textContent = store.netTag; } },
+      addid: () => addById($('id-in').value),
+      getid: () => { store.netOff = false; save(); showFriends(); },
+      forget: forgetOnline,
       mine: () => share(tr("Join me on Crime Grid! I'm on level {0}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Share → Add a friend):", prog('journey').caseNum), linkFor('friend', myCard())),
       add: () => {
         modal(`<h2>${tr('Add a friend')}</h2><p><small>${tr('Paste the link (or code) your friend sent you.')}</small></p>
@@ -781,8 +804,13 @@
       },
       rm: (b) => { store.friends = (store.friends || []).filter((x) => x.i !== b.dataset.id); save(); showFriends(); if ($('map').classList.contains('active')) showMap(); },
     });
+    if (NET && !store.netOff) {
+      const idIn = $('id-in');
+      idIn.addEventListener('keydown', (e) => { if (e.key === 'Enter') addById(idIn.value); });
+      ensureTag().then((tag) => { const el = $('my-id'); if (el) el.textContent = tag; refreshFriends(); })
+        .catch(() => { const el = $('id-msg'); if (el) el.innerHTML = `<small>${navigator.onLine === false ? tr('Live races need an internet connection.') : tr('Could not reach the race server. Try again in a moment.')}</small>`; });
+    }
   }
-
   // friendship goes one way (no server), so right after adding someone, offer to send our link back
   function offerShareBack(name, code) {
     const inApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -966,14 +994,14 @@
     modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Live race')}</h2><p>${msg || (navigator.onLine === false ? tr('Live races need an internet connection.') : tr('Could not reach the race server. Try again in a moment.'))}</p>
       <div class="row"><button class="primary" data-act="close">${tr('OK')}</button></div>`);
   }
-  function raceMenu() {
+  function raceMenu(friend) {
     if (!NET) return;
-    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Live race')}</h2>
-      <p>${tr('Same case, same moment. Whoever solves it first wins.')}</p>
+    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${friend ? tr('Race {0}', esc(friend.n)) : tr('Live race')}</h2>
+      <p>${friend ? tr('Pick a level. {0} gets the invite inside the game.', esc(friend.n)) : tr('Same case, same moment. Whoever solves it first wins.')}</p>
       <div class="race-diffs">${RACE_DIFFS.map((d) => `<button class="secondary" data-act="go" data-d="${d}">${esc(dname(d))}</button>`).join('')}</div>
       <p><small>${tr('New detective? You both get {0} coins and the exclusive Partners in Crime pack.', REF_COINS)}</small></p>
       <div class="row"><button class="secondary" data-act="code">${tr('I have a code')}</button><button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
-      go: (b) => createRace(b.dataset.d),
+      go: (b) => createRace(b.dataset.d, friend),
       code: () => {
         modal(`<h2>${tr('Join a race')}</h2><p><small>${tr('Type the 6-letter code your friend sent you.')}</small></p>
           <input class="name-in race-code-in" id="race-in" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC123">
@@ -995,7 +1023,7 @@
       .then((rooms) => Object.keys(rooms || {}).forEach((k) => NET.del('races/' + k).catch(() => {})))
       .catch(() => {});
   }
-  async function createRace(diff) {
+  async function createRace(diff, invitee) {
     if (!NET || !DIFF[diff]) return;
     closeModal();
     raceWait(tr('Opening a race room…'));
@@ -1005,6 +1033,15 @@
       const code = raceCode(), seed = 3000000 + Math.floor(Math.random() * 9e8);
       await NET.put('races/' + code, { v: 1, seed, diff, created: NET.TS, host: raceCard(false) });
       enterRace(code, 'host');
+      if (invitee && invitee.u) {
+        await ensureTag();
+        const c = myCard();
+        R.invitee = invitee;
+        await NET.put(`inbox/${invitee.u}/${code}`, { t: 'race', from: NET.uid(), n: String(c.n).slice(0, 18), s: c.s, i: c.i, l: c.l, code, diff, at: NET.TS });
+        const mine = R;
+        setTimeout(() => { if (R === mine && R.phase === 'lobby' && !R.foe) { R.slow = true; const el = $('race-lobby'); if (el) el.innerHTML = lobbyHtml(); } }, 60000);
+        const el = $('race-lobby'); if (el) el.innerHTML = lobbyHtml();
+      }
     } catch (e) { raceFail(e); }
   }
   async function joinRace(code) {
@@ -1035,8 +1072,11 @@
   function lobbyHtml() {
     const room = R.room, me = room && room[R.role], foe = room && room[otherRole()];
     const slot = (p, label) => `<div class="race-p${p ? '' : ' empty'}">${p ? `<span class="pf skin-${PACK[p.s] ? p.s : 'classic'}">${face({ name: p.n, g: 'f', letter: (p.n || '?')[0], color: '#7aa7ff', emoji: '🙂' }, PACK[p.s] ? p.s : 'classic')}</span><b>${esc(p.n)}</b>` : `<span class="race-dots">…</span><b>${label}</b>`}</div>`;
-    const status = !room ? tr('Connecting…') : !foe ? tr('Waiting for your friend to join…') : room.go ? tr('Get ready!') : tr('{0} joined! Starting…', esc(foe.n));
-    return `<div class="race-vs">${slot(me, tr('You'))}<span class="race-x">VS</span>${slot(foe, tr('Friend'))}</div><p class="race-status">${status}</p>
+    const inv = R.invitee;
+    const status = !room ? tr('Connecting…') : !foe && R.declined ? tr("{0} can't race right now.", esc(inv.n))
+      : !foe && inv && R.slow ? tr('{0} may be offline. Send the code another way, or try later.', esc(inv.n))
+      : !foe && inv ? tr('Invite sent to {0}. Waiting…', esc(inv.n)) : !foe ? tr('Waiting for your friend to join…') : room.go ? tr('Get ready!') : tr('{0} joined! Starting…', esc(foe.n));
+    return `<div class="race-vs">${slot(me, tr('You'))}<span class="race-x">VS</span>${slot(foe, inv ? esc(inv.n) : tr('Friend'))}</div><p class="race-status">${status}</p>
       ${room ? `<p><small>${esc(dname(room.diff))}</small></p>` : ''}`;
   }
   function showLobby() {
@@ -1194,6 +1234,135 @@
     addCoins(REF_COINS);
     sfx('unlock'); confetti();
     toast(`<span class="ti">${ic('gift', '🎁')}</span><span><b>${tr('+{0} coins for racing with {1}!', REF_COINS, esc(name))}</b><small>${fresh ? tr('Partners in Crime pack unlocked. Equip it in the shop.') : tr('Thanks for bringing a new detective!')}</small></span>`);
+  }
+
+  /* ---------- online friends: a short detective ID, live profiles and in-game invites (no links needed) ---------- */
+  let inboxStop = null, seenTimer = null, tagJob = null;
+  const ONLINE_MS = 180000, INVITE_MS = 10 * 60000;
+  function publishProfile() {
+    const c = myCard();
+    return NET.patch('users/' + NET.uid(), { n: String(c.n).slice(0, 18), s: c.s, l: c.l, t: c.t, i: c.i, tag: store.netTag, seen: NET.TS });
+  }
+  function ensureTag() {
+    if (!NET) return Promise.reject(new Error('off'));
+    if (store.netOff) { store.netOff = false; save(); }   // inviting a friend means the player wants an ID again
+    if (tagJob) return tagJob;
+    tagJob = (async () => {
+      await NET.signIn();
+      const uid = NET.uid();
+      if (store.netTag) {
+        const t = await NET.get('tags/' + store.netTag).catch(() => null);
+        if (!t || t.uid !== uid) { store.netTag = null; save(); }   // e.g. restored on a new phone
+      }
+      for (let k = 0; k < 5 && !store.netTag; k++) {
+        const tag = raceCode();
+        try { await NET.put('tags/' + tag, { uid }); store.netTag = tag; save(); } catch (e) { /* taken, try another */ }
+      }
+      if (!store.netTag) throw new Error('tag');
+      await publishProfile();
+      startInbox();
+      cleanupOnline();
+      return store.netTag;
+    })();
+    tagJob.catch(() => {}).then(() => { tagJob = null; });
+    return tagJob;
+  }
+  function cleanupOnline() {   // profiles unused for ~6 months are removed by any active player, at most once a day
+    if (store.netClean === today().num) return;
+    store.netClean = today().num; save();
+    const old = Date.now() - 180 * 86400000;
+    NET.query('users', `&orderBy=%22seen%22&endAt=${old}&limitToFirst=20`).then((users) => {
+      for (const [uid, p] of Object.entries(users || {})) {
+        NET.del('users/' + uid).then(() => Promise.all([p && p.tag ? NET.del('tags/' + p.tag) : 0, NET.del('inbox/' + uid)])).catch(() => {});
+      }
+    }).catch(() => {});
+  }
+  function startInbox() {
+    if (inboxStop || !NET || !NET.uid()) return;
+    const handled = new Set();
+    inboxStop = NET.watch('inbox/' + NET.uid(), (box) => {
+      for (const [id, m] of Object.entries(box || {})) if (!handled.has(id)) { handled.add(id); onInbox(id, m); }
+    }, () => { inboxStop = null; });
+    if (!seenTimer) seenTimer = setInterval(() => { if (!document.hidden && store.netTag) NET.patch('users/' + NET.uid(), { seen: NET.TS }).catch(() => {}); }, 120000);
+  }
+  function onInbox(id, m) {
+    const drop = () => NET.del(`inbox/${NET.uid()}/${id}`).catch(() => {});
+    if (!m || !m.from || !m.n) return drop();
+    const card = { i: m.i || String(m.from).slice(0, 12), n: m.n, l: m.l, s: m.s, d: 0, t: 0, u: m.from };
+    if (m.t === 'friend') {
+      const known = (store.friends || []).some((f) => f.u === m.from);
+      addFriend(card, true);
+      if (!known) toast(`<span class="ti">${ic('hand', '🤝')}</span><span><b>${tr('{0} added you as a friend!', esc(m.n))}</b><small>${tr('You can now invite each other to races.')}</small></span>`);
+      const fl = $('friend-list'); if (fl) fl.innerHTML = friendListHtml();
+      return drop();
+    }
+    if (m.t === 'no') {
+      if (R && R.code === m.code && R.phase === 'lobby') { R.declined = true; const el = $('race-lobby'); if (el) el.innerHTML = lobbyHtml(); }
+      return drop();
+    }
+    if (m.t !== 'race' || !DIFF[m.diff] || Date.now() - (+m.at || 0) > INVITE_MS || (R && R.phase !== 'done')) return drop();
+    addFriend(card, true);
+    const decline = () => { drop(); NET.put(`inbox/${m.from}/no_${m.code}`, { t: 'no', from: NET.uid(), n: String(myCard().n).slice(0, 18), code: m.code, at: NET.TS }).catch(() => {}); };
+    sfx('unlock');
+    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Race invite!')}</h2>
+      <div class="race-vs"><div class="race-p"><span class="pf skin-${PACK[m.s] ? m.s : 'classic'}">${face({ name: m.n, g: 'f', letter: m.n[0], color: '#7aa7ff', emoji: '🙂' }, PACK[m.s] ? m.s : 'classic')}</span><b>${esc(m.n)}</b></div></div>
+      <p>${tr('{0} invites you to a live race ({1}). First to solve the case wins!', esc(m.n), esc(dname(m.diff)))}</p>
+      <div class="row"><button class="primary" data-act="join">${ic('knife', '⚔️')} ${tr('Join')}</button><button class="secondary" data-act="no">${tr('Not now')}</button></div>`, {
+      join: () => { drop(); joinRace(m.code); },
+      no: () => { decline(); closeModal(); },
+    }, true);
+  }
+  async function refreshFriends() {
+    const list = (store.friends || []).filter((f) => f.u);
+    if (!list.length) return;
+    const online = {};
+    await Promise.all(list.map((f) => NET.get('users/' + f.u).then((p) => {
+      if (!p) return;
+      addFriend({ i: p.i || f.i, n: p.n || f.n, l: p.l, s: p.s, t: p.t, d: f.d, u: f.u, tag: p.tag }, true);
+      online[f.u] = p.seen && Date.now() - p.seen < ONLINE_MS;
+    }).catch(() => {})));
+    const fl = $('friend-list');
+    if (fl) fl.innerHTML = friendListHtml(online);
+  }
+  async function addById(raw) {
+    const tag = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const say = (t) => { const el = $('id-msg'); if (el) el.innerHTML = `<small>${t}</small>`; };
+    if (tag.length !== 6) { shake($('modal-body')); return say(tr('An ID has 6 letters and numbers.')); }
+    try {
+      await ensureTag();
+      if (tag === store.netTag) return say(tr("That's your own ID."));
+      const t = await NET.get('tags/' + tag);
+      if (!t || !t.uid) { shake($('modal-body')); return say(tr('No detective with this ID.')); }
+      const p = (await NET.get('users/' + t.uid)) || {};
+      addFriend({ i: p.i || String(t.uid).slice(0, 12), n: p.n || tag, l: p.l, s: p.s, t: p.t, u: t.uid, tag }, true);
+      const c = myCard();
+      NET.put(`inbox/${t.uid}/f${NET.uid()}`, { t: 'friend', from: NET.uid(), n: String(c.n).slice(0, 18), s: c.s, i: c.i, l: c.l, at: NET.TS }).catch(() => {});
+      sfx('coin');
+      const inp = $('id-in'); if (inp) inp.value = '';
+      say(tr('{0} added! They will see you in their friends list too.', esc(p.n || tag)));
+      refreshFriends();
+      if ($('map').classList.contains('active')) showMap();
+    } catch (e) { say(navigator.onLine === false ? tr('Live races need an internet connection.') : tr('Could not reach the race server. Try again in a moment.')); }
+  }
+  function forgetOnline() {
+    modal(`<h2>${tr('Delete my online ID')}</h2><p>${tr('This removes your detective ID and online profile from the server. Your progress on this device stays. Friends will no longer be able to invite you in the game.')}</p>
+      <div class="row"><button class="primary" data-act="yes">${tr('Delete')}</button><button class="secondary" data-act="back">${tr('Back')}</button></div>`, {
+      yes: async () => {
+        try {
+          await NET.signIn();
+          const uid = NET.uid(), tag = store.netTag;
+          if (inboxStop) { inboxStop(); inboxStop = null; }
+          await NET.del('users/' + uid);
+          if (tag) await NET.del('tags/' + tag).catch(() => {});
+          await NET.del('inbox/' + uid).catch(() => {});
+          store.netTag = null; store.netOff = true; save();
+          NET.forget();
+          toast(`<span class="ti">${ic('check', '✓')}</span><span><b>${tr('Online ID deleted.')}</b></span>`);
+          showFriends();
+        } catch (e) { raceFail(e); }
+      },
+      back: showFriends,
+    });
   }
 
   function handleLink() {
@@ -2176,6 +2345,7 @@
   const brandNew = !store.profile;
   if (brandNew) { store.profile = { name: tr('Detective'), auto: true }; save(); renderGreet(); }
   const hadLink = location.hash.length > 1;
+  if (NET && store.netTag) ensureTag().catch(() => {});
   handleLink();
   if (brandNew && !hadLink && !store.tutorialDone && !totalSolved()) startTutorial();
 })();
