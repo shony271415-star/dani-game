@@ -707,7 +707,7 @@
     stopTimer();
     $('home').classList.remove('active'); $('game').classList.remove('active'); $('map').classList.add('active');
     const cur = prog('journey').caseNum, stars = store.jStars || {};
-    const lo = Math.max(1, cur - 30), hi = cur + 30, GAP = 96;
+    const lo = Math.max(1, cur - 200), hi = cur + 300, GAP = 96;   // the journey never ends; the map shows a long stretch of it
     const W = Math.min(window.innerWidth, 480), H = (hi - lo + 1) * GAP + 180;
     const X = (n) => W / 2 + Math.sin(n * 0.9) * W * 0.27, Y = (n) => H - 110 - (n - lo) * GAP;
     const pathFor = (from, to) => {
