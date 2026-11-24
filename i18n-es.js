@@ -527,7 +527,21 @@
  "This removes your detective ID and online profile from the server. Your progress on this device stays. Friends will no longer be able to invite you in the game.": "Esto borra del servidor tu ID de detective y tu perfil en línea. Tu progreso en este dispositivo se mantiene. Tus amigos ya no podrán invitarte dentro del juego.",
  "Delete": "Eliminar",
  "Online ID deleted.": "ID en línea eliminado.",
- "Get a detective ID": "Obtener un ID de detective"
+ "Get a detective ID": "Obtener un ID de detective",
+ "Duel": "Duelo",
+ "Stake per player": "Apuesta por jugador",
+ "Free": "Gratis",
+ "The winner takes {0} coins. Leaving early loses your stake.": "El ganador se lleva {0} monedas. Si abandonas antes, pierdes tu apuesta.",
+ "Stake: {0} coins each. The winner takes {1}.": "Apuesta: {0} monedas cada uno. El ganador se lleva {1}.",
+ "{0} challenges you for {1} coins each. The winner takes {2}. Join?": "{0} te reta apostando {1} monedas cada uno. El ganador se lleva {2}. ¿Te unes?",
+ "You need {0} coins to join this duel.": "Necesitas {0} monedas para unirte a este duelo.",
+ "Not enough coins for this stake.": "No tienes monedas suficientes para esta apuesta.",
+ "{0} solved it first. You lost {1} coins.": "{0} lo resolvió primero. Perdiste {1} monedas.",
+ "You left a duel with a stake. The stake was lost.": "Abandonaste un duelo con apuesta. Perdiste la apuesta.",
+ "You lost {0} coins.": "Perdiste {0} monedas.",
+ "To invite {0} inside the game, add them once with their detective ID (Friends screen).": "Para invitar a {0} dentro del juego, añádelo una vez con su ID de detective (pantalla Amigos).",
+ "{0} can't get invites yet. Send the code another way.": "{0} aún no puede recibir invitaciones. Envía el código de otra forma.",
+ "{0} invites you to a live duel ({1}) for {2} coins each. The winner takes {3}!": "{0} te reta a un duelo en vivo ({1}) apostando {2} monedas cada uno. ¡El ganador se lleva {3}!"
 },
     pl: {
  "{0} cases solved": {

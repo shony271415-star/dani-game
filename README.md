@@ -37,7 +37,7 @@ Suspects are named in alphabetical order (A, B, C…). Expert and Extreme puzzle
 - **Coin shop**: skin packs for every suspect and victim, from Kitchen Crew (90 coins) to Neon Legends (1,500); two premium packs (Masquerade Ball, Cyber Agents) and coin bundles for real money through Google Play Billing (see `store/GOOGLE-PLAY.md`).
 - **Journey map**: a winding path of numbered levels with stars, boss levels, the scene of each level, and your friends' positions.
 - **Friends**: every player can get a 6-character detective ID. Friends add each other by ID (or by link), see who is online, and appear on the journey map.
-- **Live duel**: invite a friend inside the game; you both solve the same case at the same moment and the first to finish wins. A new player who finishes a duel with their inviter gives both 500 coins and the exclusive Partners in Crime pack.
+- **Live duel**: invite a friend inside the game (Friends list, Duel button); you both solve the same case at the same moment and the first to finish wins. Optional stake: both players put in the same number of coins (25 to 500) and the winner takes both; leaving early loses the stake. A new player who finishes a duel with their inviter gives both 500 coins and the exclusive Partners in Crime pack.
 - **Challenge link**: after a case, send a link; the friend gets exactly the same case and sees who was faster.
 - **Feel**: sounds, vibration, confetti, coin count-up (sound can be turned off).
 

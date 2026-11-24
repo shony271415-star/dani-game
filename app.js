@@ -198,7 +198,7 @@
   const linkFor = (key, payload) => `${location.origin}${location.pathname}#${key}=${b64e(payload)}`;
   function myId() { if (!store.pid) { store.pid = Math.random().toString(36).slice(2, 10); save(); } return store.pid; }
   function myCard() {
-    return { i: myId(), n: (store.profile && store.profile.name) || 'Detective', l: prog('journey').caseNum, s: skinId(), d: dailyStreak(), t: totalSolved() };
+    return { i: myId(), n: (store.profile && store.profile.name) || 'Detective', l: prog('journey').caseNum, s: skinId(), d: dailyStreak(), t: totalSolved(), u: (window.CGNet && window.CGNet.uid()) || undefined };
   }
   async function share(text, url) {
     try { if (navigator.share) { await navigator.share({ title: 'Crime Grid', text, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
@@ -767,9 +767,9 @@
   function friendRow(f, online) {
     const fp = { name: f.n, g: 'f', letter: f.n[0], color: '#7aa7ff', emoji: '🙂' };
     const age = today().num - (f.at || today().num);
-    const canRace = NET && f.u;
+    const canRace = !!NET;
     return `<div class="friend-row"><span class="pf skin-${f.s}">${face(fp, f.s)}</span><div><b>${esc(f.n)}${online ? ` <span class="on-dot" title="${esc(tr('Online now'))}"></span>` : ''}</b><small>${tr('Level {0} · {1} cases · {2}-day streak · updated {3}', f.l, f.t, f.d, age ? tr('{0}d ago', age) : tr('today'))}</small></div>
-      ${canRace ? `<button class="mini-race" data-act="racef" data-id="${f.i}" aria-label="${esc(tr('Duel {0}', f.n))}">${ic('knife', '⚔️')}</button>` : ''}
+      ${canRace ? `<button class="mini-race" data-act="racef" data-id="${f.i}" aria-label="${esc(tr('Duel {0}', f.n))}">${ic('knife', '⚔️')}<span>${tr('Duel')}</span></button>` : ''}
       <button class="mini-x" data-act="rm" data-id="${f.i}" aria-label="${esc(tr('Remove'))}">✕</button></div>`;
   }
   function friendListHtml(online) {
@@ -791,7 +791,13 @@
       ${NET && store.netTag ? `<p class="forget"><button class="linkish" data-act="forget">${tr('Delete my online ID')}</button></p>` : ''}
       <div class="row"><button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
       race: () => raceMenu(),
-      racef: (b) => { const f = (store.friends || []).find((x) => x.i === b.dataset.id); if (f) raceMenu(f); },
+      racef: (b) => {
+        const f = (store.friends || []).find((x) => x.i === b.dataset.id);
+        if (!f) return;
+        if (f.u) return raceMenu(f);
+        modal(`<div class="big">${ic('knife', '⚔️')}</div><p>${tr('To invite {0} inside the game, add them once with their detective ID (Friends screen).', esc(f.n))}</p>
+          <div class="row"><button class="primary" data-act="back">${tr('OK')}</button></div>`, { back: showFriends });
+      },
       copyid: async (b) => { if (!store.netTag) return; try { await navigator.clipboard.writeText(store.netTag); b.textContent = tr('Copied!'); } catch (e) { b.textContent = store.netTag; } },
       addid: () => addById($('id-in').value),
       getid: () => { store.netOff = false; save(); showFriends(); },
@@ -839,7 +845,7 @@
   let pendingChallenge = null;
   function startChallenge(c) {
     if (!c || !DIFF[c.diff] || !c.seed) return;
-    addFriend({ i: c.i, n: c.n, l: c.l, s: c.s, d: c.d, t: c.tt }, true);
+    addFriend({ i: c.i, n: c.n, l: c.l, s: c.s, d: c.d, t: c.tt, u: c.u }, true);
     pendingChallenge = c;
     const p = prog('challenge');
     const go = (puzzle) => { $('loading').classList.remove('show'); begin(c.diff, c.seed, puzzle, 'challenge'); };
@@ -850,7 +856,7 @@
   }
   function challengeLink() {
     const card = myCard();
-    return linkFor('challenge', { i: card.i, n: card.n, l: card.l, s: card.s, d: card.d, tt: card.t, diff: S.diff, seed: seedOf(S.slot === 'challenge' ? 'challenge' : S.slot, S.diff, S.caseNum), time: S.elapsed, title: S.P.title });
+    return linkFor('challenge', { u: card.u, i: card.i, n: card.n, l: card.l, s: card.s, d: card.d, tt: card.t, diff: S.diff, seed: seedOf(S.slot === 'challenge' ? 'challenge' : S.slot, S.diff, S.caseNum), time: S.elapsed, title: S.P.title });
   }
 
   function maybeDailyBonus() {
@@ -1002,14 +1008,21 @@
     modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Live duel')}</h2><p>${msg || (navigator.onLine === false ? tr('Live duels need an internet connection.') : tr('Could not reach the duel server. Try again in a moment.'))}</p>
       <div class="row"><button class="primary" data-act="close">${tr('OK')}</button></div>`);
   }
+  const STAKES = [0, 25, 50, 100, 250, 500];
+  let raceStake = 0;
   function raceMenu(friend) {
     if (!NET) return;
+    if (raceStake > coins()) raceStake = 0;
     modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${friend ? tr('Duel {0}', esc(friend.n)) : tr('Live duel')}</h2>
       <p>${friend ? tr('Pick a level. {0} gets the invite inside the game.', esc(friend.n)) : tr('Same case, same moment. Whoever solves it first wins.')}</p>
+      <div class="stake-h">${coinIc()} ${tr('Stake per player')}</div>
+      <div class="stake-row">${STAKES.map((v) => `<button class="${v === raceStake ? 'primary' : 'secondary'}" data-act="stake" data-v="${v}"${v > coins() ? ' disabled' : ''}>${v ? I.num(v) : tr('Free')}</button>`).join('')}</div>
+      ${raceStake ? `<p class="stake-note"><small>${tr('The winner takes {0} coins. Leaving early loses your stake.', I.num(raceStake * 2))}</small></p>` : ''}
       <div class="race-diffs">${RACE_DIFFS.map((d) => `<button class="secondary" data-act="go" data-d="${d}">${esc(dname(d))}</button>`).join('')}</div>
       <p><small>${tr('New detective? You both get {0} coins and the exclusive Partners in Crime pack.', REF_COINS)}</small></p>
       <div class="row"><button class="secondary" data-act="code">${tr('I have a code')}</button><button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
       go: (b) => createRace(b.dataset.d, friend),
+      stake: (b) => { raceStake = +b.dataset.v || 0; raceMenu(friend); },
       code: () => {
         modal(`<h2>${tr('Join a duel')}</h2><p><small>${tr('Type the 6-letter code your friend sent you.')}</small></p>
           <input class="name-in race-code-in" id="race-in" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC123">
@@ -1019,7 +1032,7 @@
             if (code.length !== 6) { shake($('modal-body')); return; }
             joinRace(code);
           },
-          back: raceMenu,
+          back: () => raceMenu(friend),
         });
         setTimeout(() => $('race-in') && $('race-in').focus(), 50);
       },
@@ -1038,21 +1051,22 @@
     try {
       await NET.signIn();
       cleanupRaces();
-      const code = raceCode(), seed = 3000000 + Math.floor(Math.random() * 9e8);
-      await NET.put('races/' + code, { v: 1, seed, diff, created: NET.TS, host: raceCard(false) });
+      const code = raceCode(), seed = 3000000 + Math.floor(Math.random() * 9e8), stake = Math.min(raceStake, Math.floor(coins()));
+      await NET.put('races/' + code, { v: 1, seed, diff, stake, created: NET.TS, host: raceCard(false) });
       enterRace(code, 'host');
       if (invitee && invitee.u) {
         await ensureTag();
         const c = myCard();
         R.invitee = invitee;
-        await NET.put(`inbox/${invitee.u}/${code}`, { t: 'race', from: NET.uid(), n: String(c.n).slice(0, 18), s: c.s, i: c.i, l: c.l, code, diff, at: NET.TS });
+        try { await NET.put(`inbox/${invitee.u}/${code}`, { t: 'race', from: NET.uid(), n: String(c.n).slice(0, 18), s: c.s, i: c.i, l: c.l, code, diff, stake, at: NET.TS }); }
+        catch (e) { R.noInbox = true; const el0 = $('race-lobby'); if (el0) el0.innerHTML = lobbyHtml(); return; }   // friend has no online profile yet
         const mine = R;
         setTimeout(() => { if (R === mine && R.phase === 'lobby' && !R.foe) { R.slow = true; const el = $('race-lobby'); if (el) el.innerHTML = lobbyHtml(); } }, 60000);
         const el = $('race-lobby'); if (el) el.innerHTML = lobbyHtml();
       }
     } catch (e) { raceFail(e); }
   }
-  async function joinRace(code) {
+  async function joinRace(code, ackStake) {
     code = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
     if (!NET) return raceFail(null, tr('Live duels are not available in this version yet.'));
     closeModal();
@@ -1065,6 +1079,19 @@
       if (room.host.uid === me) return enterRace(code, 'host');
       if (room.guest && room.guest.uid !== me) return raceFail(null, tr('This duel already has two detectives.'));
       if (room.go && !(room.guest && room.guest.uid === me)) return raceFail(null, tr('This duel has already started.'));
+      const stake = Math.max(0, Math.min(500, Math.floor(+room.stake || 0)));
+      if (stake > 0 && !(room.guest && room.guest.uid === me)) {
+        if (coins() < stake) return raceFail(null, tr('You need {0} coins to join this duel.', I.num(stake)));
+        if (ackStake !== stake) {   // never take coins without a clear yes
+          $('loading').classList.remove('show');
+          const ok = await new Promise((resolve) => modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Live duel')}</h2>
+            <p>${tr('{0} challenges you for {1} coins each. The winner takes {2}. Join?', esc(room.host.n), I.num(stake), I.num(stake * 2))}</p>
+            <div class="row"><button class="primary" data-act="yes">${tr('Join')}</button><button class="secondary" data-act="no">${tr('Not now')}</button></div>`,
+            { yes: () => { closeModal(); resolve(true); }, no: () => { closeModal(); resolve(false); } }, true));
+          if (!ok) return;
+          raceWait(tr('Joining the duel…'));
+        }
+      }
       if (!room.guest) {
         try { await NET.put(`races/${code}/guest`, raceCard(isNewbie())); }
         catch (e) {   // lost a race with another guest?
@@ -1090,9 +1117,11 @@
     const inv = R.invitee;
     const status = !room ? tr('Connecting…') : !foe && R.declined ? tr("{0} can't duel right now.", esc(inv.n))
       : !foe && inv && R.slow ? tr('{0} may be offline. Send the code another way, or try later.', esc(inv.n))
+      : !foe && inv && R.noInbox ? tr("{0} can't get invites yet. Send the code another way.", esc(inv.n))
       : !foe && inv ? tr('Invite sent to {0}. Waiting…', esc(inv.n)) : !foe ? tr('Waiting for your friend to join…') : room.go ? tr('Get ready!') : tr('{0} joined! Starting…', esc(foe.n));
     return `<div class="race-vs">${slot(me, tr('You'))}<span class="race-x">VS</span>${slot(foe, inv ? esc(inv.n) : tr('Friend'))}</div><p class="race-status">${status}</p>
-      ${room ? `<p><small>${esc(dname(room.diff))}</small></p>` : ''}`;
+      ${room ? `<p><small>${esc(dname(room.diff))}</small></p>` : ''}
+      ${room && room.stake > 0 ? `<p class="stake-note">${coinIc()} <b>${tr('Stake: {0} coins each. The winner takes {1}.', I.num(room.stake), I.num(room.stake * 2))}</b></p>` : ''}`;
   }
   function showLobby() {
     const host = R.role === 'host';
@@ -1109,6 +1138,11 @@
     const r = R;
     R = null;
     if (r.stop) r.stop();
+    if (r.phase === 'done' && !r.paid) { R = r; raceReward(true); R = null; }   // left the result screen early: settle with what we know
+    if (r.phase === 'play' && store.stakeBet && store.stakeBet.code === r.code) {   // leaving a duel with a stake forfeits it
+      const lost = store.stakeBet.amt; store.stakeBet = null; save();
+      toast(`<span class="ti">${ic('knife', '⚔️')}</span><span><b>${tr('You left a duel with a stake. The stake was lost.')}</b><small>${tr('You lost {0} coins.', I.num(lost))}</small></span>`);
+    }
     if (r.role === 'host' && r.phase === 'lobby') NET.del('races/' + r.code).catch(() => {});
     else if (r.phase !== 'done') NET.put(`races/${r.code}/left/${r.role}`, true).catch(() => {});
   }
@@ -1122,7 +1156,7 @@
     }
     R.foe = room[otherRole()] || null;
     if (R.foe && !prevFoe) {   // friends both ways, no link swapping needed
-      addFriend({ i: R.foe.i, n: R.foe.n, l: R.foe.l, s: R.foe.s, d: 0, t: R.foe.t }, true);
+      addFriend({ i: R.foe.i, n: R.foe.n, l: R.foe.l, s: R.foe.s, d: 0, t: R.foe.t, u: R.foe.uid }, true);
       sfx('coin');
     }
     if (!R.puzzle && !R.building) {
@@ -1170,6 +1204,11 @@
   }
   function startRaceGame() {
     closeModal();
+    R.stake = Math.max(0, Math.min(500, Math.floor(+R.room.stake || 0)));
+    if (R.stake > 0) {
+      if (coins() < R.stake) { const r = R; toast(`<span class="ti">${ic('knife', '⚔️')}</span><span><b>${tr('Not enough coins for this stake.')}</b></span>`); raceLeave(); showHome(); return r && null; }
+      store.coins -= R.stake; store.stakeBet = { code: R.code, amt: R.stake, at: Date.now() }; save(); renderCoins();
+    }
     R.phase = 'play';
     if (!$('race-bar')) {
       const bar = document.createElement('div');
@@ -1196,6 +1235,7 @@
   function raceFinished() {
     if (!R || R.phase !== 'play') return;
     R.phase = 'done';
+    R.finAt = Date.now();
     NET.put(`races/${R.code}/res/${R.role}`, { at: NET.TS, sec: S.elapsed, help: S.hints + S.helps }).catch(() => {});
     // the win screen appears a moment later, so keep its result line fresh for a while
     const mine = R;
@@ -1203,7 +1243,8 @@
     const t = setInterval(() => {
       const el = $('race-result');
       if (R !== mine || ++n > 120) { clearInterval(t); return; }
-      if (el) { el.innerHTML = raceResultHtml(); if (raceOutcome()) raceReward(); }
+      if (el) el.innerHTML = raceResultHtml();
+      raceReward();
       if (mine.room && mine.room.res && mine.room.res.host && mine.room.res.guest && el) clearInterval(t);
     }, 500);
   }
@@ -1213,18 +1254,28 @@
     if (!foe) return { won: true, me };
     return { won: me.at <= foe.at, me, foe };
   }
+  // the result counts once the other result is in, or 3 seconds after ours (so a near-tie is not paid out too early)
+  function raceSettled() {
+    const o = raceOutcome();
+    return !!o && !!(o.foe || Date.now() - (R.finAt || 0) >= 3000);
+  }
   function raceResultHtml() {
     if (!R) return '';
-    const o = raceOutcome(), name = esc(R.foe ? R.foe.n : '');
-    if (!o) return `<div class="duel">${tr('Checking who was first…')}</div>`;
-    if (o.won) return `<div class="duel won">${tr('You won the duel against {0}! +{1} coins', name, RACE_WIN)}${o.foe ? `<br><small>${tr('You {0} · {1} {2}', fmtTime(o.me.sec), name, fmtTime(o.foe.sec))}</small>` : ''}</div>`;
-    return `<div class="duel lost">${tr('{0} solved it first.', name)}<br><small>${tr('You {0} · {1} {2}', fmtTime(o.me.sec), name, fmtTime(o.foe.sec))}</small></div>`;
+    const o = raceOutcome(), name = esc(R.foe ? R.foe.n : ''), st = R.stake || 0;
+    if (!o || !raceSettled()) return `<div class="duel">${tr('Checking who was first…')}</div>`;
+    if (o.won) return `<div class="duel won">${tr('You won the duel against {0}! +{1} coins', name, st || RACE_WIN)}${o.foe ? `<br><small>${tr('You {0} · {1} {2}', fmtTime(o.me.sec), name, fmtTime(o.foe.sec))}</small>` : ''}</div>`;
+    return `<div class="duel lost">${st ? tr('{0} solved it first. You lost {1} coins.', name, I.num(st)) : tr('{0} solved it first.', name)}<br><small>${tr('You {0} · {1} {2}', fmtTime(o.me.sec), name, fmtTime(o.foe.sec))}</small></div>`;
   }
-  function raceReward() {
+  function raceReward(force) {
     const o = raceOutcome();
-    if (!o || R.paid) return;
+    if (!o || R.paid || (!force && !raceSettled())) return;
     R.paid = true;
-    if (o.won) { addCoins(RACE_WIN); sfx('coin'); }
+    const st = R.stake || 0;
+    if (st > 0) {
+      store.stakeBet = null;
+      if (o.won) addCoins(st * 2); else save();   // the stake was taken when the duel started
+      if (o.won) sfx('coin');
+    } else if (o.won) { addCoins(RACE_WIN); sfx('coin'); }
   }
   // inviting a new detective: both get coins and the exclusive pack, once the newcomer has finished the race
   function raceReferral() {
@@ -1317,13 +1368,15 @@
     }
     if (m.t !== 'race' || !DIFF[m.diff] || Date.now() - (+m.at || 0) > INVITE_MS || (R && R.phase !== 'done')) return drop();
     addFriend(card, true);
+    const stake = Math.max(0, Math.min(500, Math.floor(+m.stake || 0)));
     const decline = () => { drop(); NET.put(`inbox/${m.from}/no_${m.code}`, { t: 'no', from: NET.uid(), n: String(myCard().n).slice(0, 18), code: m.code, at: NET.TS }).catch(() => {}); };
     sfx('unlock');
     modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Duel invite!')}</h2>
       <div class="race-vs"><div class="race-p"><span class="pf skin-${PACK[m.s] ? m.s : 'classic'}">${face({ name: m.n, g: 'f', letter: m.n[0], color: '#7aa7ff', emoji: '🙂' }, PACK[m.s] ? m.s : 'classic')}</span><b>${esc(m.n)}</b></div></div>
-      <p>${tr('{0} invites you to a live duel ({1}). First to solve the case wins!', esc(m.n), esc(dname(m.diff)))}</p>
-      <div class="row"><button class="primary" data-act="join">${ic('knife', '⚔️')} ${tr('Join')}</button><button class="secondary" data-act="no">${tr('Not now')}</button></div>`, {
-      join: () => { drop(); joinRace(m.code); },
+      <p>${stake ? tr('{0} invites you to a live duel ({1}) for {2} coins each. The winner takes {3}!', esc(m.n), esc(dname(m.diff)), I.num(stake), I.num(stake * 2)) : tr('{0} invites you to a live duel ({1}). First to solve the case wins!', esc(m.n), esc(dname(m.diff)))}</p>
+      ${stake && coins() < stake ? `<p><small>${tr('You need {0} coins to join this duel.', I.num(stake))}</small></p>` : ''}
+      <div class="row"><button class="primary" data-act="join"${stake && coins() < stake ? ' disabled' : ''}>${ic('knife', '⚔️')} ${tr('Join')}</button><button class="secondary" data-act="no">${tr('Not now')}</button></div>`, {
+      join: () => { drop(); joinRace(m.code, stake); },
       no: () => { decline(); closeModal(); },
     }, true);
   }
@@ -2362,6 +2415,10 @@
   const brandNew = !store.profile;
   if (brandNew) { store.profile = { name: tr('Detective'), auto: true }; save(); renderGreet(); }
   else if (store.profile.auto && store.profile.name === 'Detective' && tr('Detective') !== 'Detective') { store.profile.name = tr('Detective'); save(); renderGreet(); }
+  if (store.stakeBet) {   // the game was closed in the middle of a duel with a stake
+    const lost = store.stakeBet.amt; store.stakeBet = null; save();
+    setTimeout(() => toast(`<span class="ti">${ic('knife', '⚔️')}</span><span><b>${tr('You left a duel with a stake. The stake was lost.')}</b><small>${tr('You lost {0} coins.', I.num(lost))}</small></span>`), 1200);
+  }
   const hadLink = location.hash.length > 1;
   if (NET && store.netTag) ensureTag().catch(() => {});
   handleLink();

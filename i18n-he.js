@@ -523,7 +523,21 @@
  "This removes your detective ID and online profile from the server. Your progress on this device stays. Friends will no longer be able to invite you in the game.": "זה מוחק מהשרת את מספר הבלש ואת הפרופיל המקוון שלכם. ההתקדמות במכשיר נשארת. חברים לא יוכלו יותר להזמין אתכם בתוך המשחק.",
  "Delete": "מחיקה",
  "Online ID deleted.": "מספר הבלש נמחק.",
- "Get a detective ID": "קבלת מספר בלש"
+ "Get a detective ID": "קבלת מספר בלש",
+ "Duel": "דו-קרב",
+ "Stake per player": "הימור לכל שחקן",
+ "Free": "חינם",
+ "The winner takes {0} coins. Leaving early loses your stake.": "המנצח לוקח {0} מטבעות. מי שיוצא באמצע מפסיד את ההימור.",
+ "Stake: {0} coins each. The winner takes {1}.": "הימור: {0} מטבעות מכל אחד. המנצח לוקח {1}.",
+ "{0} challenges you for {1} coins each. The winner takes {2}. Join?": "{0} רוצה לשחק איתכם על {1} מטבעות מכל אחד. המנצח לוקח {2}. מצטרפים?",
+ "You need {0} coins to join this duel.": "צריך {0} מטבעות כדי להצטרף לדו-קרב הזה.",
+ "Not enough coins for this stake.": "אין מספיק מטבעות להימור הזה.",
+ "{0} solved it first. You lost {1} coins.": "{0} פתר ראשון. הפסדתם {1} מטבעות.",
+ "You left a duel with a stake. The stake was lost.": "יצאתם מדו-קרב עם הימור. ההימור אבד.",
+ "You lost {0} coins.": "הפסדתם {0} מטבעות.",
+ "To invite {0} inside the game, add them once with their detective ID (Friends screen).": "כדי להזמין את {0} בתוך המשחק, הוסיפו אותו פעם אחת עם מספר הבלש שלו (במסך חברים).",
+ "{0} can't get invites yet. Send the code another way.": "{0} עדיין לא יכול לקבל הזמנות. שלחו לו את הקוד בדרך אחרת.",
+ "{0} invites you to a live duel ({1}) for {2} coins each. The winner takes {3}!": "{0} מזמין אתכם לדו-קרב חי ({1}) על {2} מטבעות מכל אחד. המנצח לוקח {3}!"
 },
     pl: {
  "{0} cases solved": {

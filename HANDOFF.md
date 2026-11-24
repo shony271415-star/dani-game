@@ -19,7 +19,7 @@ The owner speaks Hebrew: answer in short, simple Hebrew. Be honest about what wa
 
 ## Online features (Firebase, optional)
 - `net.js` is a tiny REST client (anonymous sign-in plus Realtime Database). It is enabled only when the API key and database URL are set. The key is not secret; it is restricted to the game's web address, and the database rules in `store/database.rules.json` do the protecting.
-- Live duel: same case at the same moment, 6-letter code, server time decides the winner (+40 coins). Invite bonus: a new player who finishes a duel with their inviter gives both 500 coins and the exclusive "Partners in Crime" pack (max 5 per inviter).
+- Live duel: same case at the same moment, 6-letter code, server time decides the winner (+40 coins, or the stake). Stakes: the host picks 0/25/50/100/250/500 coins; the guest must confirm; both pay when the duel starts (`store.stakeBet`), the winner gets 2x; leaving or closing the game forfeits. Coins are local, so stakes are trust-based (no server check); keep that in mind before adding bigger stakes. Invite bonus: a new player who finishes a duel with their inviter gives both 500 coins and the exclusive "Partners in Crime" pack (max 5 per inviter).
 - Detective ID: a 6-character ID per player. Friends add each other by ID, see an online dot, and send duel invites that pop up inside the game (only while the game is open). "Delete my online ID" removes the profile.
 - Setup and Play Data safety notes: `store/MULTIPLAYER-SETUP.md`. Privacy policy: `privacy.html`.
 - Test locally with the Firebase Database and Auth emulators (set `window.CG_NET_CONFIG` with `authBase`, `ns`). Two Playwright contexts simulate two players.

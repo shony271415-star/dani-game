@@ -410,6 +410,21 @@
   .mini-race .ic svg { width: 22px; height: 22px; }
   .other-ways { margin: 8px 0; text-align: start; } .other-ways summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
   .forget { text-align: center; margin: 4px 0; } .linkish { background: none; border: none; text-decoration: underline; font-size: 13px; opacity: .75; color: inherit; min-height: 36px; }
+  /* Partners in Crime: crimson and gold, shimmering frame */
+  .skin-partners .face, .skin-partners .token, .pf.skin-partners, .skin-partners .af { animation: partners 2.6s ease-in-out infinite; }
+  @keyframes partners { 0%, 100% { box-shadow: 0 0 0 2px #d9a441, 0 0 12px #b5243a; } 50% { box-shadow: 0 0 0 2px #ffe08a, 0 0 22px rgba(255,200,90,.95); } }
+  .skin-partners .face { background: #14060e !important; } .skin-partners .token.art { background: #14060e; }
+  .rar-exclusive { border-color: transparent !important; background: linear-gradient(#fffaf0, #fffaf0) padding-box, conic-gradient(from 0deg, #d9a441, #b5243a, #ffe08a, #b5243a, #d9a441) border-box; }
+  .rar-exclusive .pk-top b::before { content: "\2605  "; color: #d9a441; }
+  .rar-exclusive .rar { box-shadow: 0 0 8px rgba(217,164,65,.8); }
+  /* duel stakes */
+  .stake-h { display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 800; letter-spacing: 1px; margin: 6px 0 4px; text-transform: uppercase; font-size: 12px; opacity: .85; }
+  .stake-h .ic svg { width: 16px; height: 16px; }
+  .stake-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 4px; }
+  .stake-row button { min-width: 52px; min-height: 40px; padding: 4px 10px; }
+  .stake-note { text-align: center; margin: 2px 0 8px; }
+  .stake-note .ic svg { width: 16px; height: 16px; vertical-align: -3px; }
+  .mini-race { width: auto !important; min-width: 44px; padding: 0 10px !important; gap: 6px; display: inline-flex !important; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: inherit; }
   /* live race */
   .race-cta { display: flex; flex-direction: column; gap: 6px; margin: 8px 0 10px; text-align: center; }
   .race-diffs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }

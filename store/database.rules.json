@@ -82,6 +82,9 @@
         },
         "$other": {
           ".validate": false
+        },
+        "stake": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500 && newData.val() == newData.val() - 0 && newData.val() % 1 == 0"
         }
       }
     },
@@ -169,6 +172,9 @@
           },
           "$o": {
             ".validate": false
+          },
+          "stake": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500 && newData.val() % 1 == 0"
           }
         }
       }
