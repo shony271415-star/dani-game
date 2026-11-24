@@ -69,11 +69,18 @@
     async grant(id, token, restoring) {
       const coinPack = COIN_PACKS.find((c) => c.iap === id), skin = PACKS.find((x) => x.iap === id);
       store.owned = store.owned || ['classic'];
+      store.paidTokens = store.paidTokens || [];
       if (coinPack) {
-        store.coins = coins() + coinPack.coins;
+        // a token is paid out once, even if the store call below fails and the purchase shows up again next launch
+        if (!store.paidTokens.includes(token)) { store.paidTokens.push(token); store.paidTokens = store.paidTokens.slice(-50); store.coins = coins() + coinPack.coins; save(); }
         try { await this.service.consume(token); } catch (e) { /* will be retried by listPurchases next launch */ }
       }
-      if (skin && !store.owned.includes(skin.id)) { store.owned.push(skin.id); if (!restoring) store.skin = skin.id; }
+      if (skin) {
+        if (!store.owned.includes(skin.id)) { store.owned.push(skin.id); if (!restoring) store.skin = skin.id; }
+        save();
+        // Google Play refunds purchases that are not acknowledged within 3 days
+        try { if (this.service.acknowledge) await this.service.acknowledge(token, 'onetime'); } catch (e) { /* retried next launch via listPurchases */ }
+      }
       store.paid = true;
       save(); renderCoins(); applySkin();
       return coinPack ? TR`+${I.num(coinPack.coins)} coins` : skin ? TR`${tr(skin.name)} unlocked` : '';
@@ -554,6 +561,7 @@
     $('home').classList.add('active');
     $('game').classList.remove('active');
     if (!wasHome && window.__resetHomeNav) window.__resetHomeNav();
+    if (!wasHome) window.scrollTo(0, 0);
     renderGreet();
     renderCoins();
     renderJourney();
@@ -654,7 +662,7 @@
   }
 
   /* ---------- backup code: move progress to another phone or browser ---------- */
-  const BACKUP_KEYS = ['profile', 'coins', 'missions', 'winStreak', 'bestStreak', 'chestStars', 'owned', 'skin', 'journey', 'jStars', 'easy', 'medium', 'hard', 'expert', 'extreme', 'daily', 'dailyLog', 'ach', 'trophies',
+  const BACKUP_KEYS = ['lang', 'profile', 'coins', 'missions', 'winStreak', 'bestStreak', 'chestStars', 'owned', 'skin', 'journey', 'jStars', 'easy', 'medium', 'hard', 'expert', 'extreme', 'daily', 'dailyLog', 'ach', 'trophies',
     'themesSolved', 'friends', 'bonusDay', 'bonusStreak', 'pid', 'sound', 'seenHowto', 'tutorialDone', 'paid', 'engine'];
   function backupCode() {
     const o = {};
@@ -2344,6 +2352,7 @@
   // and brand-new players go straight into the guided first case.
   const brandNew = !store.profile;
   if (brandNew) { store.profile = { name: tr('Detective'), auto: true }; save(); renderGreet(); }
+  else if (store.profile.auto && store.profile.name === 'Detective' && tr('Detective') !== 'Detective') { store.profile.name = tr('Detective'); save(); renderGreet(); }
   const hadLink = location.hash.length > 1;
   if (NET && store.netTag) ensureTag().catch(() => {});
   handleLink();

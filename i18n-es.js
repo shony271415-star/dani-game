@@ -1069,7 +1069,7 @@
     stories: [
  [
   "Muerte por postre",
-  "La tarta era mentira. Las coartadas, también."
+  "Las lentejuelas eran falsas. Las coartadas, también."
  ],
  [
   "El mayordomo no fue",
@@ -1112,7 +1112,7 @@
   "Sin mayordomo, todo se complicó enseguida."
  ],
  [
-  "Juegos de herencia",
+  "Pelea por la herencia",
   "Cinco parientes, una fortuna y cero calma."
  ],
  [
@@ -1125,7 +1125,7 @@
  ],
  [
   "Brunch fatal",
-  "Los mimosas eran infinitos. Las mentiras, también."
+  "El zumo era infinito. Las mentiras, también."
  ],
  [
   "El monóculo perdido",
@@ -1156,7 +1156,7 @@
   "Alguien gritó «¡hombre al agua!». Se equivocó en todo."
  ],
  [
-  "Barco del amor, crimen del odio",
+  "Crucero del amor, caso frío",
   "Un crucero romántico. Mucho crucero, poco romance."
  ],
  [
@@ -1261,7 +1261,7 @@
  ],
  [
   "Houston, tenemos un cadáver",
-  "En el espacio nadie oye tus gritos. Por suerte, alguien lo vio."
+  "En el espacio nadie oye nada. Por suerte, alguien lo vio."
  ],
  [
   "Perdido en el espacio",
@@ -1276,8 +1276,8 @@
   "Se comieron el último pastelito lunar. Y se puso personal."
  ],
  [
-  "¿Alienígenas? Apenas los conozco",
-  "La tripulación culpó a los alienígenas. Los alienígenas están ofendidos."
+  "Coartada verdecita",
+  "La tripulación culpó a unos visitantes verdes. Los visitantes se ofendieron."
  ],
  [
   "No es ciencia de cohetes",
@@ -1516,8 +1516,8 @@
   "El caniche de globo lo vio todo."
  ],
  [
-  "Juego de gruñidos",
-  "Se acerca el invierno. Y el detective."
+  "Un largo invierno",
+  "La nieve se acumula. La lista de sospechosos, también."
  ],
  [
   "Cambio de guardia",
@@ -1536,8 +1536,8 @@
   "Un banquete, un bufón y un final nada real."
  ],
  [
-  "Mazmorras y drama",
-  "Tira iniciativa. Luego tira coartada."
+  "Dados y drama",
+  "Tira por una coartada. A todos les salió un uno."
  ],
  [
   "El fantasma tiene coartada",

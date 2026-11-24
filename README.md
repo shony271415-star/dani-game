@@ -36,8 +36,9 @@ Suspects are named in alphabetical order (A, B, C…). Expert and Extreme puzzle
 - **Trophies**: 12 achievements, 50 coins each.
 - **Coin shop**: skin packs for every suspect and victim, from Kitchen Crew (90 coins) to Neon Legends (1,500); two premium packs (Masquerade Ball, Cyber Agents) and coin bundles for real money through Google Play Billing (see `store/GOOGLE-PLAY.md`).
 - **Journey map**: a winding path of numbered levels with stars, boss levels, the scene of each level, and your friends' positions.
-- **Friends**: share a link; friends appear on your map at their level, with their skin. Sharing again updates them.
-- **Duels**: after a case, send a challenge link; the friend gets exactly the same case and sees who was faster.
+- **Friends**: every player can get a 6-character detective ID. Friends add each other by ID (or by link), see who is online, and appear on the journey map.
+- **Live duel**: invite a friend inside the game; you both solve the same case at the same moment and the first to finish wins. A new player who finishes a duel with their inviter gives both 500 coins and the exclusive Partners in Crime pack.
+- **Challenge link**: after a case, send a link; the friend gets exactly the same case and sees who was faster.
 - **Feel**: sounds, vibration, confetti, coin count-up (sound can be turned off).
 
 ## Tools
@@ -53,6 +54,7 @@ Mansion, ship, forest, space station, museum, night train, circus, castle and sk
 - `engine.js`: builds cases, proves each has exactly one solution and grades its difficulty.
 - `worker.js`: runs the engine in the background so the screen never freezes.
 - `app.js` / `index.html`: the game.
+- `net.js`: optional online features (detective ID, live duels). Hidden unless a Firebase project is configured; setup in `store/MULTIPLAYER-SETUP.md`.
 - `manifest.webmanifest`, `sw.js`, `icons/`: install as a phone app, works offline.
 
 Progress and the player's name are saved on the device.
