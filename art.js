@@ -804,7 +804,7 @@
     sea: { name: 'Deep Sea Gang', price: 480, rarity: 'Epic', desc: 'Ten sea creatures: octopus, shark, turtle, crab, seahorse, jellyfish, pufferfish, starfish, whale and swordfish.', draw: seaAvatar },
     masquerade: { name: 'Masquerade Ball', price: 0, rarity: 'Premium', desc: 'Venetian masks and feathers.', draw: masqueradeAvatar },
     cyber: { name: 'Cyber Agents', price: 0, rarity: 'Premium', desc: 'Glowing visors and scan lines.', draw: cyberAvatar },
-    partners: { name: 'Partners in Crime', price: 0, rarity: 'Exclusive', desc: 'Only for detectives who race a new friend.', draw: partnersAvatar },
+    partners: { name: 'Partners in Crime', price: 0, rarity: 'Exclusive', desc: 'Only for detectives who duel a new friend.', draw: partnersAvatar },
   };
 
   /* floor finish for each area: wood, tiles, grass, metal, deck... */

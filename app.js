@@ -40,7 +40,7 @@
     { id: 'royals', name: 'Royal Court', price: 650, rarity: 'Epic', desc: 'Crowns, jewels and ermine, in a shimmering gold frame.', emoji: ['🤴', '👸', '🫅', '👑', '🦄', '💎'] },
     { id: 'space', name: 'Space Crew', price: 800, rarity: 'Epic', desc: 'Astronauts and aliens, framed by the stars.', emoji: ['👩‍🚀', '🧑‍🚀', '👨‍🚀', '👽', '🤖', '👾', '🛸'] },
     { id: 'neon', name: 'Neon Legends', price: 1500, rarity: 'Legendary', desc: 'Glowing neon characters in a pulsing frame.', emoji: ['🌟', '💫', '⚡', '🔮', '🌈', '🪩', '✨'] },
-    { id: 'partners', name: 'Partners in Crime', ref: true, rarity: 'Exclusive', desc: 'Only for detectives who race a new friend.', emoji: ['🤝', '🕵️', '🔎', '🕵️‍♀️'] },
+    { id: 'partners', name: 'Partners in Crime', ref: true, rarity: 'Exclusive', desc: 'Only for detectives who duel a new friend.', emoji: ['🤝', '🕵️', '🔎', '🕵️‍♀️'] },
     { id: 'masquerade', name: 'Masquerade Ball', iap: 'skin_masquerade', usd: '$1.99', rarity: 'Premium', desc: 'Venetian masks, feathers and velvet. Comes with a gilded frame.', emoji: ['🎭', '🦚', '🪶', '💃', '🕺', '🎩'] },
     { id: 'cyber', name: 'Cyber Agents', iap: 'skin_cyber', usd: '$2.99', rarity: 'Premium', desc: 'Glowing visors and live scan lines. The flashiest look in the game.', emoji: ['🦾', '🤖', '🕶️', '👾', '💿', '🛰️'] },
   ];
@@ -761,7 +761,7 @@
     const age = today().num - (f.at || today().num);
     const canRace = NET && f.u;
     return `<div class="friend-row"><span class="pf skin-${f.s}">${face(fp, f.s)}</span><div><b>${esc(f.n)}${online ? ` <span class="on-dot" title="${esc(tr('Online now'))}"></span>` : ''}</b><small>${tr('Level {0} · {1} cases · {2}-day streak · updated {3}', f.l, f.t, f.d, age ? tr('{0}d ago', age) : tr('today'))}</small></div>
-      ${canRace ? `<button class="mini-race" data-act="racef" data-id="${f.i}" aria-label="${esc(tr('Race {0}', f.n))}">${ic('knife', '⚔️')}</button>` : ''}
+      ${canRace ? `<button class="mini-race" data-act="racef" data-id="${f.i}" aria-label="${esc(tr('Duel {0}', f.n))}">${ic('knife', '⚔️')}</button>` : ''}
       <button class="mini-x" data-act="rm" data-id="${f.i}" aria-label="${esc(tr('Remove'))}">✕</button></div>`;
   }
   function friendListHtml(online) {
@@ -769,14 +769,14 @@
       || `<p><small>${NET ? tr('No friends yet. Tell a friend your detective ID, or add theirs.') : tr('No friends yet. Send your link to a friend, and ask for theirs!')}</small></p>`;
   }
   function showFriends() {
-    const ids = NET && store.netOff ? `<div class="my-id"><button class="primary" data-act="getid">${tr('Get a detective ID')}</button></div><p class="id-msg"><small>${tr('Friends you add here can invite you to races right inside the game.')}</small></p>`
+    const ids = NET && store.netOff ? `<div class="my-id"><button class="primary" data-act="getid">${tr('Get a detective ID')}</button></div><p class="id-msg"><small>${tr('Friends you add here can invite you to duels right inside the game.')}</small></p>`
       : NET ? `<div class="my-id"><small>${tr('Your detective ID')}</small><b class="id-code" id="my-id" dir="ltr">${esc(store.netTag || '······')}</b><button class="secondary" data-act="copyid">${tr('Copy')}</button></div>
       <div class="add-id"><input class="name-in" id="id-in" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="${esc(tr("Friend's ID"))}" dir="ltr"><button class="primary" data-act="addid">${tr('Add')}</button></div>
-      <p class="id-msg" id="id-msg"><small>${tr('Friends you add here can invite you to races right inside the game.')}</small></p>` : '';
+      <p class="id-msg" id="id-msg"><small>${tr('Friends you add here can invite you to duels right inside the game.')}</small></p>` : '';
     modal(`<div class="big">${ic('hand', '🤝')}</div><h2>${tr('Friends')}</h2>
       ${ids}
       <div class="friend-list" id="friend-list">${friendListHtml()}</div>
-      ${NET ? `<div class="race-cta"><button class="primary" data-act="race">${ic('knife', '⚔️')} ${tr('Live race with a friend')}</button><small>${tr('New detective? You both get {0} coins and the exclusive Partners in Crime pack.', REF_COINS)}</small></div>` : ''}
+      ${NET ? `<div class="race-cta"><button class="primary" data-act="race">${ic('knife', '⚔️')} ${tr('Live duel with a friend')}</button><small>${tr('New detective? You both get {0} coins and the exclusive Partners in Crime pack.', REF_COINS)}</small></div>` : ''}
       <details class="other-ways"${NET ? '' : ' open'}><summary>${tr('Other ways to add friends')}</summary>
         <p><small>${tr("You're on level <b>{0}</b>. Send your link so friends see you on their map. Send it again whenever you want them to see your new progress.", prog('journey').caseNum)}</small></p>
         <div class="row"><button class="secondary" data-act="mine">${tr('Send my link')}</button><button class="secondary" data-act="add">${tr('Add a friend')}</button></div></details>
@@ -808,7 +808,7 @@
       const idIn = $('id-in');
       idIn.addEventListener('keydown', (e) => { if (e.key === 'Enter') addById(idIn.value); });
       ensureTag().then((tag) => { const el = $('my-id'); if (el) el.textContent = tag; refreshFriends(); })
-        .catch(() => { const el = $('id-msg'); if (el) el.innerHTML = `<small>${navigator.onLine === false ? tr('Live races need an internet connection.') : tr('Could not reach the race server. Try again in a moment.')}</small>`; });
+        .catch(() => { const el = $('id-msg'); if (el) el.innerHTML = `<small>${navigator.onLine === false ? tr('Live duels need an internet connection.') : tr('Could not reach the duel server. Try again in a moment.')}</small>`; });
     }
   }
   // friendship goes one way (no server), so right after adding someone, offer to send our link back
@@ -894,7 +894,7 @@
       const owned = store.owned.includes(x.id), on = skinId() === x.id, short = (x.price || 0) - coins();
       const btn = on ? `<button class="secondary" disabled>${tr('Equipped ✓')}</button>`
         : owned ? `<button class="primary" data-act="equip" data-id="${x.id}">${tr('Equip')}</button>`
-        : x.ref ? `<button class="secondary" ${NET ? 'data-act="race"' : 'disabled'}>${ic('knife', '⚔️')} ${tr('Race a new friend to unlock')}</button>`
+        : x.ref ? `<button class="secondary" ${NET ? 'data-act="race"' : 'disabled'}>${ic('knife', '⚔️')} ${tr('Duel a new friend to unlock')}</button>`
         : x.iap ? `<button class="primary premium-btn" data-act="iap" data-id="${x.iap}">${tr('Buy for {0}', IAP.price(x.iap, x.usd))}</button>`
         : short > 0 ? `<button class="secondary" disabled>${coinIc()} ${I.num(x.price)} · ${tr('need {0} more', I.num(short))}</button>`
         : `<button class="primary" data-act="buy" data-id="${x.id}">${tr('Buy for {0}', coinIc() + ' ' + I.num(x.price))}</button>`;
@@ -991,19 +991,19 @@
     $('loading').classList.remove('show');
     if (R && R.stop) R.stop();
     R = null;
-    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Live race')}</h2><p>${msg || (navigator.onLine === false ? tr('Live races need an internet connection.') : tr('Could not reach the race server. Try again in a moment.'))}</p>
+    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Live duel')}</h2><p>${msg || (navigator.onLine === false ? tr('Live duels need an internet connection.') : tr('Could not reach the duel server. Try again in a moment.'))}</p>
       <div class="row"><button class="primary" data-act="close">${tr('OK')}</button></div>`);
   }
   function raceMenu(friend) {
     if (!NET) return;
-    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${friend ? tr('Race {0}', esc(friend.n)) : tr('Live race')}</h2>
+    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${friend ? tr('Duel {0}', esc(friend.n)) : tr('Live duel')}</h2>
       <p>${friend ? tr('Pick a level. {0} gets the invite inside the game.', esc(friend.n)) : tr('Same case, same moment. Whoever solves it first wins.')}</p>
       <div class="race-diffs">${RACE_DIFFS.map((d) => `<button class="secondary" data-act="go" data-d="${d}">${esc(dname(d))}</button>`).join('')}</div>
       <p><small>${tr('New detective? You both get {0} coins and the exclusive Partners in Crime pack.', REF_COINS)}</small></p>
       <div class="row"><button class="secondary" data-act="code">${tr('I have a code')}</button><button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
       go: (b) => createRace(b.dataset.d, friend),
       code: () => {
-        modal(`<h2>${tr('Join a race')}</h2><p><small>${tr('Type the 6-letter code your friend sent you.')}</small></p>
+        modal(`<h2>${tr('Join a duel')}</h2><p><small>${tr('Type the 6-letter code your friend sent you.')}</small></p>
           <input class="name-in race-code-in" id="race-in" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC123">
           <div class="row"><button class="primary" data-act="ok">${tr('Join')}</button><button class="secondary" data-act="back">${tr('Back')}</button></div>`, {
           ok: () => {
@@ -1026,7 +1026,7 @@
   async function createRace(diff, invitee) {
     if (!NET || !DIFF[diff]) return;
     closeModal();
-    raceWait(tr('Opening a race room…'));
+    raceWait(tr('Opening a duel room…'));
     try {
       await NET.signIn();
       cleanupRaces();
@@ -1046,17 +1046,17 @@
   }
   async function joinRace(code) {
     code = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
-    if (!NET) return raceFail(null, tr('Live races are not available in this version yet.'));
+    if (!NET) return raceFail(null, tr('Live duels are not available in this version yet.'));
     closeModal();
-    raceWait(tr('Joining the race…'));
+    raceWait(tr('Joining the duel…'));
     try {
       await NET.signIn();
       const room = await NET.get('races/' + code);
-      if (!room || !room.host) return raceFail(null, tr('This race has ended, or the code is wrong.'));
+      if (!room || !room.host) return raceFail(null, tr('This duel has ended, or the code is wrong.'));
       const me = NET.uid();
       if (room.host.uid === me) return enterRace(code, 'host');
-      if (room.guest && room.guest.uid !== me) return raceFail(null, tr('This race already has two detectives.'));
-      if (room.go && !(room.guest && room.guest.uid === me)) return raceFail(null, tr('This race has already started.'));
+      if (room.guest && room.guest.uid !== me) return raceFail(null, tr('This duel already has two detectives.'));
+      if (room.go && !(room.guest && room.guest.uid === me)) return raceFail(null, tr('This duel has already started.'));
       if (!room.guest) await NET.put(`races/${code}/guest`, raceCard(isNewbie()));
       enterRace(code, 'guest');
     } catch (e) { raceFail(e); }
@@ -1073,7 +1073,7 @@
     const room = R.room, me = room && room[R.role], foe = room && room[otherRole()];
     const slot = (p, label) => `<div class="race-p${p ? '' : ' empty'}">${p ? `<span class="pf skin-${PACK[p.s] ? p.s : 'classic'}">${face({ name: p.n, g: 'f', letter: (p.n || '?')[0], color: '#7aa7ff', emoji: '🙂' }, PACK[p.s] ? p.s : 'classic')}</span><b>${esc(p.n)}</b>` : `<span class="race-dots">…</span><b>${label}</b>`}</div>`;
     const inv = R.invitee;
-    const status = !room ? tr('Connecting…') : !foe && R.declined ? tr("{0} can't race right now.", esc(inv.n))
+    const status = !room ? tr('Connecting…') : !foe && R.declined ? tr("{0} can't duel right now.", esc(inv.n))
       : !foe && inv && R.slow ? tr('{0} may be offline. Send the code another way, or try later.', esc(inv.n))
       : !foe && inv ? tr('Invite sent to {0}. Waiting…', esc(inv.n)) : !foe ? tr('Waiting for your friend to join…') : room.go ? tr('Get ready!') : tr('{0} joined! Starting…', esc(foe.n));
     return `<div class="race-vs">${slot(me, tr('You'))}<span class="race-x">VS</span>${slot(foe, inv ? esc(inv.n) : tr('Friend'))}</div><p class="race-status">${status}</p>
@@ -1081,11 +1081,11 @@
   }
   function showLobby() {
     const host = R.role === 'host';
-    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Live race')}</h2>
+    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Live duel')}</h2>
       ${host ? `<p>${tr('Send this code or the invite link to a friend:')}</p><div class="race-code" dir="ltr">${R.code}</div>` : ''}
       <div id="race-lobby">${lobbyHtml()}</div>
       <div class="row">${host ? `<button class="primary" data-act="invite">${ic('share', '📤')} ${tr('Send invite')}</button>` : ''}<button class="secondary" data-act="cancel">${tr('Cancel')}</button></div>`, {
-      invite: () => share(tr('Race me on Crime Grid! Same case, first to solve it wins. Code: {0}', R.code), raceUrl(R.code)),
+      invite: () => share(tr('Duel me on Crime Grid! Same case, first to solve it wins. Code: {0}', R.code), raceUrl(R.code)),
       cancel: () => { raceLeave(); closeModal(); },
     }, true);
   }
@@ -1101,7 +1101,7 @@
     const prevFoe = R.foe;
     R.room = room;
     if (!room || !room.host) {
-      if (R.phase === 'lobby') return raceFail(null, tr('Your friend cancelled the race.'));
+      if (R.phase === 'lobby') return raceFail(null, tr('Your friend cancelled the duel.'));
       if (R.stop) R.stop();
       return;
     }
@@ -1126,7 +1126,7 @@
       paintRaceBar();
       const foeRes = room.res && room.res[otherRole()];
       if (foeRes && !R.toldFoe) { R.toldFoe = true; toast(`<span class="ti">${ic('knife', '⚔️')}</span><span><b>${tr('{0} solved it first!', esc(R.foe.n))}</b><small>${tr('Finish the case anyway.')}</small></span>`); }
-      if (room.left && room.left[otherRole()] && !R.toldLeft) { R.toldLeft = true; toast(`<span class="ti">${ic('knife', '⚔️')}</span><span><b>${tr('{0} left the race.', esc(R.foe.n))}</b></span>`); }
+      if (room.left && room.left[otherRole()] && !R.toldLeft) { R.toldLeft = true; toast(`<span class="ti">${ic('knife', '⚔️')}</span><span><b>${tr('{0} left the duel.', esc(R.foe.n))}</b></span>`); }
     }
     raceReferral();
     if (R.phase === 'done') {
@@ -1146,7 +1146,7 @@
     const step = () => {
       if (!R || R.phase !== 'count') return;
       if (n === 0) return startRaceGame();
-      modal(`<div class="race-count">${n}</div><p>${tr('Racing {0}', esc(R.foe ? R.foe.n : ''))}</p>`, {}, true);
+      modal(`<div class="race-count">${n}</div><p>${tr('Dueling {0}', esc(R.foe ? R.foe.n : ''))}</p>`, {}, true);
       sfx('place');
       n--;
       setTimeout(step, 800);
@@ -1202,7 +1202,7 @@
     if (!R) return '';
     const o = raceOutcome(), name = esc(R.foe ? R.foe.n : '');
     if (!o) return `<div class="duel">${tr('Checking who was first…')}</div>`;
-    if (o.won) return `<div class="duel won">${tr('You won the race against {0}! +{1} coins', name, RACE_WIN)}${o.foe ? `<br><small>${tr('You {0} · {1} {2}', fmtTime(o.me.sec), name, fmtTime(o.foe.sec))}</small>` : ''}</div>`;
+    if (o.won) return `<div class="duel won">${tr('You won the duel against {0}! +{1} coins', name, RACE_WIN)}${o.foe ? `<br><small>${tr('You {0} · {1} {2}', fmtTime(o.me.sec), name, fmtTime(o.foe.sec))}</small>` : ''}</div>`;
     return `<div class="duel lost">${tr('{0} solved it first.', name)}<br><small>${tr('You {0} · {1} {2}', fmtTime(o.me.sec), name, fmtTime(o.foe.sec))}</small></div>`;
   }
   function raceReward() {
@@ -1233,7 +1233,7 @@
     if (fresh) store.owned.push('partners');
     addCoins(REF_COINS);
     sfx('unlock'); confetti();
-    toast(`<span class="ti">${ic('gift', '🎁')}</span><span><b>${tr('+{0} coins for racing with {1}!', REF_COINS, esc(name))}</b><small>${fresh ? tr('Partners in Crime pack unlocked. Equip it in the shop.') : tr('Thanks for bringing a new detective!')}</small></span>`);
+    toast(`<span class="ti">${ic('gift', '🎁')}</span><span><b>${tr('+{0} coins for dueling {1}!', REF_COINS, esc(name))}</b><small>${fresh ? tr('Partners in Crime pack unlocked. Equip it in the shop.') : tr('Thanks for bringing a new detective!')}</small></span>`);
   }
 
   /* ---------- online friends: a short detective ID, live profiles and in-game invites (no links needed) ---------- */
@@ -1292,7 +1292,7 @@
     if (m.t === 'friend') {
       const known = (store.friends || []).some((f) => f.u === m.from);
       addFriend(card, true);
-      if (!known) toast(`<span class="ti">${ic('hand', '🤝')}</span><span><b>${tr('{0} added you as a friend!', esc(m.n))}</b><small>${tr('You can now invite each other to races.')}</small></span>`);
+      if (!known) toast(`<span class="ti">${ic('hand', '🤝')}</span><span><b>${tr('{0} added you as a friend!', esc(m.n))}</b><small>${tr('You can now invite each other to duels.')}</small></span>`);
       const fl = $('friend-list'); if (fl) fl.innerHTML = friendListHtml();
       return drop();
     }
@@ -1304,9 +1304,9 @@
     addFriend(card, true);
     const decline = () => { drop(); NET.put(`inbox/${m.from}/no_${m.code}`, { t: 'no', from: NET.uid(), n: String(myCard().n).slice(0, 18), code: m.code, at: NET.TS }).catch(() => {}); };
     sfx('unlock');
-    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Race invite!')}</h2>
+    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Duel invite!')}</h2>
       <div class="race-vs"><div class="race-p"><span class="pf skin-${PACK[m.s] ? m.s : 'classic'}">${face({ name: m.n, g: 'f', letter: m.n[0], color: '#7aa7ff', emoji: '🙂' }, PACK[m.s] ? m.s : 'classic')}</span><b>${esc(m.n)}</b></div></div>
-      <p>${tr('{0} invites you to a live race ({1}). First to solve the case wins!', esc(m.n), esc(dname(m.diff)))}</p>
+      <p>${tr('{0} invites you to a live duel ({1}). First to solve the case wins!', esc(m.n), esc(dname(m.diff)))}</p>
       <div class="row"><button class="primary" data-act="join">${ic('knife', '⚔️')} ${tr('Join')}</button><button class="secondary" data-act="no">${tr('Not now')}</button></div>`, {
       join: () => { drop(); joinRace(m.code); },
       no: () => { decline(); closeModal(); },
@@ -1342,7 +1342,7 @@
       say(tr('{0} added! They will see you in their friends list too.', esc(p.n || tag)));
       refreshFriends();
       if ($('map').classList.contains('active')) showMap();
-    } catch (e) { say(navigator.onLine === false ? tr('Live races need an internet connection.') : tr('Could not reach the race server. Try again in a moment.')); }
+    } catch (e) { say(navigator.onLine === false ? tr('Live duels need an internet connection.') : tr('Could not reach the duel server. Try again in a moment.')); }
   }
   function forgetOnline() {
     modal(`<h2>${tr('Delete my online ID')}</h2><p>${tr('This removes your detective ID and online profile from the server. Your progress on this device stays. Friends will no longer be able to invite you in the game.')}</p>
@@ -1471,9 +1471,9 @@
     if (!S) return;
     const P = S.P, slot = S.slot, { title, intro } = caseText();
     const rb = $('race-bar'); if (rb) rb.hidden = slot !== 'race';
-    const label = slot === 'race' ? tr('Live race: {0}', title) : slot === 'challenge' && S.challenge ? tr("{0}'s challenge: {1}", S.challenge.n, title) : slot === 'daily' ? tr('Daily Case: {0}', title) : slot === 'tutorial' ? title : slot === 'journey' ? tr('Level {0}: {1}', S.caseNum, title) : tr('Level {0}: {1}', S.caseNum, title);
+    const label = slot === 'race' ? tr('Live duel: {0}', title) : slot === 'challenge' && S.challenge ? tr("{0}'s challenge: {1}", S.challenge.n, title) : slot === 'daily' ? tr('Daily Case: {0}', title) : slot === 'tutorial' ? title : slot === 'journey' ? tr('Level {0}: {1}', S.caseNum, title) : tr('Level {0}: {1}', S.caseNum, title);
     $('case-title').innerHTML = (ART ? `<span class="tic">${ART.theme(P.theme.id)}</span>` : P.theme.icon + ' ') + esc(label);
-    $('intro').textContent = slot === 'race' && R && R.foe ? tr('First to solve it wins. {0} is racing you right now!', R.foe.n) : slot === 'challenge' && S.challenge ? tr('⚔ {0} solved this in {1}. Can you beat that?', S.challenge.n, fmtTime(S.challenge.time)) : intro;
+    $('intro').textContent = slot === 'race' && R && R.foe ? tr('First to solve it wins. {0} is dueling you right now!', R.foe.n) : slot === 'challenge' && S.challenge ? tr('⚔ {0} solved this in {1}. Can you beat that?', S.challenge.n, fmtTime(S.challenge.time)) : intro;
     updateSub();
   }
 
@@ -1576,7 +1576,7 @@
   function stopTimer() { if (timer) clearInterval(timer); timer = null; }
   function updateSub() {
     const dn = dname(S.diff);
-    const kind = S.slot === 'race' ? tr('Live race') + ' · ' + dn : S.slot === 'challenge' ? tr('Challenge') + ' · ' + dn : S.slot === 'daily' ? tr('Daily') + ' · ' + dn : S.slot === 'tutorial' ? tr('Tutorial') : S.slot === 'journey' ? tr('Level {0}', S.caseNum) + ' · ' + dn + (isBoss(S.caseNum) ? ' · ' + tr('Boss') : '') : dn + ' · ' + tr('Level {0}', S.caseNum);
+    const kind = S.slot === 'race' ? tr('Live duel') + ' · ' + dn : S.slot === 'challenge' ? tr('Challenge') + ' · ' + dn : S.slot === 'daily' ? tr('Daily') + ' · ' + dn : S.slot === 'tutorial' ? tr('Tutorial') : S.slot === 'journey' ? tr('Level {0}', S.caseNum) + ' · ' + dn + (isBoss(S.caseNum) ? ' · ' + tr('Boss') : '') : dn + ' · ' + tr('Level {0}', S.caseNum);
     $('case-sub').textContent = ART ? `${fmtTime(S.elapsed)} · ${kind} · ${I.themeName(S.P.theme.name)}` : `${I.themeName(S.P.theme.name)} · ${kind} · ⏱ ${fmtTime(S.elapsed)}`;
   }
 
@@ -2213,7 +2213,7 @@
         <div class="w-actions">
           <button class="primary w-main" data-act="${hasNext ? 'next' : 'shareres'}">${hasNext ? (S.slot === 'journey' ? tr('Level {0} →', S.caseNum + 1) : tr('Next case →')) : `${ic('share', '📤')} ${tr('Share result')}`}</button>
           ${hasNext ? `<button class="secondary w-sec share-res" data-act="shareres">${ic('share', '📤')} ${tr('Share result')}</button>` : ''}
-          <div class="w-links"><button data-act="home">${tr('Menu')}</button><button data-act="duel">${ic('knife', '⚔️')} ${S.slot === 'race' ? tr('New race') : S.slot === 'challenge' ? tr('Challenge back') : tr('Challenge a friend')}</button></div>
+          <div class="w-links"><button data-act="home">${tr('Menu')}</button><button data-act="duel">${ic('knife', '⚔️')} ${S.slot === 'race' ? tr('New duel') : S.slot === 'challenge' ? tr('Challenge back') : tr('Challenge a friend')}</button></div>
         </div></div>`, {
       next: nextCase,
       shareres: () => shareResult(nStars),
@@ -2231,7 +2231,7 @@
       ${ret.lines.length ? `<div class="ret-lines">${ret.lines.map((l) => `<div>${l}</div>`).join('')}</div>` : ''}
       <div class="row">${S.slot === 'daily' || S.slot === 'challenge' || S.slot === 'race' ? '' : `<button class="primary" data-act="next">${S.slot === 'journey' ? tr('Level {0} →', S.caseNum + 1) : tr('Next case →')}</button>`}<button class="${S.slot === 'daily' || S.slot === 'challenge' || S.slot === 'race' ? 'primary' : 'secondary'}" data-act="home">${tr('Menu')}</button></div>
       ${ART ? `<div class="row"><button class="primary share-res" data-act="shareres">${ic('share', '📤')} ${tr('Share result')}</button></div>` : ''}
-      <div class="row"><button class="secondary duel-btn" data-act="duel">${ic('knife', '⚔️')} ${S.slot === 'race' ? tr('New race') : S.slot === 'challenge' ? tr('Challenge back') : tr('Challenge a friend')}</button></div>`, {
+      <div class="row"><button class="secondary duel-btn" data-act="duel">${ic('knife', '⚔️')} ${S.slot === 'race' ? tr('New duel') : S.slot === 'challenge' ? tr('Challenge back') : tr('Challenge a friend')}</button></div>`, {
       next: nextCase,
       shareres: () => shareResult(nStars),
       duel: () => (S.slot === 'race' ? raceMenu() : share(tr('I solved "{0}" in {1} on Crime Grid. Can you beat my time?', caseText().title, fmtTime(S.elapsed)), challengeLink())),
