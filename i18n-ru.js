@@ -522,7 +522,21 @@
  "This removes your detective ID and online profile from the server. Your progress on this device stays. Friends will no longer be able to invite you in the game.": "Ваш ID детектива и онлайн-профиль будут удалены с сервера. Прогресс на этом устройстве сохранится. Друзья больше не смогут звать вас в игре.",
  "Delete": "Удалить",
  "Online ID deleted.": "Онлайн-ID удалён.",
- "Get a detective ID": "Получить ID детектива"
+ "Get a detective ID": "Получить ID детектива",
+ "Duel": "Дуэль",
+ "Stake per player": "Ставка с каждого",
+ "Free": "Бесплатно",
+ "The winner takes {0} coins. Leaving early loses your stake.": "Победитель забирает {0} монет. Кто выйдет раньше, потеряет ставку.",
+ "Stake: {0} coins each. The winner takes {1}.": "Ставка: по {0} монет. Победитель забирает {1}.",
+ "{0} challenges you for {1} coins each. The winner takes {2}. Join?": "{0} предлагает сыграть на {1} монет с каждого. Победитель забирает {2}. Присоединиться?",
+ "You need {0} coins to join this duel.": "Чтобы присоединиться к дуэли, нужно {0} монет.",
+ "Not enough coins for this stake.": "Не хватает монет для этой ставки.",
+ "{0} solved it first. You lost {1} coins.": "{0} раскрыл(а) дело первым. Вы потеряли {1} монет.",
+ "You left a duel with a stake. The stake was lost.": "Вы вышли из дуэли со ставкой. Ставка потеряна.",
+ "You lost {0} coins.": "Вы потеряли {0} монет.",
+ "To invite {0} inside the game, add them once with their detective ID (Friends screen).": "Чтобы звать {0} прямо в игре, один раз добавьте друга по его ID детектива (экран «Друзья»).",
+ "{0} can't get invites yet. Send the code another way.": "{0} пока не может получать приглашения. Отправьте код другим способом.",
+ "{0} invites you to a live duel ({1}) for {2} coins each. The winner takes {3}!": "{0} зовёт вас на живую дуэль ({1}) на {2} монет с каждого. Победитель забирает {3}!"
 },
     pl: {
  "{0} cases solved": {

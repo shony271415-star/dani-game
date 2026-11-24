@@ -766,7 +766,14 @@
     const d = p.isVictim, s = slotOf(p), skin = ['#f2d3b5', '#e0b28a', '#c48a5e', '#8f6040'][rn(p, 3, 4)];
     const HAIR = ['#2b2530', '#6b4a33', '#c98a3a', '#1c1822', '#a0522d', '#e8d6a0', '#3d3540', '#7a2b3a', '#2b2530', '#5a4a3a'][s];
     const COAT = ['#c9a27a', '#7a6a5a', '#b59a6c', '#5a6a7a', '#8a5a3a', '#c9a27a', '#6b6a73', '#9a7a5a', '#4a5a4a', '#b5a58a'][s];
+    const h = hash(p.name + p.letter), SC = ['#b5243a', '#d9a441', '#b5243a', '#3bb0a0', '#d9a441', '#b5243a', '#d9a441', '#c24fa8', '#d9a441', '#3bb0a0'][s];
+    const bg = `<defs><radialGradient id="pc${h}" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#8a2342"/><stop offset=".6" stop-color="#3a0f24"/><stop offset="1" stop-color="#14060e"/></radialGradient><linearGradient id="pg${h}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".5" stop-color="#f0c35f"/><stop offset="1" stop-color="#b9862c"/></linearGradient></defs><circle cx="32" cy="32" r="32" fill="url(#pc${h})"/>`
+      + `<g fill="#ffe08a"><path d="M9 13l1.2 2.8 2.8 1.2-2.8 1.2L9 21l-1.2-2.800-2.800-1.200 2.800-1.200Z"/><path d="M54 10l.9 2 2 .9-2 .9-.9 2-.9-2-2-.9 2-.9Z"/><circle cx="55" cy="38" r="1"/><circle cx="8" cy="40" r=".9"/><circle cx="48" cy="22" r=".8"/></g>`;
+    const link = `<g transform="translate(51 55)" fill="none" stroke="url(#pg${h})" stroke-width="2.200"><circle cx="-3" cy="0" r="4.300"/><circle cx="3" cy="0" r="4.300"/></g>`;
     const body = `<path d="M8 64c0-12 10-18 24-18s24 6 24 18Z" fill="${COAT}" ${st(1.6)}/><path d="M32 47l-9 7 4 10M32 47l9 7-4 10" fill="none" ${st(1.4)}/><path d="M25 47l7 8 7-8" fill="#efe4cf" ${st(1.2)}/>`
+      + `<path d="M22 49c3 4 17 4 20 0l1 5c-4 4-18 4-22 0Z" fill="${SC}" ${st(1.2)}/><path d="M38 52l3 11-4 1-1-10Z" fill="${SC}" ${st(1.1)}/>`
+      + `<path d="M11 55l7-4 4 6-8 3Z M53 55l-7-4-4 6 8 3Z" fill="url(#pg${h})" ${st(1)}/>`
+      + `<g transform="translate(24 58)"><path d="M0-4.500l4 1.500v4c0 3-2 4.500-4 5.500-2-1-4-2.500-4-5.500v-4Z" fill="url(#pg${h})" ${st(1.1)}/><path d="M0-2l1.100 2.200 2.400.3-1.700 1.700.4 2.400L0 3.500l-2.200 1.100.4-2.400-1.700-1.700 2.400-.3Z" fill="#7a1d3a"/></g>`;
       + `<g transform="translate(43 56)"><circle cx="-1.6" cy="0" r="2.6" fill="none" stroke="#ffd166" stroke-width="1.6"/><circle cx="1.6" cy="0" r="2.6" fill="none" stroke="#ffd166" stroke-width="1.6"/></g>`;
     const face = `<ellipse cx="32" cy="32" rx="12.5" ry="13.5" fill="${skin}" ${st(1.6)}/>`;
     let back = '', top = '', extra = '', eyes = eyesAt(d, 27, 37, 31.5, 2), mouth = smile(d, 38.5, 3);
@@ -781,7 +788,7 @@
     if (s === 7) top = `<path d="M19 27c-1-10 5-16 13-16s14 6 13 16c-8-2-18-2-26 0Z" fill="#2e8b57" ${st(1.4)}/><path d="M19 23h26" stroke="#1f6a42" stroke-width="2"/><circle cx="32" cy="10" r="3" fill="#efe4cf" ${st(1)}/>`;
     if (s === 8) { back = `<g fill="${HAIR}" ${st(1.2)}><circle cx="20" cy="22" r="5"/><circle cx="26" cy="16" r="5"/><circle cx="33" cy="14" r="5"/><circle cx="40" cy="16" r="5"/><circle cx="45" cy="22" r="5"/><circle cx="19" cy="30" r="4"/><circle cx="46" cy="30" r="4"/></g>`; extra = `<path d="M20 48c6 4 18 4 24 0l-2 6c-6 3-14 3-20 0Z" fill="#b5243a" ${st(1.3)}/>`; }
     if (s === 9) { back = `<path d="M14 40c-2-18 6-29 18-29s20 11 18 29c-2 6-6 8-8 8H22c-2 0-6-2-8-8Z" fill="${COAT}" ${st(1.5)}/>`; top = `<path d="M19 26c3-7 8-9 13-9s10 2 13 9" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2"/>`; }
-    return SVG64(`${back}${body}${extra && s === 8 ? extra : ''}${face}${eyes}${mouth}${s !== 8 ? extra : ''}${top}`);
+    return SVG64(`${bg}${back}${body}${link}${extra && s === 8 ? extra : ''}${face}${eyes}${mouth}${s !== 8 ? extra : ''}${top}`);
   }
 
   const SKINS = {
