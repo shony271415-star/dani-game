@@ -4,8 +4,8 @@
   'use strict';
   // Filled in once the Firebase project exists (see store/MULTIPLAYER-SETUP.md). Empty = live races are hidden.
   const CONFIG = window.CG_NET_CONFIG || {
-    apiKey: '',
-    dbUrl: '',          // e.g. https://crime-grid-xxxx-default-rtdb.europe-west1.firebasedatabase.app
+    apiKey: 'AIzaSyBgmE2YO5YNVwi9GyyzBqBHfU9ELjOXFxs',
+    dbUrl: 'https://crimegrid-7c6da-default-rtdb.europe-west1.firebasedatabase.app',          // e.g. https://crime-grid-xxxx-default-rtdb.europe-west1.firebasedatabase.app
   };
   const AUTH_BASE = CONFIG.authBase || 'https://';           // emulator: http://127.0.0.1:9099/
   const DB_QS = CONFIG.ns ? `&ns=${CONFIG.ns}` : '';          // emulator namespace
