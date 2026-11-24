@@ -457,7 +457,77 @@
  "{0}/{1} stars to the next chest": "{0}/{1} estrellas para el próximo cofre",
  "Star chest opened! +{0} coins": "¡Cofre abierto! +{0} monedas",
  "Star chest opened! New pack: {0}": "¡Cofre abierto! Nuevo pack: {0}",
- "Win streak: {0}": "Racha de victorias: {0}"
+ "Win streak: {0}": "Racha de victorias: {0}",
+ "Partners in Crime": "Cómplices",
+ "Exclusive": "Exclusivo",
+ "Only for detectives who duel a new friend.": "Solo para detectives que se baten en duelo con un amigo nuevo.",
+ "Duel a new friend to unlock": "Bátete en duelo con un amigo nuevo para desbloquear",
+ "Live duel": "Duelo en vivo",
+ "Live duel: {0}": "Duelo en vivo: {0}",
+ "First to solve it wins. {0} is dueling you right now!": "Gana quien lo resuelva primero. ¡{0} se está batiendo en duelo contigo ahora mismo!",
+ "New duel": "Nuevo duelo",
+ "Live duel with a friend": "Duelo en vivo con un amigo",
+ "New detective? You both get {0} coins and the exclusive Partners in Crime pack.": "¿Detective nuevo? Cada uno recibe {0} monedas y el paquete exclusivo Cómplices.",
+ "Live duels need an internet connection.": "Los duelos en vivo necesitan conexión a internet.",
+ "Could not reach the duel server. Try again in a moment.": "No se pudo conectar con el servidor. Inténtalo de nuevo en un momento.",
+ "Same case, same moment. Whoever solves it first wins.": "Mismo caso, mismo momento. Gana quien lo resuelva primero.",
+ "I have a code": "Tengo un código",
+ "Join a duel": "Unirse a un duelo",
+ "Type the 6-letter code your friend sent you.": "Escribe el código de 6 caracteres que te envió tu amigo.",
+ "Join": "Unirse",
+ "Opening a duel room…": "Abriendo una sala de duelo…",
+ "Live duels are not available in this version yet.": "Los duelos en vivo aún no están disponibles en esta versión.",
+ "Joining the duel…": "Uniéndote al duelo…",
+ "This duel has ended, or the code is wrong.": "Este duelo terminó o el código es incorrecto.",
+ "This duel already has two detectives.": "Este duelo ya tiene dos detectives.",
+ "This duel has already started.": "Este duelo ya empezó.",
+ "Friend": "Amigo",
+ "Connecting…": "Conectando…",
+ "Waiting for your friend to join…": "Esperando a que tu amigo se una…",
+ "Get ready!": "¡Prepárate!",
+ "{0} joined! Starting…": "¡{0} se unió! Empezando…",
+ "Send this code or the invite link to a friend:": "Envía este código o el enlace de invitación a un amigo:",
+ "Send invite": "Enviar invitación",
+ "Duel me on Crime Grid! Same case, first to solve it wins. Code: {0}": "¡Bátete en duelo conmigo en Crime Grid! Mismo caso, gana quien lo resuelva primero. Código: {0}",
+ "Your friend cancelled the duel.": "Tu amigo canceló el duelo.",
+ "{0} solved it first!": "¡{0} lo resolvió primero!",
+ "Finish the case anyway.": "Termina el caso de todos modos.",
+ "{0} left the duel.": "{0} abandonó el duelo.",
+ "Dueling {0}": "Duelo contra {0}",
+ "Solved!": "¡Resuelto!",
+ "Checking who was first…": "Comprobando quién fue primero…",
+ "You won the duel against {0}! +{1} coins": "¡Ganaste el duelo contra {0}! +{1} monedas",
+ "{0} solved it first.": "{0} lo resolvió primero.",
+ "+{0} coins for dueling {1}!": "¡+{0} monedas por el duelo con {1}!",
+ "Partners in Crime pack unlocked. Equip it in the shop.": "Paquete Cómplices desbloqueado. Equípalo en la tienda.",
+ "Thanks for bringing a new detective!": "¡Gracias por traer a un detective nuevo!",
+ "Online now": "En línea ahora",
+ "Duel {0}": "Duelo contra {0}",
+ "No friends yet. Tell a friend your detective ID, or add theirs.": "Aún no tienes amigos. Dile a un amigo tu ID de detective o añade el suyo.",
+ "Your detective ID": "Tu ID de detective",
+ "Copy": "Copiar",
+ "Friend's ID": "ID del amigo",
+ "Friends you add here can invite you to duels right inside the game.": "Los amigos que añadas aquí pueden retarte a duelos dentro del juego.",
+ "Other ways to add friends": "Otras formas de añadir amigos",
+ "Delete my online ID": "Eliminar mi ID en línea",
+ "Copied!": "¡Copiado!",
+ "Pick a level. {0} gets the invite inside the game.": "Elige un nivel. {0} recibirá la invitación dentro del juego.",
+ "{0} can't duel right now.": "{0} no puede batirse en duelo ahora.",
+ "{0} may be offline. Send the code another way, or try later.": "Puede que {0} no esté conectado. Envía el código de otra forma o inténtalo más tarde.",
+ "Invite sent to {0}. Waiting…": "Invitación enviada a {0}. Esperando…",
+ "{0} added you as a friend!": "¡{0} te añadió como amigo!",
+ "You can now invite each other to duels.": "Ya puedes invitarle a un duelo.",
+ "Duel invite!": "¡Invitación a un duelo!",
+ "{0} invites you to a live duel ({1}). First to solve the case wins!": "{0} te reta a un duelo en vivo ({1}). ¡Gana quien resuelva el caso primero!",
+ "Not now": "Ahora no",
+ "An ID has 6 letters and numbers.": "Un ID tiene 6 letras y números.",
+ "That's your own ID.": "Ese es tu propio ID.",
+ "No detective with this ID.": "No hay ningún detective con este ID.",
+ "{0} added! They will see you in their friends list too.": "¡{0} añadido! También te verá en su lista de amigos.",
+ "This removes your detective ID and online profile from the server. Your progress on this device stays. Friends will no longer be able to invite you in the game.": "Esto borra del servidor tu ID de detective y tu perfil en línea. Tu progreso en este dispositivo se mantiene. Tus amigos ya no podrán invitarte dentro del juego.",
+ "Delete": "Eliminar",
+ "Online ID deleted.": "ID en línea eliminado.",
+ "Get a detective ID": "Obtener un ID de detective"
 },
     pl: {
  "{0} cases solved": {
@@ -999,7 +1069,7 @@
     stories: [
  [
   "Muerte por postre",
-  "La tarta era mentira. Las coartadas, también."
+  "Las lentejuelas eran falsas. Las coartadas, también."
  ],
  [
   "El mayordomo no fue",
@@ -1042,7 +1112,7 @@
   "Sin mayordomo, todo se complicó enseguida."
  ],
  [
-  "Juegos de herencia",
+  "Pelea por la herencia",
   "Cinco parientes, una fortuna y cero calma."
  ],
  [
@@ -1055,7 +1125,7 @@
  ],
  [
   "Brunch fatal",
-  "Los mimosas eran infinitos. Las mentiras, también."
+  "El zumo era infinito. Las mentiras, también."
  ],
  [
   "El monóculo perdido",
@@ -1086,7 +1156,7 @@
   "Alguien gritó «¡hombre al agua!». Se equivocó en todo."
  ],
  [
-  "Barco del amor, crimen del odio",
+  "Crucero del amor, caso frío",
   "Un crucero romántico. Mucho crucero, poco romance."
  ],
  [
@@ -1191,7 +1261,7 @@
  ],
  [
   "Houston, tenemos un cadáver",
-  "En el espacio nadie oye tus gritos. Por suerte, alguien lo vio."
+  "En el espacio nadie oye nada. Por suerte, alguien lo vio."
  ],
  [
   "Perdido en el espacio",
@@ -1206,8 +1276,8 @@
   "Se comieron el último pastelito lunar. Y se puso personal."
  ],
  [
-  "¿Alienígenas? Apenas los conozco",
-  "La tripulación culpó a los alienígenas. Los alienígenas están ofendidos."
+  "Coartada verdecita",
+  "La tripulación culpó a unos visitantes verdes. Los visitantes se ofendieron."
  ],
  [
   "No es ciencia de cohetes",
@@ -1446,8 +1516,8 @@
   "El caniche de globo lo vio todo."
  ],
  [
-  "Juego de gruñidos",
-  "Se acerca el invierno. Y el detective."
+  "Un largo invierno",
+  "La nieve se acumula. La lista de sospechosos, también."
  ],
  [
   "Cambio de guardia",
@@ -1466,8 +1536,8 @@
   "Un banquete, un bufón y un final nada real."
  ],
  [
-  "Mazmorras y drama",
-  "Tira iniciativa. Luego tira coartada."
+  "Dados y drama",
+  "Tira por una coartada. A todos les salió un uno."
  ],
  [
   "El fantasma tiene coartada",

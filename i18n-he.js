@@ -453,7 +453,77 @@
  "{0}/{1} stars to the next chest": "{0}/{1} כוכבים עד התיבה הבאה",
  "Star chest opened! +{0} coins": "תיבת הכוכבים נפתחה! +{0} מטבעות",
  "Star chest opened! New pack: {0}": "תיבת הכוכבים נפתחה! חבילה חדשה: {0}",
- "Win streak: {0}": "רצף ניצחונות: {0}"
+ "Win streak: {0}": "רצף ניצחונות: {0}",
+ "Partners in Crime": "שותפים לפשע",
+ "Exclusive": "בלעדי",
+ "Only for detectives who duel a new friend.": "רק לבלשים שעושים דו-קרב עם חבר חדש.",
+ "Duel a new friend to unlock": "דו-קרב עם חבר חדש פותח אותה",
+ "Live duel": "דו-קרב חי",
+ "Live duel: {0}": "דו-קרב חי: {0}",
+ "First to solve it wins. {0} is dueling you right now!": "מי שפותר ראשון מנצח. {0} בדו-קרב נגדכם עכשיו!",
+ "New duel": "דו-קרב חדש",
+ "Live duel with a friend": "דו-קרב חי עם חבר",
+ "New detective? You both get {0} coins and the exclusive Partners in Crime pack.": "בלש חדש? שניכם מקבלים {0} מטבעות ואת החבילה הבלעדית \"שותפים לפשע\".",
+ "Live duels need an internet connection.": "דו-קרב חי צריך חיבור לאינטרנט.",
+ "Could not reach the duel server. Try again in a moment.": "אין חיבור לשרת. נסו שוב עוד רגע.",
+ "Same case, same moment. Whoever solves it first wins.": "אותו תיק, באותו רגע. מי שפותר ראשון מנצח.",
+ "I have a code": "יש לי קוד",
+ "Join a duel": "הצטרפות לדו-קרב",
+ "Type the 6-letter code your friend sent you.": "הקלידו את הקוד בן 6 התווים שהחבר שלח לכם.",
+ "Join": "הצטרפות",
+ "Opening a duel room…": "פותחים חדר דו-קרב…",
+ "Live duels are not available in this version yet.": "דו-קרב חי עוד לא זמין בגרסה הזו.",
+ "Joining the duel…": "מצטרפים לדו-קרב…",
+ "This duel has ended, or the code is wrong.": "הדו-קרב הזה נגמר, או שהקוד שגוי.",
+ "This duel already has two detectives.": "בדו-קרב הזה כבר יש שני בלשים.",
+ "This duel has already started.": "הדו-קרב הזה כבר התחיל.",
+ "Friend": "חבר",
+ "Connecting…": "מתחברים…",
+ "Waiting for your friend to join…": "מחכים שהחבר יצטרף…",
+ "Get ready!": "היכונו!",
+ "{0} joined! Starting…": "{0} הצטרף! מתחילים…",
+ "Send this code or the invite link to a friend:": "שלחו לחבר את הקוד או את קישור ההזמנה:",
+ "Send invite": "שליחת הזמנה",
+ "Duel me on Crime Grid! Same case, first to solve it wins. Code: {0}": "בואו לדו-קרב נגדי ב-Crime Grid! אותו תיק, מי שפותר ראשון מנצח. קוד: {0}",
+ "Your friend cancelled the duel.": "החבר ביטל את הדו-קרב.",
+ "{0} solved it first!": "{0} פתר ראשון!",
+ "Finish the case anyway.": "אפשר לסיים את התיק בכל זאת.",
+ "{0} left the duel.": "{0} יצא מהדו-קרב.",
+ "Dueling {0}": "דו-קרב נגד {0}",
+ "Solved!": "נפתר!",
+ "Checking who was first…": "בודקים מי היה ראשון…",
+ "You won the duel against {0}! +{1} coins": "ניצחתם בדו-קרב נגד {0}! ‎+{1} מטבעות",
+ "{0} solved it first.": "{0} פתר ראשון.",
+ "+{0} coins for dueling {1}!": "‎+{0} מטבעות על הדו-קרב עם {1}!",
+ "Partners in Crime pack unlocked. Equip it in the shop.": "החבילה \"שותפים לפשע\" נפתחה. אפשר להלביש אותה בחנות.",
+ "Thanks for bringing a new detective!": "תודה שהבאתם בלש חדש!",
+ "Online now": "מחובר עכשיו",
+ "Duel {0}": "דו-קרב נגד {0}",
+ "No friends yet. Tell a friend your detective ID, or add theirs.": "עדיין אין חברים. ספרו לחבר את מספר הבלש שלכם, או הוסיפו את שלו.",
+ "Your detective ID": "מספר הבלש שלכם",
+ "Copy": "העתקה",
+ "Friend's ID": "המספר של החבר",
+ "Friends you add here can invite you to duels right inside the game.": "חברים שמוסיפים כאן יכולים להזמין אתכם לדו-קרב ישר בתוך המשחק.",
+ "Other ways to add friends": "דרכים נוספות להוסיף חברים",
+ "Delete my online ID": "מחיקת מספר הבלש שלי",
+ "Copied!": "הועתק!",
+ "Pick a level. {0} gets the invite inside the game.": "בחרו רמה. {0} יקבל את ההזמנה בתוך המשחק.",
+ "{0} can't duel right now.": "{0} לא פנוי לדו-קרב עכשיו.",
+ "{0} may be offline. Send the code another way, or try later.": "ייתכן ש-{0} לא מחובר. שלחו את הקוד בדרך אחרת, או נסו אחר כך.",
+ "Invite sent to {0}. Waiting…": "ההזמנה נשלחה ל-{0}. מחכים…",
+ "{0} added you as a friend!": "{0} הוסיף אתכם כחברים!",
+ "You can now invite each other to duels.": "עכשיו אפשר להזמין זה את זה לדו-קרב.",
+ "Duel invite!": "הזמנה לדו-קרב!",
+ "{0} invites you to a live duel ({1}). First to solve the case wins!": "{0} מזמין אתכם לדו-קרב חי ({1}). מי שפותר ראשון מנצח!",
+ "Not now": "לא עכשיו",
+ "An ID has 6 letters and numbers.": "מספר בלש הוא 6 אותיות ומספרים.",
+ "That's your own ID.": "זה המספר שלכם.",
+ "No detective with this ID.": "אין בלש עם המספר הזה.",
+ "{0} added! They will see you in their friends list too.": "{0} נוסף! גם הוא יראה אתכם ברשימת החברים שלו.",
+ "This removes your detective ID and online profile from the server. Your progress on this device stays. Friends will no longer be able to invite you in the game.": "זה מוחק מהשרת את מספר הבלש ואת הפרופיל המקוון שלכם. ההתקדמות במכשיר נשארת. חברים לא יוכלו יותר להזמין אתכם בתוך המשחק.",
+ "Delete": "מחיקה",
+ "Online ID deleted.": "מספר הבלש נמחק.",
+ "Get a detective ID": "קבלת מספר בלש"
 },
     pl: {
  "{0} cases solved": {
@@ -998,7 +1068,7 @@
     stories: [
  [
   "מוות בקינוח",
-  "העוגה הייתה שקר. וגם האליבי של כולם."
+  "הסוכריות היו פייק. גם האליבי של כולם."
  ],
  [
   "המשרת לא עשה את זה",
@@ -1041,7 +1111,7 @@
   "בלי המשרת הכול התפרק מהר."
  ],
  [
-  "משחקי ירושה",
+  "מריבת הירושה",
   "חמישה קרובים, הון אחד, אפס רגיעה."
  ],
  [
@@ -1054,7 +1124,7 @@
  ],
  [
   "בראנץ' שהשתבש",
-  "המימוזות זרמו בלי הפסקה. והשקרים גם."
+  "המיץ זרם בלי הפסקה. והשקרים גם."
  ],
  [
   "המונוקל האבוד",
@@ -1085,7 +1155,7 @@
   "מישהו צעק \"אדם מעבר לסיפון!\". טעה בכל דבר."
  ],
  [
-  "ספינת אהבה, פשע שנאה",
+  "שייט אהבה, תיק קר",
   "שייט רומנטי. הרבה שייט, מעט רומנטיקה."
  ],
  [
@@ -1190,7 +1260,7 @@
  ],
  [
   "יוסטון, יש לנו גופה",
-  "בחלל אף אחד לא שומע אותך צועק. למזלנו, מישהו ראה."
+  "בחלל אף אחד לא שומע כלום. למזלנו, מישהו ראה."
  ],
  [
   "מנותק בחלל",
@@ -1205,8 +1275,8 @@
   "עוגת הירח האחרונה נאכלה. ואז זה נהיה אישי."
  ],
  [
-  "חייזר? בקושי הכרתי אותו",
-  "הצוות האשים חייזרים. החייזרים נעלבו."
+  "אליבי ירוק קטן",
+  "הצוות האשים אורחים ירוקים קטנים. האורחים נעלבו."
  ],
  [
   "זה לא מדע טילים",
@@ -1445,8 +1515,8 @@
   "פודל הבלונים ראה הכול."
  ],
  [
-  "משחקי גניחות",
-  "החורף מגיע. וגם הבלש."
+  "חורף ארוך",
+  "השלג מצטבר. וגם רשימת החשודים."
  ],
  [
   "חילופי משמרות אבירים",
@@ -1465,8 +1535,8 @@
   "סעודה, ליצן החצר וסוף לא מלכותי בכלל."
  ],
  [
-  "צינוקים ודרמה",
-  "תטילו על יוזמה. אחר כך תטילו על אליבי."
+  "קוביות ודרמה",
+  "מטילים אליבי. לכולם יצא אחד."
  ],
  [
   "לרוח הרפאים יש אליבי",

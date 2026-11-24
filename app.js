@@ -40,6 +40,7 @@
     { id: 'royals', name: 'Royal Court', price: 650, rarity: 'Epic', desc: 'Crowns, jewels and ermine, in a shimmering gold frame.', emoji: ['🤴', '👸', '🫅', '👑', '🦄', '💎'] },
     { id: 'space', name: 'Space Crew', price: 800, rarity: 'Epic', desc: 'Astronauts and aliens, framed by the stars.', emoji: ['👩‍🚀', '🧑‍🚀', '👨‍🚀', '👽', '🤖', '👾', '🛸'] },
     { id: 'neon', name: 'Neon Legends', price: 1500, rarity: 'Legendary', desc: 'Glowing neon characters in a pulsing frame.', emoji: ['🌟', '💫', '⚡', '🔮', '🌈', '🪩', '✨'] },
+    { id: 'partners', name: 'Partners in Crime', ref: true, rarity: 'Exclusive', desc: 'Only for detectives who duel a new friend.', emoji: ['🤝', '🕵️', '🔎', '🕵️‍♀️'] },
     { id: 'masquerade', name: 'Masquerade Ball', iap: 'skin_masquerade', usd: '$1.99', rarity: 'Premium', desc: 'Venetian masks, feathers and velvet. Comes with a gilded frame.', emoji: ['🎭', '🦚', '🪶', '💃', '🕺', '🎩'] },
     { id: 'cyber', name: 'Cyber Agents', iap: 'skin_cyber', usd: '$2.99', rarity: 'Premium', desc: 'Glowing visors and live scan lines. The flashiest look in the game.', emoji: ['🦾', '🤖', '🕶️', '👾', '💿', '🛰️'] },
   ];
@@ -68,11 +69,18 @@
     async grant(id, token, restoring) {
       const coinPack = COIN_PACKS.find((c) => c.iap === id), skin = PACKS.find((x) => x.iap === id);
       store.owned = store.owned || ['classic'];
+      store.paidTokens = store.paidTokens || [];
       if (coinPack) {
-        store.coins = coins() + coinPack.coins;
+        // a token is paid out once, even if the store call below fails and the purchase shows up again next launch
+        if (!store.paidTokens.includes(token)) { store.paidTokens.push(token); store.paidTokens = store.paidTokens.slice(-50); store.coins = coins() + coinPack.coins; save(); }
         try { await this.service.consume(token); } catch (e) { /* will be retried by listPurchases next launch */ }
       }
-      if (skin && !store.owned.includes(skin.id)) { store.owned.push(skin.id); if (!restoring) store.skin = skin.id; }
+      if (skin) {
+        if (!store.owned.includes(skin.id)) { store.owned.push(skin.id); if (!restoring) store.skin = skin.id; }
+        save();
+        // Google Play refunds purchases that are not acknowledged within 3 days
+        try { if (this.service.acknowledge) await this.service.acknowledge(token, 'onetime'); } catch (e) { /* retried next launch via listPurchases */ }
+      }
       store.paid = true;
       save(); renderCoins(); applySkin();
       return coinPack ? TR`+${I.num(coinPack.coins)} coins` : skin ? TR`${tr(skin.name)} unlocked` : '';
@@ -336,7 +344,7 @@
   }
   function haptic(kind) {
     if (kind === 'tick') return;
-    if (navigator.vibrate) { navigator.vibrate(kind === 'wrong' ? 40 : kind === 'win' ? [30, 50, 30] : 12); return; }
+    if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) { navigator.vibrate(kind === 'wrong' ? 40 : kind === 'win' ? [30, 50, 30] : 12); return; }
     if (/iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
       iosHaptic();
       if (kind === 'win' || kind === 'wrong') setTimeout(iosHaptic, 120);
@@ -397,7 +405,7 @@
       if (!h) { toastOn = false; return; }
       toastOn = true;
       const el = document.createElement('div');
-      el.className = 'toast'; el.innerHTML = h;
+      el.className = 'toast' + ($('modal').classList.contains('show') ? ' low' : ''); el.innerHTML = h; // low = bottom, so it never covers a dialog heading
       document.body.appendChild(el);
       sfx('unlock');
       setTimeout(() => el.classList.add('out'), 2600);
@@ -547,11 +555,13 @@
   /* ---------- home ---------- */
   function showHome() {
     stopTimer();
+    if (R && R.phase === 'play' && S && S.slot === 'race' && !S.won) raceLeave();
     const wasHome = $('home').classList.contains('active');
     $('map').classList.remove('active');
     $('home').classList.add('active');
     $('game').classList.remove('active');
     if (!wasHome && window.__resetHomeNav) window.__resetHomeNav();
+    if (!wasHome) window.scrollTo(0, 0);
     renderGreet();
     renderCoins();
     renderJourney();
@@ -614,7 +624,7 @@
       $('rewards-body').appendChild(el);
     }
     const have = store.owned || ['classic'], owned = have.length;
-    const next = PACKS.find((x) => !x.iap && !have.includes(x.id)) || PACKS.find((x) => !have.includes(x.id));
+    const next = PACKS.find((x) => !x.iap && !x.ref && !have.includes(x.id)) || PACKS.find((x) => !x.ref && !have.includes(x.id));
     el.innerHTML = `<button class="shop-card" id="shop-card-btn">
         <span class="sc-faces">${SHOP_PEOPLE.slice(0, 3).map((p) => `<span class="pf skin-${next ? next.id : skinId()}">${face(p, next ? next.id : skinId())}</span>`).join('')}</span>
         <span class="sc-tx"><b>${tr('Detective Shop')}</b><small>${next ? tr('New look: {0} · {1}', tr(next.name), next.iap ? IAP.price(next.iap, next.usd) : tr('{0} coins', I.num(next.price))) : tr('You own every pack!')} · ${tr('{0}/{1} owned', owned, PACKS.length)}</small></span>
@@ -652,7 +662,7 @@
   }
 
   /* ---------- backup code: move progress to another phone or browser ---------- */
-  const BACKUP_KEYS = ['profile', 'coins', 'missions', 'winStreak', 'bestStreak', 'chestStars', 'owned', 'skin', 'journey', 'jStars', 'easy', 'medium', 'hard', 'expert', 'extreme', 'daily', 'dailyLog', 'ach', 'trophies',
+  const BACKUP_KEYS = ['lang', 'profile', 'coins', 'missions', 'winStreak', 'bestStreak', 'chestStars', 'owned', 'skin', 'journey', 'jStars', 'easy', 'medium', 'hard', 'expert', 'extreme', 'daily', 'dailyLog', 'ach', 'trophies',
     'themesSolved', 'friends', 'bonusDay', 'bonusStreak', 'pid', 'sound', 'seenHowto', 'tutorialDone', 'paid', 'engine'];
   function backupCode() {
     const o = {};
@@ -669,7 +679,7 @@
     if (theirs < mine && !confirm(tr('This backup is on level {0}, but you are on level {1}. Replace your progress anyway?', theirs, mine))) return null;
     Object.keys(store).forEach((k) => delete store[k]);
     Object.assign(store, o, { engine: E.VERSION });
-    save(); applySkin();
+    save(); applySkin(); I.setLang(store.lang || I.detect()); renderGreet();
     return true;
   }
   function showBackup() {
@@ -741,26 +751,51 @@
   /* ---------- friends ---------- */
   function addFriend(card, quiet) {
     if (!card || !card.i || !card.n || card.i === myId()) return false;
+    if (card.u && NET && card.u === NET.uid()) return false;
     store.friends = store.friends || [];
-    const f = { i: String(card.i).slice(0, 12), n: String(card.n).slice(0, 18), l: Math.max(1, Math.min(1e7, +card.l || 1)), s: PACK[card.s] ? card.s : 'classic', d: +card.d || 0, t: +card.t || 0, at: today().num };
-    const k = store.friends.findIndex((x) => x.i === f.i);
+    const k = store.friends.findIndex((x) => x.i === String(card.i).slice(0, 12) || (card.u && x.u === card.u));
+    const old = k >= 0 ? store.friends[k] : {};
+    const f = { i: String(card.i).slice(0, 12), n: String(card.n).slice(0, 18), l: Math.max(1, Math.min(1e7, +card.l || old.l || 1)), s: PACK[card.s] ? card.s : old.s || 'classic', d: +card.d || old.d || 0, t: +card.t || old.t || 0, at: today().num };
+    const u = card.u || old.u;
+    if (u) f.u = String(u).slice(0, 40);
+    if (card.tag || old.tag) f.tag = String(card.tag || old.tag).slice(0, 6);
     if (k >= 0) store.friends[k] = f; else store.friends.push(f);
     save();
     if (!quiet) toast(`<span class="ti">${ic('hand', '🤝')}</span><span><b>${k >= 0 ? tr('{0} updated!', esc(f.n)) : tr('{0} added!', esc(f.n))}</b><small>${tr('Level {0} on the journey map.', f.l)}</small></span>`);
     return true;
   }
+  function friendRow(f, online) {
+    const fp = { name: f.n, g: 'f', letter: f.n[0], color: '#7aa7ff', emoji: '🙂' };
+    const age = today().num - (f.at || today().num);
+    const canRace = NET && f.u;
+    return `<div class="friend-row"><span class="pf skin-${f.s}">${face(fp, f.s)}</span><div><b>${esc(f.n)}${online ? ` <span class="on-dot" title="${esc(tr('Online now'))}"></span>` : ''}</b><small>${tr('Level {0} · {1} cases · {2}-day streak · updated {3}', f.l, f.t, f.d, age ? tr('{0}d ago', age) : tr('today'))}</small></div>
+      ${canRace ? `<button class="mini-race" data-act="racef" data-id="${f.i}" aria-label="${esc(tr('Duel {0}', f.n))}">${ic('knife', '⚔️')}</button>` : ''}
+      <button class="mini-x" data-act="rm" data-id="${f.i}" aria-label="${esc(tr('Remove'))}">✕</button></div>`;
+  }
+  function friendListHtml(online) {
+    return (store.friends || []).sort((x, y) => y.l - x.l).map((f) => friendRow(f, online && online[f.u])).join('')
+      || `<p><small>${NET ? tr('No friends yet. Tell a friend your detective ID, or add theirs.') : tr('No friends yet. Send your link to a friend, and ask for theirs!')}</small></p>`;
+  }
   function showFriends() {
-    const list = (store.friends || []).sort((x, y) => y.l - x.l).map((f) => {
-      const fp = { name: f.n, g: 'f', letter: f.n[0], color: '#7aa7ff', emoji: '🙂' };
-      const age = today().num - (f.at || today().num);
-      return `<div class="friend-row"><span class="pf skin-${f.s}">${face(fp, f.s)}</span><div><b>${esc(f.n)}</b><small>${tr('Level {0} · {1} cases · {2}-day streak · updated {3}', f.l, f.t, f.d, age ? tr('{0}d ago', age) : tr('today'))}</small></div>
-        <button class="mini-x" data-act="rm" data-id="${f.i}" aria-label="${esc(tr('Remove'))}">✕</button></div>`;
-    }).join('') || `<p><small>${tr('No friends yet. Send your link to a friend, and ask for theirs!')}</small></p>`;
-    modal(`<div class="big">${ic('hand', '🤝')}</div><h2>${tr('Share with friends')}</h2>
-      <p><small>${tr("You're on level <b>{0}</b>. Send your link so friends see you on their map. Send it again whenever you want them to see your new progress.", prog('journey').caseNum)}</small></p>
-      <div class="friend-list">${list}</div>
-      <div class="row"><button class="primary" data-act="mine">${tr('Send my link')}</button><button class="secondary" data-act="add">${tr('Add a friend')}</button></div>
+    const ids = NET && store.netOff ? `<div class="my-id"><button class="primary" data-act="getid">${tr('Get a detective ID')}</button></div><p class="id-msg"><small>${tr('Friends you add here can invite you to duels right inside the game.')}</small></p>`
+      : NET ? `<div class="my-id"><small>${tr('Your detective ID')}</small><b class="id-code" id="my-id" dir="ltr">${esc(store.netTag || '······')}</b><button class="secondary" data-act="copyid">${tr('Copy')}</button></div>
+      <div class="add-id"><input class="name-in" id="id-in" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="${esc(tr("Friend's ID"))}" dir="ltr"><button class="primary" data-act="addid">${tr('Add')}</button></div>
+      <p class="id-msg" id="id-msg"><small>${tr('Friends you add here can invite you to duels right inside the game.')}</small></p>` : '';
+    modal(`<div class="big">${ic('hand', '🤝')}</div><h2>${tr('Friends')}</h2>
+      ${ids}
+      <div class="friend-list" id="friend-list">${friendListHtml()}</div>
+      ${NET ? `<div class="race-cta"><button class="primary" data-act="race">${ic('knife', '⚔️')} ${tr('Live duel with a friend')}</button><small>${tr('New detective? You both get {0} coins and the exclusive Partners in Crime pack.', REF_COINS)}</small></div>` : ''}
+      <details class="other-ways"${NET ? '' : ' open'}><summary>${tr('Other ways to add friends')}</summary>
+        <p><small>${tr("You're on level <b>{0}</b>. Send your link so friends see you on their map. Send it again whenever you want them to see your new progress.", prog('journey').caseNum)}</small></p>
+        <div class="row"><button class="secondary" data-act="mine">${tr('Send my link')}</button><button class="secondary" data-act="add">${tr('Add a friend')}</button></div></details>
+      ${NET && store.netTag ? `<p class="forget"><button class="linkish" data-act="forget">${tr('Delete my online ID')}</button></p>` : ''}
       <div class="row"><button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
+      race: () => raceMenu(),
+      racef: (b) => { const f = (store.friends || []).find((x) => x.i === b.dataset.id); if (f) raceMenu(f); },
+      copyid: async (b) => { if (!store.netTag) return; try { await navigator.clipboard.writeText(store.netTag); b.textContent = tr('Copied!'); } catch (e) { b.textContent = store.netTag; } },
+      addid: () => addById($('id-in').value),
+      getid: () => { store.netOff = false; save(); showFriends(); },
+      forget: forgetOnline,
       mine: () => share(tr("Join me on Crime Grid! I'm on level {0}. Open this link to add me as a friend (on iPhone with the app installed: copy it and paste it in Map → Share → Add a friend):", prog('journey').caseNum), linkFor('friend', myCard())),
       add: () => {
         modal(`<h2>${tr('Add a friend')}</h2><p><small>${tr('Paste the link (or code) your friend sent you.')}</small></p>
@@ -777,8 +812,13 @@
       },
       rm: (b) => { store.friends = (store.friends || []).filter((x) => x.i !== b.dataset.id); save(); showFriends(); if ($('map').classList.contains('active')) showMap(); },
     });
+    if (NET && !store.netOff) {
+      const idIn = $('id-in');
+      idIn.addEventListener('keydown', (e) => { if (e.key === 'Enter') addById(idIn.value); });
+      ensureTag().then((tag) => { const el = $('my-id'); if (el) el.textContent = tag; refreshFriends(); })
+        .catch(() => { const el = $('id-msg'); if (el) el.innerHTML = `<small>${navigator.onLine === false ? tr('Live duels need an internet connection.') : tr('Could not reach the duel server. Try again in a moment.')}</small>`; });
+    }
   }
-
   // friendship goes one way (no server), so right after adding someone, offer to send our link back
   function offerShareBack(name, code) {
     const inApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -862,6 +902,7 @@
       const owned = store.owned.includes(x.id), on = skinId() === x.id, short = (x.price || 0) - coins();
       const btn = on ? `<button class="secondary" disabled>${tr('Equipped ✓')}</button>`
         : owned ? `<button class="primary" data-act="equip" data-id="${x.id}">${tr('Equip')}</button>`
+        : x.ref ? `<button class="secondary" ${NET ? 'data-act="race"' : 'disabled'}>${ic('knife', '⚔️')} ${tr('Duel a new friend to unlock')}</button>`
         : x.iap ? `<button class="primary premium-btn" data-act="iap" data-id="${x.iap}">${tr('Buy for {0}', IAP.price(x.iap, x.usd))}</button>`
         : short > 0 ? `<button class="secondary" disabled>${coinIc()} ${I.num(x.price)} · ${tr('need {0} more', I.num(short))}</button>`
         : `<button class="primary" data-act="buy" data-id="${x.id}">${tr('Buy for {0}', coinIc() + ' ' + I.num(x.price))}</button>`;
@@ -875,7 +916,7 @@
       <div class="row"><button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
       buy: (b) => {
         const x = PACK[b.dataset.id];
-        if (!x || coins() < x.price) return;
+        if (!x || x.ref || x.iap || !Number.isFinite(x.price) || x.price < 0 || coins() < x.price || (store.owned || []).includes(x.id)) return;
         store.coins -= x.price; store.owned.push(x.id); store.skin = x.id; save();
         applySkin(); renderCoins(); sfx('unlock'); confetti();
         showShop();
@@ -883,6 +924,7 @@
       },
       equip: (b) => { store.skin = b.dataset.id; save(); applySkin(); sfx('coin'); showShop(); },
       iap: (b) => IAP.buy(b.dataset.id),
+      race: () => raceMenu(),
     });
   }
 
@@ -937,6 +979,408 @@
   }
 
   let pendingLink = null;
+  /* ---------- live race: two detectives, the same case, at the same moment (Firebase, see net.js) ---------- */
+  const NET = window.CGNet && window.CGNet.enabled ? window.CGNet : null;
+  const RACE_DIFFS = ['easy', 'medium', 'hard', 'expert'], REF_COINS = 500, REF_MAX = 5, RACE_WIN = 40;
+  let R = null;   // { code, role, room, foe, puzzle, phase: lobby|count|play|done, stop }
+  const raceUrl = (code) => `${location.origin}${location.pathname}#race=${code}`;
+  const otherRole = () => (R.role === 'host' ? 'guest' : 'host');
+  const isNewbie = () => !store.refBy && totalSolved() <= 3;
+  function raceCode() {
+    const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', r = crypto.getRandomValues(new Uint8Array(6));
+    return Array.from(r, (b) => A[b % A.length]).join('');
+  }
+  function raceCard(nb) {
+    const c = myCard();
+    return { uid: NET.uid(), n: String(c.n).slice(0, 18), i: c.i, s: c.s, l: c.l, t: c.t, nb: !!nb };
+  }
+  function raceWait(text) { $('loading-text').textContent = text; $('loading').classList.add('show'); }
+  function raceFail(e, msg) {
+    $('loading').classList.remove('show');
+    if (R && R.stop) R.stop();
+    R = null;
+    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Live duel')}</h2><p>${msg || (navigator.onLine === false ? tr('Live duels need an internet connection.') : tr('Could not reach the duel server. Try again in a moment.'))}</p>
+      <div class="row"><button class="primary" data-act="close">${tr('OK')}</button></div>`);
+  }
+  function raceMenu(friend) {
+    if (!NET) return;
+    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${friend ? tr('Duel {0}', esc(friend.n)) : tr('Live duel')}</h2>
+      <p>${friend ? tr('Pick a level. {0} gets the invite inside the game.', esc(friend.n)) : tr('Same case, same moment. Whoever solves it first wins.')}</p>
+      <div class="race-diffs">${RACE_DIFFS.map((d) => `<button class="secondary" data-act="go" data-d="${d}">${esc(dname(d))}</button>`).join('')}</div>
+      <p><small>${tr('New detective? You both get {0} coins and the exclusive Partners in Crime pack.', REF_COINS)}</small></p>
+      <div class="row"><button class="secondary" data-act="code">${tr('I have a code')}</button><button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
+      go: (b) => createRace(b.dataset.d, friend),
+      code: () => {
+        modal(`<h2>${tr('Join a duel')}</h2><p><small>${tr('Type the 6-letter code your friend sent you.')}</small></p>
+          <input class="name-in race-code-in" id="race-in" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC123">
+          <div class="row"><button class="primary" data-act="ok">${tr('Join')}</button><button class="secondary" data-act="back">${tr('Back')}</button></div>`, {
+          ok: () => {
+            const raw = $('race-in').value, m = raw.match(/race=([A-Za-z0-9]+)/), code = (m ? m[1] : raw).toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (code.length !== 6) { shake($('modal-body')); return; }
+            joinRace(code);
+          },
+          back: raceMenu,
+        });
+        setTimeout(() => $('race-in') && $('race-in').focus(), 50);
+      },
+    });
+  }
+  function cleanupRaces() {   // rooms older than a day are removed by whoever opens the next race
+    const old = Date.now() - 86400000 - 3600000;
+    NET.query('races', `&orderBy=%22created%22&endAt=${old}&limitToFirst=20`)
+      .then((rooms) => Object.keys(rooms || {}).forEach((k) => NET.del('races/' + k).catch(() => {})))
+      .catch(() => {});
+  }
+  async function createRace(diff, invitee) {
+    if (!NET || !DIFF[diff]) return;
+    closeModal();
+    raceWait(tr('Opening a duel room…'));
+    try {
+      await NET.signIn();
+      cleanupRaces();
+      const code = raceCode(), seed = 3000000 + Math.floor(Math.random() * 9e8);
+      await NET.put('races/' + code, { v: 1, seed, diff, created: NET.TS, host: raceCard(false) });
+      enterRace(code, 'host');
+      if (invitee && invitee.u) {
+        await ensureTag();
+        const c = myCard();
+        R.invitee = invitee;
+        await NET.put(`inbox/${invitee.u}/${code}`, { t: 'race', from: NET.uid(), n: String(c.n).slice(0, 18), s: c.s, i: c.i, l: c.l, code, diff, at: NET.TS });
+        const mine = R;
+        setTimeout(() => { if (R === mine && R.phase === 'lobby' && !R.foe) { R.slow = true; const el = $('race-lobby'); if (el) el.innerHTML = lobbyHtml(); } }, 60000);
+        const el = $('race-lobby'); if (el) el.innerHTML = lobbyHtml();
+      }
+    } catch (e) { raceFail(e); }
+  }
+  async function joinRace(code) {
+    code = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+    if (!NET) return raceFail(null, tr('Live duels are not available in this version yet.'));
+    closeModal();
+    raceWait(tr('Joining the duel…'));
+    try {
+      await NET.signIn();
+      const room = await NET.get('races/' + code);
+      if (!room || !room.host) return raceFail(null, tr('This duel has ended, or the code is wrong.'));
+      const me = NET.uid();
+      if (room.host.uid === me) return enterRace(code, 'host');
+      if (room.guest && room.guest.uid !== me) return raceFail(null, tr('This duel already has two detectives.'));
+      if (room.go && !(room.guest && room.guest.uid === me)) return raceFail(null, tr('This duel has already started.'));
+      if (!room.guest) {
+        try { await NET.put(`races/${code}/guest`, raceCard(isNewbie())); }
+        catch (e) {   // lost a race with another guest?
+          const g = await NET.get(`races/${code}/guest`).catch(() => null);
+          if (g && g.uid !== me) return raceFail(null, tr('This duel already has two detectives.'));
+          throw e;
+        }
+      }
+      enterRace(code, 'guest');
+    } catch (e) { raceFail(e); }
+  }
+  function enterRace(code, role) {
+    if (R && R.stop) R.stop();
+    R = { code, role, room: null, foe: null, puzzle: null, phase: 'lobby', lastP: -1 };
+    $('loading').classList.remove('show');
+    showLobby();
+    const mine = R;
+    R.stop = NET.watch('races/' + code, (room) => { if (R === mine) onRoom(room); }, () => { if (R === mine && R.phase === 'lobby') raceFail(); });
+  }
+  function lobbyHtml() {
+    const room = R.room, me = room && room[R.role], foe = room && room[otherRole()];
+    const slot = (p, label) => `<div class="race-p${p ? '' : ' empty'}">${p ? `<span class="pf skin-${PACK[p.s] ? p.s : 'classic'}">${face({ name: p.n, g: 'f', letter: (p.n || '?')[0], color: '#7aa7ff', emoji: '🙂' }, PACK[p.s] ? p.s : 'classic')}</span><b>${esc(p.n)}</b>` : `<span class="race-dots">…</span><b>${label}</b>`}</div>`;
+    const inv = R.invitee;
+    const status = !room ? tr('Connecting…') : !foe && R.declined ? tr("{0} can't duel right now.", esc(inv.n))
+      : !foe && inv && R.slow ? tr('{0} may be offline. Send the code another way, or try later.', esc(inv.n))
+      : !foe && inv ? tr('Invite sent to {0}. Waiting…', esc(inv.n)) : !foe ? tr('Waiting for your friend to join…') : room.go ? tr('Get ready!') : tr('{0} joined! Starting…', esc(foe.n));
+    return `<div class="race-vs">${slot(me, tr('You'))}<span class="race-x">VS</span>${slot(foe, inv ? esc(inv.n) : tr('Friend'))}</div><p class="race-status">${status}</p>
+      ${room ? `<p><small>${esc(dname(room.diff))}</small></p>` : ''}`;
+  }
+  function showLobby() {
+    const host = R.role === 'host';
+    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Live duel')}</h2>
+      ${host ? `<p>${tr('Send this code or the invite link to a friend:')}</p><div class="race-code" dir="ltr">${R.code}</div>` : ''}
+      <div id="race-lobby">${lobbyHtml()}</div>
+      <div class="row">${host ? `<button class="primary" data-act="invite">${ic('share', '📤')} ${tr('Send invite')}</button>` : ''}<button class="secondary" data-act="cancel">${tr('Cancel')}</button></div>`, {
+      invite: () => share(tr('Duel me on Crime Grid! Same case, first to solve it wins. Code: {0}', R.code), raceUrl(R.code)),
+      cancel: () => { raceLeave(); closeModal(); },
+    }, true);
+  }
+  function raceLeave() {
+    if (!R) return;
+    const r = R;
+    R = null;
+    if (r.stop) r.stop();
+    if (r.role === 'host' && r.phase === 'lobby') NET.del('races/' + r.code).catch(() => {});
+    else if (r.phase !== 'done') NET.put(`races/${r.code}/left/${r.role}`, true).catch(() => {});
+  }
+  function onRoom(room) {
+    const prevFoe = R.foe;
+    R.room = room;
+    if (!room || !room.host) {
+      if (R.phase === 'lobby') return raceFail(null, tr('Your friend cancelled the duel.'));
+      if (R.stop) R.stop();
+      return;
+    }
+    R.foe = room[otherRole()] || null;
+    if (R.foe && !prevFoe) {   // friends both ways, no link swapping needed
+      addFriend({ i: R.foe.i, n: R.foe.n, l: R.foe.l, s: R.foe.s, d: 0, t: R.foe.t }, true);
+      sfx('coin');
+    }
+    if (!R.puzzle && !R.building) {
+      R.building = true;
+      const mine = R;
+      buildCase(room.diff, room.seed, (puzzle) => { if (R !== mine) return; R.puzzle = puzzle; if (R.room) onRoom(R.room); }, room.seed);
+    }
+    if (R.role === 'host' && R.foe && !room.go && !R.goSent) { R.goSent = true; NET.put(`races/${R.code}/go`, NET.TS).catch(() => { R.goSent = false; }); }
+    if (R.phase === 'lobby') {
+      const el = $('race-lobby');
+      if (el) el.innerHTML = lobbyHtml();
+      if (room.go && R.puzzle) countdown();
+      return;
+    }
+    if (R.phase === 'play') {
+      paintRaceBar();
+      const foeRes = room.res && room.res[otherRole()];
+      if (foeRes && !R.toldFoe) { R.toldFoe = true; toast(`<span class="ti">${ic('knife', '⚔️')}</span><span><b>${tr('{0} solved it first!', esc(R.foe.n))}</b><small>${tr('Finish the case anyway.')}</small></span>`); }
+      if (room.left && room.left[otherRole()] && !R.toldLeft) { R.toldLeft = true; toast(`<span class="ti">${ic('knife', '⚔️')}</span><span><b>${tr('{0} left the duel.', esc(R.foe.n))}</b></span>`); }
+    }
+    raceReferral();
+    if (R.phase === 'done') {
+      const el = $('race-result');
+      if (el) el.innerHTML = raceResultHtml();
+      raceReward();
+      if (room.res && room.res.host && room.res.guest) {
+        const r = R;
+        if (r.stop) r.stop();
+        if (r.role === 'host') setTimeout(() => NET.del('races/' + r.code).catch(() => {}), 60000);
+      }
+    }
+  }
+  function countdown() {
+    R.phase = 'count';
+    let n = 3;
+    const step = () => {
+      if (!R || R.phase !== 'count') return;
+      if (n === 0) return startRaceGame();
+      modal(`<div class="race-count">${n}</div><p>${tr('Dueling {0}', esc(R.foe ? R.foe.n : ''))}</p>`, {}, true);
+      sfx('place');
+      n--;
+      setTimeout(step, 800);
+    };
+    step();
+  }
+  function startRaceGame() {
+    closeModal();
+    R.phase = 'play';
+    if (!$('race-bar')) {
+      const bar = document.createElement('div');
+      bar.id = 'race-bar';
+      bar.className = 'race-bar';
+      $('case-sub').insertAdjacentElement('afterend', bar);
+    }
+    prog('race').cur = null;
+    begin(R.room.diff, R.room.seed, R.puzzle, 'race');
+    paintRaceBar();
+    const mine = R;
+    const tick = setInterval(() => {
+      if (R !== mine || R.phase !== 'play' || !S || S.slot !== 'race') { clearInterval(tick); return; }
+      const k = S.place.filter((x) => x >= 0).length;
+      if (k !== R.lastP) { R.lastP = k; NET.put(`races/${R.code}/p/${R.role}`, k).catch(() => {}); }
+    }, 1500);
+  }
+  function paintRaceBar() {
+    const bar = $('race-bar');
+    if (!bar || !R || !R.foe || !S) return;
+    const total = S.P.N, k = Math.min(total, (R.room.p && R.room.p[otherRole()]) || 0), done = R.room.res && R.room.res[otherRole()];
+    bar.innerHTML = `${ic('knife', '⚔️')} <b>${esc(R.foe.n)}</b> <span class="rb-track"><i style="width:${Math.round((done ? total : k) / total * 100)}%"></i></span> <span>${done ? tr('Solved!') : `${k}/${total}`}</span>`;
+  }
+  function raceFinished() {
+    if (!R || R.phase !== 'play') return;
+    R.phase = 'done';
+    NET.put(`races/${R.code}/res/${R.role}`, { at: NET.TS, sec: S.elapsed, help: S.hints + S.helps }).catch(() => {});
+    // the win screen appears a moment later, so keep its result line fresh for a while
+    const mine = R;
+    let n = 0;
+    const t = setInterval(() => {
+      const el = $('race-result');
+      if (R !== mine || ++n > 120) { clearInterval(t); return; }
+      if (el) { el.innerHTML = raceResultHtml(); if (raceOutcome()) raceReward(); }
+      if (mine.room && mine.room.res && mine.room.res.host && mine.room.res.guest && el) clearInterval(t);
+    }, 500);
+  }
+  function raceOutcome() {
+    const res = (R && R.room && R.room.res) || {}, me = res[R.role], foe = res[otherRole()];
+    if (!me) return null;
+    if (!foe) return { won: true, me };
+    return { won: me.at <= foe.at, me, foe };
+  }
+  function raceResultHtml() {
+    if (!R) return '';
+    const o = raceOutcome(), name = esc(R.foe ? R.foe.n : '');
+    if (!o) return `<div class="duel">${tr('Checking who was first…')}</div>`;
+    if (o.won) return `<div class="duel won">${tr('You won the duel against {0}! +{1} coins', name, RACE_WIN)}${o.foe ? `<br><small>${tr('You {0} · {1} {2}', fmtTime(o.me.sec), name, fmtTime(o.foe.sec))}</small>` : ''}</div>`;
+    return `<div class="duel lost">${tr('{0} solved it first.', name)}<br><small>${tr('You {0} · {1} {2}', fmtTime(o.me.sec), name, fmtTime(o.foe.sec))}</small></div>`;
+  }
+  function raceReward() {
+    const o = raceOutcome();
+    if (!o || R.paid) return;
+    R.paid = true;
+    if (o.won) { addCoins(RACE_WIN); sfx('coin'); }
+  }
+  // inviting a new detective: both get coins and the exclusive pack, once the newcomer has finished the race
+  function raceReferral() {
+    const room = R.room, g = room.guest, gDone = room.res && room.res.guest;
+    if (!g || !g.nb || !gDone || R.refDone) return;
+    R.refDone = true;
+    if (R.role === 'guest') {
+      if (store.refBy) return;
+      store.refBy = room.host.i;
+      grantReferral(room.host.n);
+    } else {
+      store.refs = store.refs || [];
+      if (store.refs.includes(g.i) || store.refs.length >= REF_MAX || g.i === myId()) return;
+      store.refs.push(g.i);
+      grantReferral(g.n);
+    }
+  }
+  function grantReferral(name) {
+    store.owned = store.owned || ['classic'];
+    const fresh = !store.owned.includes('partners');
+    if (fresh) store.owned.push('partners');
+    addCoins(REF_COINS);
+    sfx('unlock'); confetti();
+    toast(`<span class="ti">${ic('gift', '🎁')}</span><span><b>${tr('+{0} coins for dueling {1}!', REF_COINS, esc(name))}</b><small>${fresh ? tr('Partners in Crime pack unlocked. Equip it in the shop.') : tr('Thanks for bringing a new detective!')}</small></span>`);
+  }
+
+  /* ---------- online friends: a short detective ID, live profiles and in-game invites (no links needed) ---------- */
+  let inboxStop = null, seenTimer = null, tagJob = null;
+  const ONLINE_MS = 180000, INVITE_MS = 10 * 60000;
+  function publishProfile() {
+    const c = myCard();
+    return NET.patch('users/' + NET.uid(), { n: String(c.n).slice(0, 18), s: c.s, l: c.l, t: c.t, i: c.i, tag: store.netTag, seen: NET.TS });
+  }
+  function ensureTag() {
+    if (!NET) return Promise.reject(new Error('off'));
+    if (store.netOff) { store.netOff = false; save(); }   // inviting a friend means the player wants an ID again
+    if (tagJob) return tagJob;
+    tagJob = (async () => {
+      await NET.signIn();
+      const uid = NET.uid();
+      if (store.netTag) {
+        const t = await NET.get('tags/' + store.netTag).catch(() => null);
+        if (!t || t.uid !== uid) { store.netTag = null; save(); }   // e.g. restored on a new phone
+      }
+      for (let k = 0; k < 5 && !store.netTag; k++) {
+        const tag = raceCode();
+        try { await NET.put('tags/' + tag, { uid }); store.netTag = tag; save(); } catch (e) { /* taken, try another */ }
+      }
+      if (!store.netTag) throw new Error('tag');
+      await publishProfile();
+      startInbox();
+      cleanupOnline();
+      return store.netTag;
+    })();
+    tagJob.catch(() => {}).then(() => { tagJob = null; });
+    return tagJob;
+  }
+  function cleanupOnline() {   // profiles unused for ~6 months are removed by any active player, at most once a day
+    if (store.netClean === today().num) return;
+    store.netClean = today().num; save();
+    const old = Date.now() - 180 * 86400000;
+    NET.query('users', `&orderBy=%22seen%22&endAt=${old}&limitToFirst=20`).then((users) => {
+      for (const [uid, p] of Object.entries(users || {})) {
+        NET.del('users/' + uid).then(() => Promise.all([p && p.tag ? NET.del('tags/' + p.tag) : 0, NET.del('inbox/' + uid)])).catch(() => {});
+      }
+    }).catch(() => {});
+  }
+  function startInbox() {
+    if (inboxStop || !NET || !NET.uid()) return;
+    const handled = new Set();
+    inboxStop = NET.watch('inbox/' + NET.uid(), (box) => {
+      for (const [id, m] of Object.entries(box || {})) if (!handled.has(id)) { handled.add(id); onInbox(id, m); }
+    }, () => { inboxStop = null; });
+    if (!seenTimer) seenTimer = setInterval(() => { if (!document.hidden && store.netTag) NET.patch('users/' + NET.uid(), { seen: NET.TS }).catch(() => {}); }, 120000);
+  }
+  function onInbox(id, m) {
+    const drop = () => NET.del(`inbox/${NET.uid()}/${id}`).catch(() => {});
+    if (!m || !m.from || !m.n) return drop();
+    const card = { i: m.i || String(m.from).slice(0, 12), n: m.n, l: m.l, s: m.s, d: 0, t: 0, u: m.from };
+    if (m.t === 'friend') {
+      const known = (store.friends || []).some((f) => f.u === m.from);
+      addFriend(card, true);
+      if (!known) toast(`<span class="ti">${ic('hand', '🤝')}</span><span><b>${tr('{0} added you as a friend!', esc(m.n))}</b><small>${tr('You can now invite each other to duels.')}</small></span>`);
+      const fl = $('friend-list'); if (fl) fl.innerHTML = friendListHtml();
+      return drop();
+    }
+    if (m.t === 'no') {
+      if (R && R.code === m.code && R.phase === 'lobby') { R.declined = true; const el = $('race-lobby'); if (el) el.innerHTML = lobbyHtml(); }
+      return drop();
+    }
+    if (m.t !== 'race' || !DIFF[m.diff] || Date.now() - (+m.at || 0) > INVITE_MS || (R && R.phase !== 'done')) return drop();
+    addFriend(card, true);
+    const decline = () => { drop(); NET.put(`inbox/${m.from}/no_${m.code}`, { t: 'no', from: NET.uid(), n: String(myCard().n).slice(0, 18), code: m.code, at: NET.TS }).catch(() => {}); };
+    sfx('unlock');
+    modal(`<div class="big">${ic('knife', '⚔️')}</div><h2>${tr('Duel invite!')}</h2>
+      <div class="race-vs"><div class="race-p"><span class="pf skin-${PACK[m.s] ? m.s : 'classic'}">${face({ name: m.n, g: 'f', letter: m.n[0], color: '#7aa7ff', emoji: '🙂' }, PACK[m.s] ? m.s : 'classic')}</span><b>${esc(m.n)}</b></div></div>
+      <p>${tr('{0} invites you to a live duel ({1}). First to solve the case wins!', esc(m.n), esc(dname(m.diff)))}</p>
+      <div class="row"><button class="primary" data-act="join">${ic('knife', '⚔️')} ${tr('Join')}</button><button class="secondary" data-act="no">${tr('Not now')}</button></div>`, {
+      join: () => { drop(); joinRace(m.code); },
+      no: () => { decline(); closeModal(); },
+    }, true);
+  }
+  async function refreshFriends() {
+    const list = (store.friends || []).filter((f) => f.u);
+    if (!list.length) return;
+    const online = {};
+    await Promise.all(list.map((f) => NET.get('users/' + f.u).then((p) => {
+      if (!p) return;
+      addFriend({ i: p.i || f.i, n: p.n || f.n, l: p.l, s: p.s, t: p.t, d: f.d, u: f.u, tag: p.tag }, true);
+      online[f.u] = p.seen && Date.now() - p.seen < ONLINE_MS;
+    }).catch(() => {})));
+    const fl = $('friend-list');
+    if (fl) fl.innerHTML = friendListHtml(online);
+  }
+  async function addById(raw) {
+    const tag = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const say = (t) => { const el = $('id-msg'); if (el) el.innerHTML = `<small>${t}</small>`; };
+    if (tag.length !== 6) { shake($('modal-body')); return say(tr('An ID has 6 letters and numbers.')); }
+    try {
+      await ensureTag();
+      if (tag === store.netTag) return say(tr("That's your own ID."));
+      const t = await NET.get('tags/' + tag);
+      if (!t || !t.uid) { shake($('modal-body')); return say(tr('No detective with this ID.')); }
+      const p = (await NET.get('users/' + t.uid)) || {};
+      const known = (store.friends || []).some((f) => f.u === t.uid);
+      addFriend({ i: p.i || String(t.uid).slice(0, 12), n: p.n || tag, l: p.l, s: p.s, t: p.t, u: t.uid, tag }, true);
+      const c = myCard();
+      if (!known) NET.put(`inbox/${t.uid}/f${NET.uid()}`, { t: 'friend', from: NET.uid(), n: String(c.n).slice(0, 18), s: c.s, i: c.i, l: c.l, at: NET.TS }).catch(() => {});
+      sfx('coin');
+      const inp = $('id-in'); if (inp) inp.value = '';
+      say(known ? tr('{0} updated!', esc(p.n || tag)) : tr('{0} added! They will see you in their friends list too.', esc(p.n || tag)));
+      refreshFriends();
+      if ($('map').classList.contains('active')) showMap();
+    } catch (e) { say(navigator.onLine === false ? tr('Live duels need an internet connection.') : tr('Could not reach the duel server. Try again in a moment.')); }
+  }
+  function forgetOnline() {
+    modal(`<h2>${tr('Delete my online ID')}</h2><p>${tr('This removes your detective ID and online profile from the server. Your progress on this device stays. Friends will no longer be able to invite you in the game.')}</p>
+      <div class="row"><button class="primary" data-act="yes">${tr('Delete')}</button><button class="secondary" data-act="back">${tr('Back')}</button></div>`, {
+      yes: async () => {
+        try {
+          await NET.signIn();
+          const uid = NET.uid(), tag = store.netTag;
+          if (inboxStop) { inboxStop(); inboxStop = null; }
+          await NET.del('users/' + uid);
+          if (tag) await NET.del('tags/' + tag).catch(() => {});
+          await NET.del('inbox/' + uid).catch(() => {});
+          store.netTag = null; store.netOff = true; save();
+          NET.forget();
+          toast(`<span class="ti">${ic('check', '✓')}</span><span><b>${tr('Online ID deleted.')}</b></span>`);
+          showFriends();
+        } catch (e) { raceFail(e); }
+      },
+      back: showFriends,
+    });
+  }
+
   function handleLink() {
     const h = pendingLink || location.hash;
     if (!h || h.length < 2) return;
@@ -944,8 +1388,9 @@
     pendingLink = null;
     history.replaceState(null, '', location.pathname);
     if (h === '#daily') return startDaily();
-    const m = h.match(/^#(friend|challenge)=([A-Za-z0-9_-]+)/);
+    const m = h.match(/^#(friend|challenge|race)=([A-Za-z0-9_-]+)/);
     if (!m) return;
+    if (m[1] === 'race') return joinRace(m[2]);
     const data = b64d(m[2]);
     if (m[1] === 'friend') {
       if (!addFriend(data, true)) return;
@@ -956,9 +1401,10 @@
 
   function offerTutorial() {
     modal(`<div class="big">${ic('cap', '🎓')}</div><h2>${tr('New here?')}</h2><p>${tr("Take the 2-minute tutorial: we'll solve a tiny case together, step by step.")}</p>
-      <div class="row"><button class="primary" data-act="go">${tr('Start tutorial')}</button><button class="secondary" data-act="close">${tr('I know how to play')}</button></div>`, {
+      <div class="row"><button class="primary" data-act="go">${tr('Start tutorial')}</button><button class="secondary" data-act="skip">${tr('I know how to play')}</button></div>`, {
       go: () => { closeModal(); startTutorial(); },
-    });
+      skip: () => { store.tutorialDone = true; save(); closeModal(); },   // do not ask again on the next launch
+    }, true);
   }
 
   /* ---------- game ---------- */
@@ -1041,9 +1487,10 @@
   function paintCaseHeader() {
     if (!S) return;
     const P = S.P, slot = S.slot, { title, intro } = caseText();
-    const label = slot === 'challenge' && S.challenge ? tr("{0}'s challenge: {1}", S.challenge.n, title) : slot === 'daily' ? tr('Daily Case: {0}', title) : slot === 'tutorial' ? title : slot === 'journey' ? tr('Level {0}: {1}', S.caseNum, title) : tr('Level {0}: {1}', S.caseNum, title);
+    const rb = $('race-bar'); if (rb) rb.hidden = slot !== 'race';
+    const label = slot === 'race' ? tr('Live duel: {0}', title) : slot === 'challenge' && S.challenge ? tr("{0}'s challenge: {1}", S.challenge.n, title) : slot === 'daily' ? tr('Daily Case: {0}', title) : slot === 'tutorial' ? title : slot === 'journey' ? tr('Level {0}: {1}', S.caseNum, title) : tr('Level {0}: {1}', S.caseNum, title);
     $('case-title').innerHTML = (ART ? `<span class="tic">${ART.theme(P.theme.id)}</span>` : P.theme.icon + ' ') + esc(label);
-    $('intro').textContent = slot === 'challenge' && S.challenge ? tr('⚔ {0} solved this in {1}. Can you beat that?', S.challenge.n, fmtTime(S.challenge.time)) : intro;
+    $('intro').textContent = slot === 'race' && R && R.foe ? tr('First to solve it wins. {0} is dueling you right now!', R.foe.n) : slot === 'challenge' && S.challenge ? tr('⚔ {0} solved this in {1}. Can you beat that?', S.challenge.n, fmtTime(S.challenge.time)) : intro;
     updateSub();
   }
 
@@ -1079,7 +1526,7 @@
 
   function renderCoach() {
     const el = $('coach');
-    if (!S || S.tut < 0) { el.hidden = true; return; }
+    if (!S || S.tut < 0) { el.hidden = true; el.classList.remove('coach2'); return; }
     const step = TUTORIAL[S.tut];
     el.hidden = false;
     if (ART) {
@@ -1146,7 +1593,7 @@
   function stopTimer() { if (timer) clearInterval(timer); timer = null; }
   function updateSub() {
     const dn = dname(S.diff);
-    const kind = S.slot === 'challenge' ? tr('Challenge') + ' · ' + dn : S.slot === 'daily' ? tr('Daily') + ' · ' + dn : S.slot === 'tutorial' ? tr('Tutorial') : S.slot === 'journey' ? tr('Level {0}', S.caseNum) + ' · ' + dn + (isBoss(S.caseNum) ? ' · ' + tr('Boss') : '') : dn + ' · ' + tr('Level {0}', S.caseNum);
+    const kind = S.slot === 'race' ? tr('Live duel') + ' · ' + dn : S.slot === 'challenge' ? tr('Challenge') + ' · ' + dn : S.slot === 'daily' ? tr('Daily') + ' · ' + dn : S.slot === 'tutorial' ? tr('Tutorial') : S.slot === 'journey' ? tr('Level {0}', S.caseNum) + ' · ' + dn + (isBoss(S.caseNum) ? ' · ' + tr('Boss') : '') : dn + ' · ' + tr('Level {0}', S.caseNum);
     $('case-sub').textContent = ART ? `${fmtTime(S.elapsed)} · ${kind} · ${I.themeName(S.P.theme.name)}` : `${I.themeName(S.P.theme.name)} · ${kind} · ⏱ ${fmtTime(S.elapsed)}`;
   }
 
@@ -1687,7 +2134,7 @@
     const P = S.P, v = P.people[P.victim], zone = I.zone(P.zones[P.zoneOf[P.solution[P.victim]]].name);
     if (S.won) {
       const m = P.people[P.murderer];
-      const nextLabel = S.slot === 'journey' ? tr('Level {0} →', S.caseNum + 1) : S.slot === 'tutorial' ? tr('Play level 1 →') : S.slot === 'daily' || S.slot === 'challenge' ? '' : tr('Next case →');
+      const nextLabel = S.slot === 'journey' ? tr('Level {0} →', S.caseNum + 1) : S.slot === 'tutorial' ? tr('Play level 1 →') : S.slot === 'daily' || S.slot === 'challenge' || S.slot === 'race' ? '' : tr('Next case →');
       el.innerHTML = `<div class="acc-t">${tr('Case closed: <b>{0}</b> did it.', esc(m.name))}</div>
         <div class="acc-btns">${nextLabel ? `<button class="primary" data-next="1">${nextLabel}</button>` : ''}<button class="secondary" data-home="1">${tr('Menu')}</button></div>`;
       return;
@@ -1740,6 +2187,10 @@
       if (all) { store.trophies = store.trophies || {}; store.trophies[`${y}-${mo + 1}`] = true; }
       const n = dailyStreak();
       dailyTxt = `<br>${ic('flame', '🔥')} ${tr('{0}-day streak! Come back tomorrow for a new case.', n)}`;
+    } else if (S.slot === 'race') {
+      pg.cur = null;
+      raceFinished();
+      dailyTxt = `<div id="race-result">${raceResultHtml()}</div>`;
     } else if (S.slot === 'challenge') {
       pg.cur = null;
       const c = S.challenge, diff = c ? S.elapsed - c.time : 0;
@@ -1757,7 +2208,7 @@
     const levelTxt = S.slot === 'journey' ? `<div class="lvl-done">${tr('Level {0} complete!', S.caseNum)}</div>` : '';
     const helpTxt = [S.helps ? '🧾 ' + trp(S.helps, '1 clue/check', '{0} clues/checks') : '', S.hints ? '👁️ ' + trp(S.hints, '1 reveal', '{0} reveals') : ''].filter(Boolean).join(' · ');
     const lockLine = m.g === 'm' ? tr("He's on the way to jail.") : tr("She's on the way to jail.");
-    const hasNext = S.slot !== 'daily' && S.slot !== 'challenge';
+    const hasNext = S.slot !== 'daily' && S.slot !== 'challenge' && S.slot !== 'race';
     if (ART) {
       const bestSec = isBest ? S.elapsed : (store[S.diff] && store[S.diff].best);
       const stat = (cls, html) => `<span class="w-stat ${cls}">${html}</span>`;
@@ -1779,11 +2230,11 @@
         <div class="w-actions">
           <button class="primary w-main" data-act="${hasNext ? 'next' : 'shareres'}">${hasNext ? (S.slot === 'journey' ? tr('Level {0} →', S.caseNum + 1) : tr('Next case →')) : `${ic('share', '📤')} ${tr('Share result')}`}</button>
           ${hasNext ? `<button class="secondary w-sec share-res" data-act="shareres">${ic('share', '📤')} ${tr('Share result')}</button>` : ''}
-          <div class="w-links"><button data-act="home">${tr('Menu')}</button><button data-act="duel">${ic('knife', '⚔️')} ${S.slot === 'challenge' ? tr('Challenge back') : tr('Challenge a friend')}</button></div>
+          <div class="w-links"><button data-act="home">${tr('Menu')}</button><button data-act="duel">${ic('knife', '⚔️')} ${S.slot === 'race' ? tr('New duel') : S.slot === 'challenge' ? tr('Challenge back') : tr('Challenge a friend')}</button></div>
         </div></div>`, {
       next: nextCase,
       shareres: () => shareResult(nStars),
-      duel: () => share(tr('I solved "{0}" in {1} on Crime Grid. Can you beat my time?', caseText().title, fmtTime(S.elapsed)), challengeLink()),
+      duel: () => (S.slot === 'race' ? raceMenu() : share(tr('I solved "{0}" in {1} on Crime Grid. Can you beat my time?', caseText().title, fmtTime(S.elapsed)), challengeLink())),
       home: () => { closeModal(); showHome(); },
     });
       $('modal-body').classList.add('win-modal');
@@ -1795,12 +2246,12 @@
       <p>${ART ? '' : '⏱ '}${fmtTime(S.elapsed)}${helpTxt ? ' · ' + plain(helpTxt) : ''}${isBest ? '<br>' + tr('New personal best!') : ''}${dailyTxt}</p>
       ${ART ? shareCardHtml(nStars) : ''}
       ${ret.lines.length ? `<div class="ret-lines">${ret.lines.map((l) => `<div>${l}</div>`).join('')}</div>` : ''}
-      <div class="row">${S.slot === 'daily' || S.slot === 'challenge' ? '' : `<button class="primary" data-act="next">${S.slot === 'journey' ? tr('Level {0} →', S.caseNum + 1) : tr('Next case →')}</button>`}<button class="${S.slot === 'daily' || S.slot === 'challenge' ? 'primary' : 'secondary'}" data-act="home">${tr('Menu')}</button></div>
+      <div class="row">${S.slot === 'daily' || S.slot === 'challenge' || S.slot === 'race' ? '' : `<button class="primary" data-act="next">${S.slot === 'journey' ? tr('Level {0} →', S.caseNum + 1) : tr('Next case →')}</button>`}<button class="${S.slot === 'daily' || S.slot === 'challenge' || S.slot === 'race' ? 'primary' : 'secondary'}" data-act="home">${tr('Menu')}</button></div>
       ${ART ? `<div class="row"><button class="primary share-res" data-act="shareres">${ic('share', '📤')} ${tr('Share result')}</button></div>` : ''}
-      <div class="row"><button class="secondary duel-btn" data-act="duel">${ic('knife', '⚔️')} ${S.slot === 'challenge' ? tr('Challenge back') : tr('Challenge a friend')}</button></div>`, {
+      <div class="row"><button class="secondary duel-btn" data-act="duel">${ic('knife', '⚔️')} ${S.slot === 'race' ? tr('New duel') : S.slot === 'challenge' ? tr('Challenge back') : tr('Challenge a friend')}</button></div>`, {
       next: nextCase,
       shareres: () => shareResult(nStars),
-      duel: () => share(tr('I solved "{0}" in {1} on Crime Grid. Can you beat my time?', caseText().title, fmtTime(S.elapsed)), challengeLink()),
+      duel: () => (S.slot === 'race' ? raceMenu() : share(tr('I solved "{0}" in {1} on Crime Grid. Can you beat my time?', caseText().title, fmtTime(S.elapsed)), challengeLink())),
       home: () => { closeModal(); showHome(); },
     });
     }
@@ -1858,7 +2309,7 @@
     const finish = () => { if (over) return; over = true; timers.forEach(clearTimeout); ov.classList.add('out'); setTimeout(() => ov.remove(), 400); done(); };
     const at = (ms, fn) => timers.push(setTimeout(fn, calm ? ms / 3 : ms));
     at(1500, () => { ov.classList.add('rev'); sfx('unlock'); });
-    at(2500, () => { ov.classList.add('stamped'); sfx('place'); if (navigator.vibrate) try { navigator.vibrate(40); } catch (e) { /* ignore */ } });
+    at(2500, () => { ov.classList.add('stamped'); sfx('place'); if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) try { navigator.vibrate(40); } catch (e) { /* ignore */ } });
     at(3900, finish);
     ov.addEventListener('click', finish);
   }
@@ -1910,7 +2361,9 @@
   // and brand-new players go straight into the guided first case.
   const brandNew = !store.profile;
   if (brandNew) { store.profile = { name: tr('Detective'), auto: true }; save(); renderGreet(); }
+  else if (store.profile.auto && store.profile.name === 'Detective' && tr('Detective') !== 'Detective') { store.profile.name = tr('Detective'); save(); renderGreet(); }
   const hadLink = location.hash.length > 1;
+  if (NET && store.netTag) ensureTag().catch(() => {});
   handleLink();
-  if (brandNew && !hadLink && !store.tutorialDone && !totalSolved()) startTutorial();
+  if (!hadLink && !store.tutorialDone && !totalSolved()) { if (brandNew) startTutorial(); else offerTutorial(); }   // reloaded mid-tutorial: offer it again
 })();

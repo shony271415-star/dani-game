@@ -196,6 +196,7 @@
   .toast { position: fixed; left: 50%; top: calc(14px + env(safe-area-inset-top)); transform: translateX(-50%); z-index: 50; background: #fffaf2; color: var(--ink);
     border-radius: 16px; padding: 10px 16px; box-shadow: 0 8px 24px rgba(0,0,0,.3); display: flex; gap: 10px; align-items: center; min-width: 260px; animation: pop .25s ease-out; transition: opacity .35s, transform .35s; }
   .toast.out { opacity: 0; transform: translate(-50%, -20px); }
+  .toast.low { top: auto; bottom: calc(14px + env(safe-area-inset-bottom)); } .toast.low.out { transform: translate(-50%, 20px); }
   .toast .ti { font-size: 30px; } .toast .ti svg { width: 38px; height: 38px; } .toast b { display: block; } .toast small { font-size: 12.5px; }
   .confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40; }
 

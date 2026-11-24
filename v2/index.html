@@ -196,6 +196,7 @@
   .toast { position: fixed; left: 50%; top: calc(14px + env(safe-area-inset-top)); transform: translateX(-50%); z-index: 50; background: #fffaf2; color: var(--ink);
     border-radius: 16px; padding: 10px 16px; box-shadow: 0 8px 24px rgba(0,0,0,.3); display: flex; gap: 10px; align-items: center; min-width: 260px; animation: pop .25s ease-out; transition: opacity .35s, transform .35s; }
   .toast.out { opacity: 0; transform: translate(-50%, -20px); }
+  .toast.low { top: auto; bottom: calc(14px + env(safe-area-inset-bottom)); } .toast.low.out { transform: translate(-50%, 20px); }
   .toast .ti { font-size: 30px; } .toast .ti svg { width: 38px; height: 38px; } .toast b { display: block; } .toast small { font-size: 12.5px; }
   .confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40; }
 
@@ -394,6 +395,42 @@
   .zone-label.zl-l { left: 1px; transform: none; }
   .zone-label.zl-r { left: auto; right: 1px; transform: none; }
   @media (max-width: 400px) { .tools { gap: 3px; margin: 7px 2px 0; } .tool { padding: 5px 5px; font-size: 12px; } body.art .tool .ic svg { width: 16px; height: 16px; } }
+  /* online friends */
+  .my-id { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 6px 0; }
+  .my-id small { flex-basis: 100%; text-align: center; }
+  .id-code { font: 700 28px/1.1 "Courier Prime", monospace; letter-spacing: 5px; color: #d9a441; user-select: all; -webkit-user-select: all; }
+  .my-id button { min-height: 40px; padding: 4px 14px; }
+  .add-id { display: flex; gap: 8px; margin: 8px 0 2px; }
+  .add-id input { flex: 1; min-width: 0; margin: 0; text-transform: uppercase; text-align: center; font: 700 20px "Courier Prime", monospace; letter-spacing: 3px; }
+  .add-id button { flex: none; min-width: 80px; }
+  .id-msg { margin: 6px 0 14px; min-height: 1.2em; text-align: center; line-height: 1.45; } .id-msg small { display: block; line-height: 1.45; }
+  .add-id input::placeholder { font-size: 15px; letter-spacing: 0; text-transform: none; }
+  .on-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #3fd17a; box-shadow: 0 0 6px #3fd17a; vertical-align: middle; }
+  .mini-race { flex: none; width: 44px; height: 44px; border-radius: 10px; border: 1.5px solid #d9a441; background: rgba(217,164,65,.12); display: grid; place-items: center; padding: 0; }
+  .mini-race .ic svg { width: 22px; height: 22px; }
+  .other-ways { margin: 8px 0; text-align: start; } .other-ways summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
+  .forget { text-align: center; margin: 4px 0; } .linkish { background: none; border: none; text-decoration: underline; font-size: 13px; opacity: .75; color: inherit; min-height: 36px; }
+  /* live race */
+  .race-cta { display: flex; flex-direction: column; gap: 6px; margin: 8px 0 10px; text-align: center; }
+  .race-diffs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+  .race-code { font: 700 34px/1.2 "Courier Prime", monospace; letter-spacing: 6px; text-align: center; padding: 6px 10px; border: 2px dashed #d9a441; border-radius: 10px; margin: 8px auto; width: max-content; user-select: all; -webkit-user-select: all; }
+  .race-code-in { text-transform: uppercase; text-align: center; font: 700 24px "Courier Prime", monospace; letter-spacing: 4px; }
+  .race-vs { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 10px 0 4px; }
+  .race-p { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 90px; max-width: 120px; overflow-wrap: anywhere; }
+  .race-p .pf, .race-dots { width: 56px; height: 56px; }
+  .race-dots { display: grid; place-items: center; border: 2px dashed currentColor; border-radius: 50%; opacity: .6; animation: raceBlink 1.2s infinite; }
+  @keyframes raceBlink { 50% { opacity: .2; } }
+  .race-x { font: 700 22px "Oswald", sans-serif; color: #d9a441; }
+  .race-status { font-weight: 700; margin: 4px 0; }
+  .race-count { font: 900 110px/1 "Playfair Display", serif; text-align: center; color: #d9a441; animation: raceCount .8s ease-out; }
+  @keyframes raceCount { from { transform: scale(1.8); opacity: 0; } 40% { opacity: 1; } to { transform: scale(1); } }
+  .race-bar { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 3px; }
+  .race-bar[hidden] { display: none; }
+  .race-bar .ic svg { width: 14px; height: 14px; }
+  .rb-track { flex: 1; max-width: 120px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.18); overflow: hidden; }
+  .rb-track i { display: block; height: 100%; background: #d9a441; transition: width .4s; }
+  .rar-exclusive .rar { background: linear-gradient(90deg, #7a2b3a, #d9a441, #7a2b3a); color: #fff; }
+  .rar-exclusive { border-color: #d9a441; }
 </style>
 
 <style>
@@ -1106,6 +1143,7 @@ body.noir .cell.coach-hl { box-shadow: inset 0 0 0 4px #ffb300, inset 0 0 14px r
   document.getElementById('themes-row').innerHTML = ['mansion', 'ship', 'forest', 'space', 'museum', 'train', 'circus', 'castle', 'ski']
     .map((t) => `<span class="ic th">${MysteryArt.theme(t)}</span>`).join('');
 </script>
+<script src="../net.js"></script>
 <script src="../app.js"></script>
 </body>
 </html>

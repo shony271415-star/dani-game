@@ -761,6 +761,29 @@
     return SVG64(`${bg}${b}${eyes}${sm ? smile(d, sm, 3) : ''}${noTie ? pearl : tie}${cheeks}${hatS}${bubbles}`);
   }
 
+  // Partners in Crime: exclusive pack, earned by racing a new detective (never sold)
+  function partnersAvatar(p) {
+    const d = p.isVictim, s = slotOf(p), skin = ['#f2d3b5', '#e0b28a', '#c48a5e', '#8f6040'][rn(p, 3, 4)];
+    const HAIR = ['#2b2530', '#6b4a33', '#c98a3a', '#1c1822', '#a0522d', '#e8d6a0', '#3d3540', '#7a2b3a', '#2b2530', '#5a4a3a'][s];
+    const COAT = ['#c9a27a', '#7a6a5a', '#b59a6c', '#5a6a7a', '#8a5a3a', '#c9a27a', '#6b6a73', '#9a7a5a', '#4a5a4a', '#b5a58a'][s];
+    const body = `<path d="M8 64c0-12 10-18 24-18s24 6 24 18Z" fill="${COAT}" ${st(1.6)}/><path d="M32 47l-9 7 4 10M32 47l9 7-4 10" fill="none" ${st(1.4)}/><path d="M25 47l7 8 7-8" fill="#efe4cf" ${st(1.2)}/>`
+      + `<g transform="translate(43 56)"><circle cx="-1.6" cy="0" r="2.6" fill="none" stroke="#ffd166" stroke-width="1.6"/><circle cx="1.6" cy="0" r="2.6" fill="none" stroke="#ffd166" stroke-width="1.6"/></g>`;
+    const face = `<ellipse cx="32" cy="32" rx="12.5" ry="13.5" fill="${skin}" ${st(1.6)}/>`;
+    let back = '', top = '', extra = '', eyes = eyesAt(d, 27, 37, 31.5, 2), mouth = smile(d, 38.5, 3);
+    const hairCap = `<path d="M19.5 29c-1-10 5-16 12.5-16s13.5 6 12.5 16c-3-5-7-7-12.5-7s-9.5 2-12.5 7Z" fill="${HAIR}" ${st(1.4)}/>`;
+    if (s === 0) top = `<path d="M12 23c6 2 34 2 40 0-1 3-6 5-20 5s-19-2-20-5Z" fill="#5a4a3a" ${st(1.5)}/><path d="M20 24c0-9 4-14 12-14s12 5 12 14c-6 1.5-18 1.5-24 0Z" fill="#5a4a3a" ${st(1.5)}/><path d="M20.5 20.5c7 1.4 16 1.4 23 0v3.4c-7 1.4-16 1.4-23 0Z" fill="#ffd166"/>`;
+    if (s === 1) { back = `<path d="M18 30c-3 8-1 16 3 19M46 30c3 8 1 16-3 19" fill="none" stroke="${HAIR}" stroke-width="5" stroke-linecap="round"/>`; top = hairCap + `<path d="M17 22c2-6 9-9 17-8 8 1 13 5 12 9-6-2-12-2-17-1-5 0-9 1-12 0Z" fill="#b5243a" ${st(1.4)}/><circle cx="33" cy="13" r="1.6" fill="#b5243a" ${st(.9)}/>`; }
+    if (s === 2) top = hairCap + `<path d="M18 24c0-7 6-11 14-11s14 4 14 10c-8-1-20-1-28 1Z" fill="#6b6a73" ${st(1.4)}/><path d="M18 24c5-2 16-3 28-1l4 2c-9 0-22 0-32-1Z" fill="#4a4a52" ${st(1.3)}/>`;
+    if (s === 3) { back = `<path d="M18 26c-2 10 0 18 4 20h20c4-2 6-10 4-20Z" fill="${HAIR}" ${st(1.3)}/>`; top = hairCap + `<path d="M18 30c-2-1-2-6 0-7M46 30c2-1 2-6 0-7" fill="none" ${st(1.4)}/><path d="M18 23c2-10 26-10 28 0" fill="none" stroke="${INK}" stroke-width="1.8"/><path d="M46 30l-3 8h-4" fill="none" ${st(1.2)}/><circle cx="38" cy="38" r="1.3" fill="${INK}"/>`; }
+    if (s === 4) top = `<path d="M14 25c4 2 32 2 36 0-1 3-6 4-18 4s-17-1-18-4Z" fill="#2b2530" ${st(1.5)}/><path d="M21 25c-1-9 4-13 11-13s12 4 11 13c-6 1.4-16 1.4-22 0Z" fill="#2b2530" ${st(1.5)}/><path d="M26 15c3-1 7-1 10 0" stroke="#fff" stroke-opacity=".3" stroke-width="1.4" fill="none"/>`;
+    if (s === 5) top = hairCap + `<path d="M19 24c0-7 6-11 13-11s13 4 13 11Z" fill="#2f3a52" ${st(1.4)}/><path d="M19 24c-4 0-7 1-8 3 4 1 7 0 9-1Z" fill="#2f3a52" ${st(1.3)}/><circle cx="32" cy="13.5" r="1.4" fill="#2f3a52" ${st(.8)}/>`;
+    if (s === 6) { top = hairCap + `<circle cx="32" cy="12" r="5" fill="${HAIR}" ${st(1.3)}/>`; extra = d ? '' : `<circle cx="27" cy="31.5" r="4" fill="none" ${st(1.3)}/><circle cx="37" cy="31.5" r="4" fill="none" ${st(1.3)}/><path d="M31 31.5h2" ${st(1.2)}/>`; }
+    if (s === 7) top = `<path d="M19 27c-1-10 5-16 13-16s14 6 13 16c-8-2-18-2-26 0Z" fill="#2e8b57" ${st(1.4)}/><path d="M19 23h26" stroke="#1f6a42" stroke-width="2"/><circle cx="32" cy="10" r="3" fill="#efe4cf" ${st(1)}/>`;
+    if (s === 8) { back = `<g fill="${HAIR}" ${st(1.2)}><circle cx="20" cy="22" r="5"/><circle cx="26" cy="16" r="5"/><circle cx="33" cy="14" r="5"/><circle cx="40" cy="16" r="5"/><circle cx="45" cy="22" r="5"/><circle cx="19" cy="30" r="4"/><circle cx="46" cy="30" r="4"/></g>`; extra = `<path d="M20 48c6 4 18 4 24 0l-2 6c-6 3-14 3-20 0Z" fill="#b5243a" ${st(1.3)}/>`; }
+    if (s === 9) { back = `<path d="M14 40c-2-18 6-29 18-29s20 11 18 29c-2 6-6 8-8 8H22c-2 0-6-2-8-8Z" fill="${COAT}" ${st(1.5)}/>`; top = `<path d="M19 26c3-7 8-9 13-9s10 2 13 9" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2"/>`; }
+    return SVG64(`${back}${body}${extra && s === 8 ? extra : ''}${face}${eyes}${mouth}${s !== 8 ? extra : ''}${top}`);
+  }
+
   const SKINS = {
     classic: { name: 'Classic Detectives', price: 0, rarity: 'Basic', desc: 'The original cast.', draw: (p) => avatar(p), emoji: null },
     pets: { name: 'Pet Detectives', price: 120, rarity: 'Common', desc: 'Cats, dogs, foxes, owls and more. Paws off the evidence!', draw: petAvatar, emoji: ['🐱', '🐶', '🦊', '🐰', '🐻', '🐼', '🦉', '🐸', '🐯', '🐨'] },
@@ -781,6 +804,7 @@
     sea: { name: 'Deep Sea Gang', price: 480, rarity: 'Epic', desc: 'Ten sea creatures: octopus, shark, turtle, crab, seahorse, jellyfish, pufferfish, starfish, whale and swordfish.', draw: seaAvatar },
     masquerade: { name: 'Masquerade Ball', price: 0, rarity: 'Premium', desc: 'Venetian masks and feathers.', draw: masqueradeAvatar },
     cyber: { name: 'Cyber Agents', price: 0, rarity: 'Premium', desc: 'Glowing visors and scan lines.', draw: cyberAvatar },
+    partners: { name: 'Partners in Crime', price: 0, rarity: 'Exclusive', desc: 'Only for detectives who duel a new friend.', draw: partnersAvatar },
   };
 
   /* floor finish for each area: wood, tiles, grass, metal, deck... */
