@@ -344,7 +344,7 @@
   }
   function haptic(kind) {
     if (kind === 'tick') return;
-    if (navigator.vibrate) { navigator.vibrate(kind === 'wrong' ? 40 : kind === 'win' ? [30, 50, 30] : 12); return; }
+    if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) { navigator.vibrate(kind === 'wrong' ? 40 : kind === 'win' ? [30, 50, 30] : 12); return; }
     if (/iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
       iosHaptic();
       if (kind === 'win' || kind === 'wrong') setTimeout(iosHaptic, 120);
@@ -405,7 +405,7 @@
       if (!h) { toastOn = false; return; }
       toastOn = true;
       const el = document.createElement('div');
-      el.className = 'toast'; el.innerHTML = h;
+      el.className = 'toast' + ($('modal').classList.contains('show') ? ' low' : ''); el.innerHTML = h; // low = bottom, so it never covers a dialog heading
       document.body.appendChild(el);
       sfx('unlock');
       setTimeout(() => el.classList.add('out'), 2600);
@@ -679,7 +679,7 @@
     if (theirs < mine && !confirm(tr('This backup is on level {0}, but you are on level {1}. Replace your progress anyway?', theirs, mine))) return null;
     Object.keys(store).forEach((k) => delete store[k]);
     Object.assign(store, o, { engine: E.VERSION });
-    save(); applySkin();
+    save(); applySkin(); I.setLang(store.lang || I.detect()); renderGreet();
     return true;
   }
   function showBackup() {
@@ -916,7 +916,7 @@
       <div class="row"><button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
       buy: (b) => {
         const x = PACK[b.dataset.id];
-        if (!x || coins() < x.price) return;
+        if (!x || x.ref || x.iap || !Number.isFinite(x.price) || x.price < 0 || coins() < x.price || (store.owned || []).includes(x.id)) return;
         store.coins -= x.price; store.owned.push(x.id); store.skin = x.id; save();
         applySkin(); renderCoins(); sfx('unlock'); confetti();
         showShop();
@@ -1065,7 +1065,14 @@
       if (room.host.uid === me) return enterRace(code, 'host');
       if (room.guest && room.guest.uid !== me) return raceFail(null, tr('This duel already has two detectives.'));
       if (room.go && !(room.guest && room.guest.uid === me)) return raceFail(null, tr('This duel has already started.'));
-      if (!room.guest) await NET.put(`races/${code}/guest`, raceCard(isNewbie()));
+      if (!room.guest) {
+        try { await NET.put(`races/${code}/guest`, raceCard(isNewbie())); }
+        catch (e) {   // lost a race with another guest?
+          const g = await NET.get(`races/${code}/guest`).catch(() => null);
+          if (g && g.uid !== me) return raceFail(null, tr('This duel already has two detectives.'));
+          throw e;
+        }
+      }
       enterRace(code, 'guest');
     } catch (e) { raceFail(e); }
   }
@@ -1342,12 +1349,13 @@
       const t = await NET.get('tags/' + tag);
       if (!t || !t.uid) { shake($('modal-body')); return say(tr('No detective with this ID.')); }
       const p = (await NET.get('users/' + t.uid)) || {};
+      const known = (store.friends || []).some((f) => f.u === t.uid);
       addFriend({ i: p.i || String(t.uid).slice(0, 12), n: p.n || tag, l: p.l, s: p.s, t: p.t, u: t.uid, tag }, true);
       const c = myCard();
-      NET.put(`inbox/${t.uid}/f${NET.uid()}`, { t: 'friend', from: NET.uid(), n: String(c.n).slice(0, 18), s: c.s, i: c.i, l: c.l, at: NET.TS }).catch(() => {});
+      if (!known) NET.put(`inbox/${t.uid}/f${NET.uid()}`, { t: 'friend', from: NET.uid(), n: String(c.n).slice(0, 18), s: c.s, i: c.i, l: c.l, at: NET.TS }).catch(() => {});
       sfx('coin');
       const inp = $('id-in'); if (inp) inp.value = '';
-      say(tr('{0} added! They will see you in their friends list too.', esc(p.n || tag)));
+      say(known ? tr('{0} updated!', esc(p.n || tag)) : tr('{0} added! They will see you in their friends list too.', esc(p.n || tag)));
       refreshFriends();
       if ($('map').classList.contains('active')) showMap();
     } catch (e) { say(navigator.onLine === false ? tr('Live duels need an internet connection.') : tr('Could not reach the duel server. Try again in a moment.')); }
@@ -1393,9 +1401,10 @@
 
   function offerTutorial() {
     modal(`<div class="big">${ic('cap', '🎓')}</div><h2>${tr('New here?')}</h2><p>${tr("Take the 2-minute tutorial: we'll solve a tiny case together, step by step.")}</p>
-      <div class="row"><button class="primary" data-act="go">${tr('Start tutorial')}</button><button class="secondary" data-act="close">${tr('I know how to play')}</button></div>`, {
+      <div class="row"><button class="primary" data-act="go">${tr('Start tutorial')}</button><button class="secondary" data-act="skip">${tr('I know how to play')}</button></div>`, {
       go: () => { closeModal(); startTutorial(); },
-    });
+      skip: () => { store.tutorialDone = true; save(); closeModal(); },   // do not ask again on the next launch
+    }, true);
   }
 
   /* ---------- game ---------- */
@@ -2300,7 +2309,7 @@
     const finish = () => { if (over) return; over = true; timers.forEach(clearTimeout); ov.classList.add('out'); setTimeout(() => ov.remove(), 400); done(); };
     const at = (ms, fn) => timers.push(setTimeout(fn, calm ? ms / 3 : ms));
     at(1500, () => { ov.classList.add('rev'); sfx('unlock'); });
-    at(2500, () => { ov.classList.add('stamped'); sfx('place'); if (navigator.vibrate) try { navigator.vibrate(40); } catch (e) { /* ignore */ } });
+    at(2500, () => { ov.classList.add('stamped'); sfx('place'); if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) try { navigator.vibrate(40); } catch (e) { /* ignore */ } });
     at(3900, finish);
     ov.addEventListener('click', finish);
   }
@@ -2356,5 +2365,5 @@
   const hadLink = location.hash.length > 1;
   if (NET && store.netTag) ensureTag().catch(() => {});
   handleLink();
-  if (brandNew && !hadLink && !store.tutorialDone && !totalSolved()) startTutorial();
+  if (!hadLink && !store.tutorialDone && !totalSolved()) { if (brandNew) startTutorial(); else offerTutorial(); }   // reloaded mid-tutorial: offer it again
 })();
