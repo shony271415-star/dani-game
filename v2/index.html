@@ -431,6 +431,15 @@
     body.noir .status { margin-top: 3px; min-height: 16px; font-size: 12px; }
     body.noir .play-area { padding-bottom: 3px; }
   }
+  /* three more premium packs */
+  .skin-deco .face, .skin-deco .token, .pf.skin-deco, .skin-deco .af { animation: decoGlow 3s ease-in-out infinite; }
+  @keyframes decoGlow { 0%, 100% { box-shadow: 0 0 0 2px #d9a441, 0 0 10px rgba(217,164,65,.5); } 50% { box-shadow: 0 0 0 2px #ffe08a, 0 0 20px rgba(255,224,138,.9); } }
+  .skin-steam .face, .skin-steam .token, .pf.skin-steam, .skin-steam .af { animation: steamGlow 2.8s ease-in-out infinite; }
+  @keyframes steamGlow { 0%, 100% { box-shadow: 0 0 0 2px #c98a3a, 0 0 10px rgba(205,127,50,.55); } 50% { box-shadow: 0 0 0 2px #e8b25a, 0 0 18px rgba(232,178,90,.85); } }
+  .skin-gothic .face, .skin-gothic .token, .pf.skin-gothic, .skin-gothic .af { animation: gothGlow 3.2s ease-in-out infinite; }
+  @keyframes gothGlow { 0%, 100% { box-shadow: 0 0 0 2px #8f6fd0, 0 0 12px rgba(143,111,208,.6); } 50% { box-shadow: 0 0 0 2px #c9b8f0, 0 0 22px rgba(201,184,240,.9); } }
+  .skin-deco .face, .skin-steam .face, .skin-gothic .face { background: #0d0b16 !important; }
+  .skin-deco .token.art, .skin-steam .token.art, .skin-gothic .token.art { background: #0d0b16; }
   /* remove-ads button, top corner opposite the coins (only shown when the game has ads) */
   .noads-pill { position: absolute; top: calc(14px + env(safe-area-inset-top)); left: 14px; right: auto; z-index: 3; background: rgba(0,0,0,.35); border: 1px solid rgba(217,164,65,.5); color: #f3e6c8; border-radius: 20px; padding: 6px 12px; min-height: 36px; font: 700 13px "Oswald", sans-serif; letter-spacing: 1px; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; }
   body.noir #home > .noads-pill, #home > .noads-pill { position: absolute; }

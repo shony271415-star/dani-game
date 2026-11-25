@@ -24,22 +24,25 @@
   /* ---------- skin packs sold in the coin shop ---------- */
   const PACKS = [
     { id: 'classic', name: 'Classic Detectives', price: 0, rarity: 'Basic', desc: 'The original cast.', emoji: null },
-    { id: 'chefs', name: 'Kitchen Crew', price: 90, rarity: 'Common', desc: 'Chef hats, curly mustaches and a pinch of suspicion.', emoji: ['👨‍🍳', '👩‍🍳', '🧑‍🍳'] },
-    { id: 'clowns', name: 'Circus Clowns', price: 100, rarity: 'Common', desc: 'Red noses, wild hair. Nobody trusts a clown.', emoji: ['🤡', '🎪', '🎈', '🤹'] },
-    { id: 'cowboys', name: 'Wild West', price: 110, rarity: 'Common', desc: 'Cowboy hats, bandanas and a shiny sheriff star.', emoji: ['🤠', '🐴', '🌵', '⭐'] },
-    { id: 'pets', name: 'Pet Detectives', price: 120, rarity: 'Common', desc: 'Cats, dogs, foxes, owls and more. Paws off the evidence!', emoji: ['🐱', '🐶', '🦊', '🐰', '🐻', '🐼', '🦉', '🐸', '🐯', '🐨'] },
-    { id: 'robots', name: 'Robo Squad', price: 120, rarity: 'Common', desc: 'Beep boop. Box heads with glowing LED eyes.', emoji: ['🤖', '🦾', '🔋', '⚙️'] },
-    { id: 'pirates', name: 'Pirate Crew', price: 150, rarity: 'Rare', desc: 'Eye patches, tricorns and gold earrings. Arr!', emoji: ['🏴‍☠️', '🦜', '⚓', '🗺️', '💰'] },
-    { id: 'ninjas', name: 'Shadow Ninjas', price: 180, rarity: 'Rare', desc: 'Silent hoods, colourful headbands, one throwing star.', emoji: ['🥷', '🗡️', '🌙', '🎋'] },
-    { id: 'dinos', name: 'Dino Hoodies', price: 210, rarity: 'Rare', desc: 'Everyone in a dinosaur onesie. Rawr.', emoji: ['🦖', '🦕', '🐊', '🐉'] },
-    { id: 'wizards', name: 'Wizard Academy', price: 250, rarity: 'Rare', desc: 'Starry hats, long beards and glowing wands.', emoji: ['🧙', '🧙‍♀️', '🧙‍♂️', '🪄', '🔮'] },
-    { id: 'gangsters', name: 'Noir Gangsters', price: 280, rarity: 'Rare', desc: 'Fedoras, trench coats and very dark sunglasses.', emoji: ['🕴️', '🤵', '🤵‍♀️', '🧔‍♂️', '👩‍🦰', '🧑‍💼', '👨‍💼', '👩‍💼'] },
-    { id: 'heroes', name: 'Super Squad', price: 400, rarity: 'Epic', desc: 'Masks, capes and big shiny emblems.', emoji: ['🦸', '🦸‍♀️', '🦸‍♂️', '⚡', '🛡️'] },
-    { id: 'sea', name: 'Deep Sea Gang', price: 480, rarity: 'Epic', desc: 'Ten sea creatures: octopus, shark, turtle, crab, seahorse, jellyfish, pufferfish, starfish, whale and swordfish.', emoji: ['🐙', '🦈', '🐡', '🦀', '🪼', '🐳'] },
-    { id: 'monsters', name: 'Monster Mash', price: 560, rarity: 'Epic', desc: 'Vampires, mummies, ghosts, a cyclops and one very polite werewolf.', emoji: ['🧛', '🧟', '👻', '🧙', '🧌', '🐺', '🎃', '💀', '🧞'] },
-    { id: 'royals', name: 'Royal Court', price: 650, rarity: 'Epic', desc: 'Crowns, jewels and ermine, in a shimmering gold frame.', emoji: ['🤴', '👸', '🫅', '👑', '🦄', '💎'] },
-    { id: 'space', name: 'Space Crew', price: 800, rarity: 'Epic', desc: 'Astronauts and aliens, framed by the stars.', emoji: ['👩‍🚀', '🧑‍🚀', '👨‍🚀', '👽', '🤖', '👾', '🛸'] },
-    { id: 'neon', name: 'Neon Legends', price: 1500, rarity: 'Legendary', desc: 'Glowing neon characters in a pulsing frame.', emoji: ['🌟', '💫', '⚡', '🔮', '🌈', '🪩', '✨'] },
+    { id: 'chefs', name: 'Kitchen Crew', price: 360, rarity: 'Common', desc: 'Chef hats, curly mustaches and a pinch of suspicion.', emoji: ['👨‍🍳', '👩‍🍳', '🧑‍🍳'] },
+    { id: 'clowns', name: 'Circus Clowns', price: 400, rarity: 'Common', desc: 'Red noses, wild hair. Nobody trusts a clown.', emoji: ['🤡', '🎪', '🎈', '🤹'] },
+    { id: 'cowboys', name: 'Wild West', price: 440, rarity: 'Common', desc: 'Cowboy hats, bandanas and a shiny sheriff star.', emoji: ['🤠', '🐴', '🌵', '⭐'] },
+    { id: 'pets', name: 'Pet Detectives', price: 480, rarity: 'Common', desc: 'Cats, dogs, foxes, owls and more. Paws off the evidence!', emoji: ['🐱', '🐶', '🦊', '🐰', '🐻', '🐼', '🦉', '🐸', '🐯', '🐨'] },
+    { id: 'robots', name: 'Robo Squad', price: 480, rarity: 'Common', desc: 'Beep boop. Box heads with glowing LED eyes.', emoji: ['🤖', '🦾', '🔋', '⚙️'] },
+    { id: 'pirates', name: 'Pirate Crew', price: 600, rarity: 'Rare', desc: 'Eye patches, tricorns and gold earrings. Arr!', emoji: ['🏴‍☠️', '🦜', '⚓', '🗺️', '💰'] },
+    { id: 'ninjas', name: 'Shadow Ninjas', price: 720, rarity: 'Rare', desc: 'Silent hoods, colourful headbands, one throwing star.', emoji: ['🥷', '🗡️', '🌙', '🎋'] },
+    { id: 'dinos', name: 'Dino Hoodies', price: 840, rarity: 'Rare', desc: 'Everyone in a dinosaur onesie. Rawr.', emoji: ['🦖', '🦕', '🐊', '🐉'] },
+    { id: 'wizards', name: 'Wizard Academy', price: 1000, rarity: 'Rare', desc: 'Starry hats, long beards and glowing wands.', emoji: ['🧙', '🧙‍♀️', '🧙‍♂️', '🪄', '🔮'] },
+    { id: 'gangsters', name: 'Noir Gangsters', price: 1120, rarity: 'Rare', desc: 'Fedoras, trench coats and very dark sunglasses.', emoji: ['🕴️', '🤵', '🤵‍♀️', '🧔‍♂️', '👩‍🦰', '🧑‍💼', '👨‍💼', '👩‍💼'] },
+    { id: 'heroes', name: 'Super Squad', price: 1600, rarity: 'Epic', desc: 'Masks, capes and big shiny emblems.', emoji: ['🦸', '🦸‍♀️', '🦸‍♂️', '⚡', '🛡️'] },
+    { id: 'sea', name: 'Deep Sea Gang', price: 1920, rarity: 'Epic', desc: 'Ten sea creatures: octopus, shark, turtle, crab, seahorse, jellyfish, pufferfish, starfish, whale and swordfish.', emoji: ['🐙', '🦈', '🐡', '🦀', '🪼', '🐳'] },
+    { id: 'monsters', name: 'Monster Mash', price: 2240, rarity: 'Epic', desc: 'Vampires, mummies, ghosts, a cyclops and one very polite werewolf.', emoji: ['🧛', '🧟', '👻', '🧙', '🧌', '🐺', '🎃', '💀', '🧞'] },
+    { id: 'royals', name: 'Royal Court', price: 2600, rarity: 'Epic', desc: 'Crowns, jewels and ermine, in a shimmering gold frame.', emoji: ['🤴', '👸', '🫅', '👑', '🦄', '💎'] },
+    { id: 'space', name: 'Space Crew', price: 3200, rarity: 'Epic', desc: 'Astronauts and aliens, framed by the stars.', emoji: ['👩‍🚀', '🧑‍🚀', '👨‍🚀', '👽', '🤖', '👾', '🛸'] },
+    { id: 'neon', name: 'Neon Legends', price: 6000, rarity: 'Legendary', desc: 'Glowing neon characters in a pulsing frame.', emoji: ['🌟', '💫', '⚡', '🔮', '🌈', '🪩', '✨'] },
+    { id: 'deco', name: 'Jazz Age', iap: 'skin_deco', usd: '$2.99', rarity: 'Premium', desc: 'Art deco gold, bow ties, pearls and a sunburst frame.', emoji: ['🎷', '🎩', '🥂', '💎'] },
+    { id: 'steam', name: 'Steampunk Guild', iap: 'skin_steam', usd: '$2.99', rarity: 'Premium', desc: 'Brass goggles, gears and top hats in a riveted frame.', emoji: ['⚙️', '🎩', '🔧', '🕰️'] },
+    { id: 'gothic', name: 'Haunted Gala', iap: 'skin_gothic', usd: '$1.99', rarity: 'Premium', desc: 'Powdered wigs, lace collars and candlelight. Ghosts welcome.', emoji: ['👻', '🕯️', '🎭', '🦇'] },
     { id: 'partners', name: 'Partners in Crime', ref: true, rarity: 'Exclusive', desc: 'Only for detectives who duel a new friend.', emoji: ['🤝', '🕵️', '🔎', '🕵️‍♀️'] },
     { id: 'masquerade', name: 'Masquerade Ball', iap: 'skin_masquerade', usd: '$1.99', rarity: 'Premium', desc: 'Venetian masks, feathers and velvet. Comes with a gilded frame.', emoji: ['🎭', '🦚', '🪶', '💃', '🕺', '🎩'] },
     { id: 'cyber', name: 'Cyber Agents', iap: 'skin_cyber', usd: '$2.99', rarity: 'Premium', desc: 'Glowing visors and live scan lines. The flashiest look in the game.', emoji: ['🦾', '🤖', '🕶️', '👾', '💿', '🛰️'] },
@@ -54,6 +57,15 @@
   /* ---------- ads: none yet. When ads are added, show them only if adsAllowed(); players can pay once to remove them ---------- */
   const ADS_ON = false;   // flip to true in the release that contains real ads (window.CG_ADS_ON is only for tests)
   const REMOVE_ADS = { iap: 'remove_ads', usd: '$3.99' };
+  /* rewarded video: the native wrapper (version 2) sets window.CGAdBridge = { isReady(): boolean, showRewarded(cb: (rewarded: boolean) => void) }.
+     Without it nothing below is shown. Watching is always the player's own choice, and a few per day at most. */
+  const AD_HINTS_PER_DAY = 3;
+  const adBridgeReady = () => !!(window.CGAdBridge && typeof window.CGAdBridge.showRewarded === 'function' && (!window.CGAdBridge.isReady || window.CGAdBridge.isReady()));
+  function adHintsLeft() { const d = today().num; if (!store.adHints || store.adHints.day !== d) store.adHints = { day: d, n: 0 }; return AD_HINTS_PER_DAY - store.adHints.n; }
+  function watchAd(then) {
+    try { window.CGAdBridge.showRewarded((ok) => { if (ok) then(); else toast(`<span class="ti">${ic('lock', '🔒')}</span><span><b>${tr('No video available right now. Try again later.')}</b></span>`); }); }
+    catch (e) { toast(`<span class="ti">${ic('lock', '🔒')}</span><span><b>${tr('No video available right now. Try again later.')}</b></span>`); }
+  }
   const adsAllowed = () => !!(ADS_ON || window.CG_ADS_ON) && !store.noAds;
   window.CGAds = { allowed: () => adsAllowed() };
   const IAP = {
@@ -137,10 +149,40 @@
   }
   const dailyLog = () => (store.dailyLog = store.dailyLog || {});
   function dailyStreak() {
-    const log = dailyLog(), t = today().num;
-    let day = log[t] ? t : t - 1, n = 0;
-    while (log[day]) { n++; day--; }
+    const log = dailyLog(), fr = store.frozen || {}, t = today().num;
+    let day = (log[t] || fr[t]) ? t : t - 1, n = 0;
+    while (log[day] || fr[day]) { if (log[day]) n++; day--; }   // a frozen day keeps the streak alive without adding to it
     return n;
+  }
+  // earned by finishing every 7th day of a streak: saves the streak if exactly one day was missed
+  function applyStreakFreeze() {
+    const log = dailyLog(), t = today().num, y = t - 1;
+    store.frozen = store.frozen || {};
+    if (log[t] || log[y] || store.frozen[y] || (store.freezes || 0) < 1) return;
+    if (!(log[y - 1] || store.frozen[y - 1])) return;
+    store.frozen[y] = true; store.freezes -= 1; save();
+    setTimeout(() => toast(`<span class="ti">${ic('flame', '🔥')}</span><span><b>${tr('Streak freeze used!')}</b><small>${tr('Your {0}-day streak is safe. Solve today to keep it going.', dailyStreak())}</small></span>`), 600);
+  }
+  // a repeating calendar reminder (works on any phone, no server needed)
+  function remindDaily() {
+    const times = [[8, 0], [13, 0], [20, 0]];
+    modal(`<div class="big">${ic('flame', '🔥')}</div><h2>${tr('Daily reminder')}</h2>
+      <p>${tr('Pick a time. Your calendar will remind you every day to solve the Daily Case.')}</p>
+      <div class="stake-row">${times.map(([h], i) => `<button class="${h === 20 ? 'primary' : 'secondary'}" data-act="t${i}">${String(h).padStart(2, '0')}:00</button>`).join('')}</div>
+      <div class="row"><button class="secondary" data-act="close">${tr('Not now')}</button></div>`,
+      Object.fromEntries(times.map(([h, m], i) => ['t' + i, () => { closeModal(); downloadReminder(h, m); }])));
+  }
+  function downloadReminder(h, m) {
+    const d = new Date(), p2 = (n) => String(n).padStart(2, '0');
+    const stamp = `${d.getFullYear()}${p2(d.getMonth() + 1)}${p2(d.getDate())}T${p2(h)}${p2(m)}00`;
+    const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Crime Grid//Daily//EN', 'BEGIN:VEVENT', 'UID:crimegrid-daily-reminder@crimegrid', `DTSTAMP:${stamp}`, `DTSTART:${stamp}`, 'DURATION:PT10M', 'RRULE:FREQ=DAILY',
+      `SUMMARY:${tr("Crime Grid: today's case is waiting")}`, `DESCRIPTION:${tr('Solve the Daily Case and keep your streak!')} ${GAME_URL}`, 'BEGIN:VALARM', 'TRIGGER:PT0M', 'ACTION:DISPLAY', 'DESCRIPTION:Crime Grid', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+    const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = 'crime-grid-daily.ics';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    toast(`<span class="ti">${ic('check', '✓')}</span><span><b>${tr('Reminder file ready')}</b><small>${tr('Open it to add the daily reminder to your calendar.')}</small></span>`);
   }
 
   /* ---------- tutorial: a hand-made first case ---------- */
@@ -224,13 +266,12 @@
   }
 
   /* ---------- coins ---------- */
-  const COIN_BASE = { easy: 10, medium: 15, hard: 20, expert: 30, extreme: 50 };
+  const COIN_BASE = { easy: 5, medium: 8, hard: 10, expert: 15, extreme: 25 };
   const COST = { clue: 20, check: 10, reveal: 50 };
   const BONUS = [10, 15, 20, 25, 30, 40, 60];
 
   /* ---------- retention: daily missions, win streak, star chest ---------- */
-  const CHEST_GOAL = 15, MISSION_ALL_BONUS = 30;
-  const MISSIONS = [
+    const MISSIONS = [
     { id: 'solve3', n: 3, reward: 25, text: ['Solve {0} cases', 3], hit: () => 1 },
     { id: 'hard', n: 1, reward: 25, text: ['Solve a Hard or harder case'], hit: (c) => (['hard', 'expert', 'extreme'].includes(c.diff) ? 1 : 0) },
     { id: 'clean', n: 1, reward: 20, text: ['Solve a case without any help'], hit: (c) => (c.clean ? 1 : 0) },
@@ -241,7 +282,7 @@
   function missions() {
     const d = today().num;
     if (!store.missions || store.missions.day !== d) {
-      store.missions = { day: d, list: [0, 2, 4].map((k) => ({ id: MISSIONS[(d + k) % MISSIONS.length].id, p: 0, done: false })), all: false };
+      store.missions = { day: d, list: [0].map((k) => ({ id: MISSIONS[(d + k) % MISSIONS.length].id, p: 0, done: false })), all: false };
       save();
     }
     return store.missions;
@@ -251,13 +292,6 @@
   // called once per solved case; returns extra coins and a few message lines
   function retentionOnWin(c) {
     const lines = [], out = { coins: 0, lines };
-    // win streak: every win in a row without revealing a suspect
-    store.winStreak = c.hints ? 0 : (store.winStreak || 0) + 1;
-    store.bestStreak = Math.max(store.bestStreak || 0, store.winStreak);
-    if (store.winStreak >= 2) {
-      const b = Math.min(store.winStreak, 10) * 2;
-      out.coins += b; lines.push(`${ic('flame', '🔥')} ${tr('Win streak ×{0}: +{1} coins', store.winStreak, b)}`);
-    }
     // daily missions
     const ms = missions();
     ms.list.forEach((it) => {
@@ -269,24 +303,6 @@
         lines.push(`${ic('check', '✔️')} ${tr('Mission complete: {0} · +{1} coins', missionText(def), def.reward)}`);
       }
     });
-    if (!ms.all && ms.list.every((it) => it.done)) {
-      ms.all = true; out.coins += MISSION_ALL_BONUS;
-      lines.push(`${ic('gift', '🎁')} ${tr('All missions done! +{0} coins', MISSION_ALL_BONUS)}`);
-    }
-    // star chest
-    store.chestStars = (store.chestStars || 0) + c.stars;
-    while (store.chestStars >= CHEST_GOAL) {
-      store.chestStars -= CHEST_GOAL;
-      const cheap = PACKS.filter((x) => !x.iap && x.price > 0 && x.price <= 120 && !(store.owned || ['classic']).includes(x.id));
-      if (cheap.length && Math.random() < 0.3) {
-        const x = cheap[Math.floor(Math.random() * cheap.length)];
-        store.owned = [...(store.owned || ['classic']), x.id];
-        lines.push(`${ic('gift', '🎁')} ${tr('Star chest opened! New pack: {0}', tr(x.name))}`);
-      } else {
-        const b = 30 + Math.floor(Math.random() * 12) * 10;
-        out.coins += b; lines.push(`${ic('gift', '🎁')} ${tr('Star chest opened! +{0} coins', b)}`);
-      }
-    }
     return out;
   }
   function renderRetention() {
@@ -297,10 +313,9 @@
       const def = missionDef(it.id);
       return `<div class="mi${it.done ? ' done' : ''}"><span class="mi-ck">${it.done ? '✓' : ''}</span><span class="mi-tx">${esc(missionText(def))}</span><span class="mi-pr">${it.done ? '' : def.n > 1 ? `${it.p}/${def.n}` : ''}</span><span class="mi-rw">${coinIc()} ${def.reward}</span></div>`;
     }).join('');
-    const cs = store.chestStars || 0, ws = store.winStreak || 0;
-    $('rewards-sum').innerHTML = `${ic('gift', '🎁')} ${tr('Daily Missions')} ${got}/3 · ${cs}/${CHEST_GOAL} ★`;
-    el.innerHTML = `<div class="missions"><div class="mi-h"><b>${tr('Daily Missions')}</b><span>${got}/3${ms.all ? ' ✓' : ` · ${coinIc()} +${MISSION_ALL_BONUS}`}</span></div>${rows}</div>
-      <div class="chest"><span class="ch-ic">${ic('gift', '🎁')}</span><div class="ch-tx"><b>${tr('Star chest')}</b><div class="ch-bar"><div style="width:${Math.round((cs / CHEST_GOAL) * 100)}%"></div></div><small>${tr('{0}/{1} stars to the next chest', cs, CHEST_GOAL)}${ws >= 2 ? ` · ${ic('flame', '🔥')} ${tr('Win streak: {0}', ws)}` : ''}</small></div></div>`;
+    const n = ms.list.length;
+    $('rewards-sum').innerHTML = `${ic('gift', '🎁')} ${tr(n > 1 ? 'Daily Missions' : 'Daily Mission')} ${got}/${n}`;
+    el.innerHTML = `<div class="missions"><div class="mi-h"><b>${tr(n > 1 ? 'Daily Missions' : 'Daily Mission')}</b><span>${got}/${n}</span></div>${rows}</div>`;
   }
   const coinIc = () => ic('coin', '🪙');
 
@@ -584,6 +599,7 @@
     $('game').classList.remove('active');
     if (!wasHome && window.__resetHomeNav) window.__resetHomeNav();
     if (!wasHome) window.scrollTo(0, 0);
+    applyStreakFreeze();
     renderGreet();
     renderCoins();
     renderNoAds();
@@ -685,7 +701,7 @@
   }
 
   /* ---------- backup code: move progress to another phone or browser ---------- */
-  const BACKUP_KEYS = ['noAds', 'lang', 'profile', 'coins', 'missions', 'winStreak', 'bestStreak', 'chestStars', 'owned', 'skin', 'journey', 'jStars', 'easy', 'medium', 'hard', 'expert', 'extreme', 'daily', 'dailyLog', 'ach', 'trophies',
+  const BACKUP_KEYS = ['noAds', 'lang', 'profile', 'coins', 'missions', 'freezes', 'frozen', 'seenWhatIf', 'owned', 'skin', 'journey', 'jStars', 'easy', 'medium', 'hard', 'expert', 'extreme', 'daily', 'dailyLog', 'ach', 'trophies',
     'themesSolved', 'friends', 'bonusDay', 'bonusStreak', 'pid', 'sound', 'seenHowto', 'tutorialDone', 'paid', 'engine'];
   function backupCode() {
     const o = {};
@@ -983,9 +999,10 @@
         <span class="dc-tx"><b>${tr('Daily Case')}</b><small>${info}</small></span>
         <span class="badge${noir && done ? ' solved' : ''}">${status}</span>
       </button>
-      <div class="streak">${streak ? `${ic('flame', '🔥')} ${done ? tr('{0}-day streak', streak) : tr('{0}-day streak, solve today to keep it!', streak)}` : tr('A new case every day. Same one for everyone!')} <span class="nb">· <button class="mini-link" id="cal-btn">${tr('Calendar')}</button></span></div>`;
+      <div class="streak">${streak ? `${ic('flame', '🔥')} ${done ? tr('{0}-day streak', streak) : tr('{0}-day streak, solve today to keep it!', streak)}` : tr('A new case every day. Same one for everyone!')} ${(store.freezes || 0) > 0 ? ` <span class="nb">· ${tr('Freeze')} ×${store.freezes}</span>` : ''} <span class="nb">· <button class="mini-link" id="cal-btn">${tr('Calendar')}</button> · <button class="mini-link" id="remind-btn">${tr('Remind me')}</button></span></div>`;
     $('daily-btn').addEventListener('click', startDaily);
     $('cal-btn').addEventListener('click', showCalendar);
+    $('remind-btn').addEventListener('click', remindDaily);
   }
 
   // Daily tab: a small menu (today's case, streak, calendar) instead of jumping straight into the level
@@ -1551,6 +1568,7 @@
     if (slot === 'journey' || DIFF[slot]) prefetchNext(slot, caseNum);
     if (slot === 'tutorial') renderCoach();
     else if (!store.seenHowto && !store.tutorialDone) { store.seenHowto = true; save(); showHowto(); }
+    else if (slot !== 'race' && !store.seenWhatIf && puzzle.grade && puzzle.grade.level >= 2) showWhatIf();
     checkDone(true);
   }
 
@@ -2045,11 +2063,13 @@
         <button class="primary" data-act="clue">${ic('note', '🧾')} ${tr('Give me an extra clue')} ${price('clue')}<small>${tr("A fact about the whole scene. Nobody's spot is revealed.")}</small></button>
         <button class="secondary" data-act="check">${ic('check', '✔️')} ${tr('Check my placements')} ${price('check')}<small>${tr('Tells you if someone on the board is in the wrong spot.')}</small></button>
         <button class="secondary" data-act="reveal">${ic('eye', '👁️')} ${tr('Reveal one suspect')} ${price('reveal')}<small>${tr('The last resort.')}</small></button>
+        ${adBridgeReady() && adHintsLeft() > 0 ? `<button class="secondary" data-act="adclue">${ic('note', '🎬')} ${tr('Watch a short video: free clue')}<small>${tr('{0} left today', adHintsLeft())}</small></button>` : ''}
       </div>
       <div class="row"><button class="secondary" data-act="close">${tr('Never mind')}</button></div>`, {
       clue: () => { closeModal(); if (pay('clue')) giveExtraClue(); },
       check: () => { closeModal(); if (pay('check')) checkPlacements(); },
       reveal: () => { closeModal(); if (pay('reveal')) revealOne(); },
+      adclue: () => { closeModal(); watchAd(() => { if (adHintsLeft() > 0) { store.adHints.n++; save(); giveExtraClue(); } }); },
     });
   });
 
@@ -2160,6 +2180,18 @@
     else if (modalActions[btn.dataset.act]) modalActions[btn.dataset.act](btn);
   });
 
+  // shown once, before the first case that needs trial-and-contradiction reasoning
+  function showWhatIf() {
+    store.seenWhatIf = true; save();
+    modal(`<div class="big">${ic('bulb', '💡')}</div><h2>${tr('New trick: "What if?"')}</h2>
+      <p>${tr('Stuck? Pretend a suspect stands on one square and follow the clues.')}</p>
+      <div class="howto"><ul>
+        <li>${tr('Pencil the guess in with <b>Draft</b>, so it is only an idea.')}</li>
+        <li>${tr('If two people end up in the same row or column, or a clue breaks, the guess was impossible.')}</li>
+        <li>${tr('Cross that square out with <b>Mark</b> and try another one.')}</li></ul></div>
+      <p><small>${tr('Bigger cases need this a lot. Take your time.')}</small></p>
+      <div class="row"><button class="primary" data-act="close">${tr('Got it')}</button></div>`);
+  }
   function showHowto() {
     modal(`<div class="big">${ic('logo', '👮')}</div><h2>${tr('Welcome, detective!')}</h2>
       <div class="howto">
@@ -2255,7 +2287,7 @@
       return;
     }
     const nStars = !S.hints && !S.helps && !S.wrongAccuse.length ? 3 : !S.hints ? 2 : 1;
-    let earned = (COIN_BASE[S.diff] + (nStars === 3 ? 10 : nStars === 2 ? 5 : 0)) * (S.slot === 'daily' ? 2 : 1);
+    let earned = (COIN_BASE[S.diff] + (nStars === 3 ? 5 : nStars === 2 ? 2 : 0)) * (S.slot === 'daily' ? 2 : 1);
     const ret = retentionOnWin({ diff: S.diff, slot: S.slot, stars: nStars, clean: !S.hints && !S.helps, hints: S.hints });
     earned += ret.coins;
     store.coins = coins() + earned;
@@ -2271,6 +2303,7 @@
       if (all) { store.trophies = store.trophies || {}; store.trophies[`${y}-${mo + 1}`] = true; }
       const n = dailyStreak();
       dailyTxt = `<br>${ic('flame', '🔥')} ${tr('{0}-day streak! Come back tomorrow for a new case.', n)}`;
+      if (n > 0 && n % 7 === 0) { store.freezes = Math.min(2, (store.freezes || 0) + 1); dailyTxt += `<br>${ic('gift', '🎁')} ${tr('Streak freeze earned! It saves your streak if you miss one day.')}`; }
     } else if (S.slot === 'race') {
       pg.cur = null;
       raceFinished();
@@ -2307,6 +2340,7 @@
         <p class="w-story">${tr('<b>{0}</b> was alone with {1} {2}.', esc(m.name), esc(v.name), esc(zone.in))} ${lockLine} ${ic('lock', '🔒')}</p>
         <div class="w-stars" dir="ltr">${[1, 2, 3].map((k) => `<span class="ic w-star${k <= nStars ? ' on' : ''}" style="--i:${k}">${ART.ui(k <= nStars ? 'star' : 'starOff')}</span>`).join('')}</div>
         <div class="w-coins">${coinIc()} <span>+<b id="earned">0</b></span></div>
+        ${adBridgeReady() && earned > 0 && S.slot !== 'race' ? `<button class="secondary w-sec" data-act="dbl">${ic('coin', '🪙')} ${tr('Watch a short video: double coins (+{0})', I.num(earned))}</button>` : ''}
         <div class="w-stats">${stats}</div>
         ${dailyTxt ? `<div class="w-note">${dailyTxt.replace(/^<br>/, '')}</div>` : ''}
         ${shareCardHtml(nStars)}
@@ -2322,6 +2356,8 @@
       home: () => { closeModal(); showHome(); },
     });
       $('modal-body').classList.add('win-modal');
+      const dbl = $('modal-body').querySelector('[data-act="dbl"]');
+      if (dbl) dbl.addEventListener('click', () => { dbl.disabled = true; watchAd(() => { addCoins(earned); sfx('coin'); dbl.textContent = tr('Coins doubled!'); }); });
     } else {
       modal(`<div class="big">${ART ? `<span class="ic win-face">${face(m)}</span><span class="ic">${ART.ui('siren')}</span>` : m.emoji + '🚔'}</div><h2>${tr('Case closed!')}</h2>
       <p>${tr('<b>{0}</b> was alone with {1} {2}.', esc(m.name), esc(v.name), esc(zone.in))}<br>${lockLine} ${ic('lock', '🔒')}</p>
@@ -2370,7 +2406,8 @@
   // the result screen already shows level, time and stars once, so there is no separate result card any more
   function shareCardHtml() { return ''; }
   function shareResult(nStars) {
-    const text = `🕵️ Crime Grid · ${resultLabel()}\n⏱ ${fmtTime(S.elapsed)} · ${'⭐'.repeat(nStars)}\n${tr('Can you solve it?')}\n${GAME_URL}`;
+    const streakLn = S.slot === 'daily' && dailyStreak() > 1 ? `\n🔥 ${tr('{0}-day streak', dailyStreak())}` : '';
+    const text = `🕵️ Crime Grid · ${resultLabel()}\n⏱ ${fmtTime(S.elapsed)} · ${'⭐'.repeat(nStars)}${streakLn}\n${tr('Can you solve it?')}\n${GAME_URL}`;
     return shareText(text);
   }
   async function shareText(text) {

@@ -2,6 +2,7 @@
 
 Read `README.md` first, then skim `engine.js`, `app.js`, `art.js`, `i18n.js`, `net.js`.
 The owner speaks Hebrew: answer in short, simple Hebrew. Be honest about what was not tested.
+The owner wants proactive upgrades: keep looking for what can be improved without being asked (UX, bugs, retention, store assets, performance), do the safe ones on the work branch and report them, and ask before anything goes to the live branch.
 
 ## Branches (important)
 - `claude/practical-keller-9slz4t` = LIVE branch (GitHub Pages serves it to players). Never push to it without an explicit request. To release: merge from `claude/crimegrid-next`, run a Playwright smoke test (new player and old save, 0 errors, coins/packs/skin kept), then push.
@@ -23,6 +24,9 @@ The owner speaks Hebrew: answer in short, simple Hebrew. Be honest about what wa
 - Detective ID: a 6-character ID per player. Friends add each other by ID, see an online dot, and send duel invites that pop up inside the game (only while the game is open). "Delete my online ID" removes the profile.
 - Setup and Play Data safety notes: `store/MULTIPLAYER-SETUP.md`. Privacy policy: `privacy.html`.
 - Test locally with the Firebase Database and Auth emulators (set `window.CG_NET_CONFIG` with `authBase`, `ns`). Two Playwright contexts simulate two players.
+
+## Rewarded video (version 2)
+- `window.CGAdBridge = { isReady(), showRewarded(cb) }` is the contract for the native wrapper. Without it nothing is shown. With it: a free clue (3 a day) in the Help menu and a double-coins button on the win screen.
 
 ## Ads and Remove Ads
 - The game has NO ads yet (`ADS_ON = false` in `app.js`). A "No ads" button (top corner of the home screen) and the `remove_ads` purchase are already built but stay hidden until `ADS_ON` is true. Any future ad code must check `window.CGAds.allowed()` first. The purchase sets `store.noAds` (kept in the backup code, restored by `listPurchases`, acknowledged).

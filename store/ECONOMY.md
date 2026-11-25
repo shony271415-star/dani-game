@@ -1,51 +1,33 @@
-# Crime Grid: coin economy
+# Crime Grid: coin economy (v2, slower on purpose)
+
+Goal: a mid-tier skin takes about 2 to 3 weeks of normal play, so coins have a reason to be bought.
 
 ## Income (coins)
 | Source | Amount |
 |---|---|
-| Solve a case (`COIN_BASE`) | Rookie 10, Detective 15, Inspector 20, Expert 30, Extreme 50 |
-| Star bonus | 3 stars +10, 2 stars +5 |
+| Solve a case (`COIN_BASE`) | Rookie 5, Detective 8, Inspector 10, Expert 15, Extreme 25 |
+| Star bonus | 3 stars +5, 2 stars +2 |
 | Daily case | everything above x2 |
-| Win streak (no reveals) | +2 per win in a row, up to +20 |
 | Daily gift (`BONUS`) | 10, 15, 20, 25, 30, 40, 60 over a 7-day streak |
-| Daily missions | 15-25 each, +30 for all three |
-| Star chest (15 stars) | 30-140 coins, or 30% chance of a free Common pack |
-| Starting coins | 30 (was 100; existing saves keep their balance) |
+| Daily mission | one per day, 15 to 25 coins |
+| Trophies | 50 once each (12 trophies) |
+| Starting coins | 30 |
 
-Journey levels: 1-3 Rookie, 4-10 Detective, 11-25 Inspector with an Expert boss every 5th level, then Expert (Extreme bosses after level 50).
+Removed in this version: win-streak bonus, star chest, "all missions" bonus. A streak freeze (earned at every 7th streak day, max 2) keeps a daily streak alive after one missed day.
+Typical income: about 70 to 120 coins a day for a player who solves 3 to 5 cases and the daily case.
 Hints cost `COST`: clue 20, check 10, reveal 50.
 
-## Shop prices (v30, was 10-4000 with a gap between 40 and 300)
-| Rarity | Pack | Price | Why |
-|---|---|---|---|
-| Common | Kitchen Crew | 90 | simplest art: hats and mustaches |
-| Common | Circus Clowns | 100 | |
-| Common | Wild West | 110 | |
-| Common | Robo Squad | 120 | |
-| Common | Pet Detectives | 120 | most characters (8 animals), cute, a favourite |
-| Rare | Pirate Crew | 150 | |
-| Rare | Shadow Ninjas | 180 | |
-| Rare | Dino Hoodies | 210 | |
-| Rare | Wizard Academy | 250 | |
-| Rare | Noir Gangsters | 280 | the noir look matches the app |
-| Epic | Super Squad | 400 | |
-| Epic | Deep Sea Gang | 480 | 10 different sea animals |
-| Epic | Monster Mash | 560 | 10 creatures (moved up from Rare) |
-| Epic | Royal Court | 650 | gold frame |
-| Epic | Space Crew | 800 | framed scene, aliens |
-| Legendary | Neon Legends | 1500 | glowing, animated frame |
-| Premium (real money) | Masquerade Ball $1.99, Cyber Agents $2.99 | unchanged | IAP ids unchanged |
+## Shop prices (coins, 4x the old ladder)
+| Rarity | Packs | Price |
+|---|---|---|
+| Common | Kitchen Crew 360, Circus Clowns 400, Wild West 440, Robo Squad 480, Pet Detectives 480 | 3 to 7 days |
+| Rare | Pirate Crew 600, Shadow Ninjas 720, Dino Hoodies 840, Wizard Academy 1,000, Noir Gangsters 1,120 | 1 to 2 weeks |
+| Epic | Super Squad 1,600, Deep Sea Gang 1,920, Monster Mash 2,240, Royal Court 2,600, Space Crew 3,200 | 3 to 6 weeks |
+| Legendary | Neon Legends 6,000 | 2 months |
 
-Pack ids and IAP ids are unchanged, and `owned` is untouched, so nobody loses a pack they bought. The shop lists packs from cheapest to most expensive.
+Real-money coin packs (Google Play): 500 for $0.99, 1,200 for $1.99, 3,000 for $3.99, 7,500 for $7.99.
+Premium packs (real money only, never for coins): Masquerade Ball $1.99, Cyber Agents $2.99, Jazz Age $2.99, Steampunk Guild $2.99, Haunted Gala $1.99.
+Exclusive (earned only by duelling a new friend): Partners in Crime.
 
-## Pacing (simulated with 30 starting coins)
-The simulation includes the daily gift, one batch of missions per day and the streak bonus. Careful = no help, streak kept, 4 cases a day. Average = about one check per level, 3 cases a day. Casual = help on every level, 2 cases a day.
-
-| Player | First pack (90) | 120 | 250 | 560 | 1500 (Neon) |
-|---|---|---|---|---|---|
-| Careful | level 3 | level 4 | level 6 | level 12 | level 25 |
-| Average | level 4 | level 6 | level 11 | level 19 | level 45 |
-| Casual | level 11 | level 13 | level 21 | level 37 | level 75 |
-
-The first purchase lands at about level 4-6 for a typical player. The step between neighbouring tiers is at most about 1.5x inside Common/Rare/Epic; the only big jump is Epic to Legendary (800 to 1500), because Neon is the only Legendary pack.
-The star chest only gives away Common packs (price up to 120).
+Pack ids, IAP ids and the `owned` list are unchanged, so nobody loses a pack they already own. Players who had saved coins keep them, but the same coins now buy less.
+Duel stakes (25 to 500) come out of the same coins and are trust-based (coins are local).
