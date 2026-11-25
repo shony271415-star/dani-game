@@ -7,7 +7,8 @@ Everything here is ready to copy into the Google Play Console.
 |---|---|---|
 | App icon | `store/app-icon-512.png` | 512×512 PNG |
 | Feature graphic | `store/feature-graphic.png` | 1024×500 |
-| Phone screenshots | `store/screenshots/1-home.png` … `5-case-closed.png` | 2–8 images, 1080×1920 |
+| Phone screenshots | `store/screenshots/1-home.png` … `7-duel.png` (home, two puzzle boards, draft mode, expert board, case closed, shop, live duel) | 2–8 images, 1080×1920 |
+| Promo video (30 s, silent, vertical) | `promo/crime-grid-30s.mp4` | use for the Play listing video link, TikTok, Reels, Shorts |
 | Privacy policy URL | https://shony271415-star.github.io/dani-game/privacy.html | required |
 | The game itself | https://shony271415-star.github.io/dani-game/v2/ | the address to package |
 
@@ -17,6 +18,7 @@ Everything here is ready to copy into the Google Play Console.
 
 **Short description** (max 80):
 `Sudoku meets murder mystery. Place the suspects, find the killer. New case daily!`
+(Do not use competitor names, "Murdoku" or "#1" anywhere in the listing.)
 
 **Full description:**
 ```
@@ -27,29 +29,38 @@ Crime Grid is a logic puzzle where sudoku meets a murder mystery. Every suspect 
 FEATURES
 • Unlimited cases, from a gentle 4×4 Rookie case to a brutal 10×10 Extreme case with 9 suspects
 • A new Daily Case every day, the same for everyone, with a streak to keep alive
-• Every case has exactly one solution, reachable by pure logic. No guessing
+• Every case has exactly one solution, found by logic. Bigger cases teach you the "what if?" trick
 • 9 hand-drawn scenes: a mansion, a ship, a forest, a space station, a museum, a night train, a circus, a castle and a ski lodge
 • Draft mode to pencil in possibilities, just like on paper
+• Collect coins and unlock skins for every suspect, from cute pets to noir gangsters, plus premium packs
+• Add friends with a short detective ID and race them head to head in a live duel, with optional coin stakes
+• Daily streak with streak freezes, and a calendar reminder if you want one
 • Smart help when you're stuck: an extra clue about the whole scene, without spoiling the answer
 • A friendly step-by-step tutorial for first-time detectives
-• Works offline. No account, no ads, no tracking
+• Works offline. No account, no ads, no tracking (friends and duels are optional and need internet)
 
 Grab a cup of tea, sharpen your pencil, and start investigating.
 ```
 
 **Category:** Games → Puzzle
-**Tags:** Puzzle, Logic, Brain games, Detective, Single player
+**Tags:** Puzzle, Logic, Brain games, Detective, Daily puzzle
 
-## Data safety form (all answers: nothing is collected)
-- Does your app collect or share any of the required user data types? **No**
-- Is all user data encrypted in transit? **Yes** (nothing personal is sent; the files load over HTTPS)
-- Do you provide a way for users to request that their data is deleted? Not needed (no data collected). Progress is stored only on the device.
+## Data safety form (online friends and duels are optional, so answer "yes")
+Details and the reasoning are in `store/MULTIPLAYER-SETUP.md`. Short version:
+- Does your app collect or share any of the required user data types? **Yes, collected** (only when the player opens Friends or starts a duel); **not shared** (Firebase acts as our processor).
+- Data types: **Personal info → Name** (the nickname, optional, free text); **Device or other IDs → User IDs** (anonymous Firebase ID, game ID, detective ID); **App activity → Other actions** (level, solved count, duel progress and time).
+- Purpose: **App functionality** only. No advertising, no analytics.
+- Encrypted in transit: **Yes**.
+- Deletion: **Yes**, inside the app (Friends → "Delete my online ID") and by email (gamezsm20@gmail.com).
+- Purchases are handled by Google Play. Nothing about location, contacts or photos is collected.
 
 ## Content rating questionnaire (IARC)
 - Category: Game / puzzle
-- Violence: the theme is a murder mystery, but there's **no depiction of violence**. Victims appear as cartoon faces with "X" eyes, and there's no blood or weapons in use.
-- No sexual content, language, drugs, gambling, user interaction or sharing of location.
-- Expected result: a low age rating (for example "Everyone 10+" / PEGI 7–12 range).
+- Violence: the theme is a murder mystery, but there's **no depiction of violence**. Victims appear as cartoon faces with "X" eyes, and there's no blood or weapons in use. Answer honestly that the theme is a fictional crime.
+- No sexual content, strong language or drugs.
+- **Users can interact: yes** (a friend or duel opponent sees your nickname; there is no chat). Answer the questionnaire carefully about "digital purchases: yes".
+- **Coin stakes in duels:** coins are in-game only and cannot be cashed out, so this is not gambling. If the questionnaire asks about simulated gambling, answer that there is no real-money gambling; if in doubt, ask for a review rather than guess.
+- Expected result: Teen / PEGI 12 range is plausible. That is fine for a 13+ audience.
 
 ## Target audience
 13 and older (choosing under 13 brings the "Families" policy requirements).
@@ -94,6 +105,9 @@ The game already contains the purchase code (Google Play Billing through the Dig
 | `coins_7500` | 7,500 coins | $7.99 |
 | `skin_masquerade` | Masquerade Ball skin pack | $1.99 |
 | `skin_cyber` | Cyber Agents skin pack | $2.99 |
+| `skin_deco` | Jazz Age skin pack | $2.99 |
+| `skin_steam` | Steampunk Guild skin pack | $2.99 |
+| `skin_gothic` | Haunted Gala skin pack | $1.99 |
 | `remove_ads` | Removes ads for good (one-time, non-consumable: do NOT make it a subscription) | $3.99 |
 
 3. **Package with billing on:** when packaging on PWABuilder, turn on the Google Play Billing option in the Android settings, so the app can talk to Play Billing.

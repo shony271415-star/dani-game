@@ -791,6 +791,88 @@
     return SVG64(`${bg}${back}${body}${link}${extra && s === 8 ? extra : ''}${face}${eyes}${mouth}${s !== 8 ? extra : ''}${top}`);
   }
 
+  /* ---------- three premium packs built from one portrait template ---------- */
+  function packAvatar(T) {
+    return (p) => {
+      const d = p.isVictim, s = slotOf(p), h = hash(T.id + p.name + p.letter);
+      const skin = T.skins[rn(p, 3, T.skins.length)], coat = T.coat[s], acc = T.acc[s];
+      const bg = `<defs><radialGradient id="${T.id}${h}" cx="50%" cy="38%" r="72%"><stop offset="0" stop-color="${T.bg[0]}"/><stop offset=".6" stop-color="${T.bg[1]}"/><stop offset="1" stop-color="${T.bg[2]}"/></radialGradient></defs><circle cx="32" cy="32" r="32" fill="url(#${T.id}${h})"/>${T.deco}`;
+      const body = `<path d="M8 64c0-12 10-18 24-18s24 6 24 18Z" fill="${coat}" ${st(1.6)}/>${T.neck(s, acc, coat)}`;
+      const face = `<ellipse cx="32" cy="32" rx="12.5" ry="13.5" fill="${skin}" ${st(1.6)}/>`;
+      const t = T.tops(s, acc, coat) || {};
+      return SVG64(`${bg}${t.back || ''}${body}${face}${eyesAt(d, 27, 37, 31.5, 2)}${smile(d, 38.5, 3)}${t.extra || ''}${t.top || ''}`);
+    };
+  }
+  const STACHE = `<path d="M26 38c2-2 4-2 6-.6 2-1.4 4-1.4 6 .6-2 1.6-4 1.4-6 .2-2 1.2-4 1.4-6-.2Z" fill="#2b2530"/>`;
+  const capHair = (c, w = 1.4) => `<path d="M19.5 29c-1-10 5-16 12.5-16s13.5 6 12.5 16c-3-5-7-7-12.5-7s-9.5 2-12.5 7Z" fill="${c}" ${st(w)}/>`;
+  const bobHair = (c) => `<path d="M19.5 29c-1-10 5-16 12.5-16s13.5 6 12.5 16c-3-5-7-7-12.5-7s-9.5 2-12.5 7Z" fill="${c}" ${st(1.4)}/><path d="M18.500 29c-3 7-2 13 1 16l4-3c-2-4-2-8-2-13ZM45.500 29c3 7 2 13-1 16l-4-3c2-4 2-8 2-13Z" fill="${c}" ${st(1.3)}/>`;
+  const wideHat = (c, band, tall) => `<path d="M14 27c4 2 32 2 36 0-1 3-7 4-18 4s-17-1-18-4Z" fill="${c}" ${st(1.4)}/><path d="${tall ? 'M22 27l1-17h18l1 17c-6 1.8-14 1.8-20 0Z' : 'M21 27c-1-9 4-14 11-14s12 5 11 14c-6 1.8-14 1.8-22 0Z'}" fill="${c}" ${st(1.4)}/><path d="M22.5 ${tall ? 22 : 21.5}c6 1.4 13 1.4 19 0v3.5c-6 1.4-13 1.4-19 0Z" fill="${band}"/>`;
+  const DECO = {
+    id: 'dc', skins: ['#f2d3b5', '#e0b28a', '#c48a5e', '#8f6040'],
+    bg: ['#34305f', '#15142e', '#08081a'],
+    deco: `<g stroke="#d9a441" stroke-opacity=".38" stroke-width="1.2"><path d="M32 70L-4 8M32 70L6 -2M32 70L22 -6M32 70L32 -8M32 70L42 -6M32 70L58 -2M32 70L68 8"/></g><circle cx="32" cy="32" r="30.6" fill="none" stroke="#d9a441" stroke-width="1.5"/>`,
+    coat: ['#14121f', '#1d2b4a', '#4a1226', '#14121f', '#0f3a3a', '#2a1a3a', '#1d2b4a', '#4a1226', '#14121f', '#2b2b2b'],
+    acc: ['#d9a441', '#f0c35f', '#e8e0d0', '#d9a441', '#ffe08a', '#c24fa8', '#d9a441', '#e8e0d0', '#d9a441', '#d9a441'],
+    neck: (s, a) => `<path d="M24 47l-6 17M40 47l6 17" fill="none" stroke="#d9a441" stroke-width="1.4"/><path d="M24 47l8 9 8-9" fill="#f4efe6" ${st(1.2)}/>`
+      + ([1, 3, 5, 7].includes(s) ? `<g fill="#f6efe0" ${st(.6)}><circle cx="25" cy="52" r="1.5"/><circle cx="28" cy="55" r="1.5"/><circle cx="32" cy="56.5" r="1.6"/><circle cx="36" cy="55" r="1.5"/><circle cx="39" cy="52" r="1.5"/></g>` : `<path d="M28 52l4 2-4 2zM36 52l-4 2 4 2z" fill="${a}" ${st(.9)}/><circle cx="32" cy="54" r="1.3" fill="${a}"/>`),
+    tops: (s, a) => [
+      { top: wideHat('#2b2530', a, false) },
+      { top: bobHair('#2b2530') + `<path d="M19 24c8-3 18-3 26 0" stroke="${a}" stroke-width="2.4" fill="none"/><path d="M44 22c3-9 8-10 9-14-6 1-10 6-9 14Z" fill="#c24fa8" ${st(1)}/>` },
+      { top: capHair('#1c1822'), extra: `<circle cx="37" cy="31.5" r="4" fill="none" stroke="${a}" stroke-width="1.4"/><path d="M41 33c2 4 3 8 1 13" stroke="${a}" fill="none" stroke-width="1"/>` },
+      { top: bobHair('#e3b65c') + `<g fill="#f6efe0"><circle cx="22" cy="24" r="1.5"/><circle cx="26" cy="21.5" r="1.5"/><circle cx="32" cy="20.5" r="1.6"/><circle cx="38" cy="21.5" r="1.5"/><circle cx="42" cy="24" r="1.5"/></g>` },
+      { top: wideHat('#14121f', a, false) },
+      { top: `<path d="M18 28c-1-10 5-16 14-16s15 6 14 16c-4-3-9-4-14-4s-10 1-14 4Z" fill="#7a2b8a" ${st(1.4)}/><path d="M20 22c8-6 16-6 24 0" fill="none" stroke="#c24fa8" stroke-width="1.6"/><circle cx="32" cy="17" r="2.6" fill="${a}" ${st(.9)}/><path d="M36 15c3-6 8-7 10-11-6 1-10 5-10 11Z" fill="#c24fa8" ${st(.9)}/>` },
+      { top: wideHat('#0b0b12', a, true) },
+      { top: `<path d="M17 30c-2-11 3-18 15-18s17 7 15 18c-5 2-25 2-30 0Z" fill="#b5243a" ${st(1.4)}/><path d="M18 27c9 3 19 3 28 0" stroke="${a}" stroke-width="2" fill="none"/><circle cx="44" cy="24" r="2.5" fill="#f4efe6" ${st(.8)}/>` },
+      { top: `<path d="M26 16c3-1 7-1 10 0" stroke="#fff" stroke-opacity=".5" stroke-width="1.4" fill="none" stroke-linecap="round"/>`, extra: STACHE },
+      { top: capHair('#1c1822') + `<path d="M41 18l5-5" stroke="${a}" stroke-width="2" stroke-linecap="round"/>` },
+    ][s],
+  };
+  const STEAM = {
+    id: 'sp', skins: ['#f2d3b5', '#e0b28a', '#c48a5e', '#8f6040'],
+    bg: ['#8a5326', '#3a2412', '#150c06'],
+    deco: `<g fill="none" stroke="#d9a441" stroke-opacity=".4" stroke-width="2"><circle cx="9" cy="10" r="6" stroke-dasharray="2.4 2"/><circle cx="56" cy="52" r="8" stroke-dasharray="2.4 2"/><circle cx="55" cy="12" r="3.5" stroke-dasharray="2 1.6"/></g><circle cx="32" cy="32" r="30.6" fill="none" stroke="#c98a3a" stroke-width="1.5"/>`,
+    coat: ['#5a3a22', '#3b4a52', '#6b2f1f', '#2f4a3a', '#4a3a2a', '#2e2e3a', '#7a5a2a', '#3a2a2a', '#5a4a3a', '#3b3b3b'],
+    acc: ['#d9a441', '#e0b060', '#cd7f32', '#d9a441', '#e8c27a', '#cd7f32', '#d9a441', '#e0b060', '#cd7f32', '#d9a441'],
+    neck: (s, a) => `<path d="M26 47l6 7 6-7" fill="#e8d9b8" ${st(1.2)}/><g fill="${a}" ${st(.9)}><circle cx="32" cy="57" r="1.7"/><circle cx="32" cy="61" r="1.7"/><circle cx="17" cy="56" r="3.2"/><circle cx="47" cy="56" r="3.2"/></g><path d="M17 53.5v5M14.5 56h5M47 53.5v5M44.5 56h5" stroke="${INK}" stroke-width=".9"/>`,
+    tops: (s, a) => {
+      const goggles = (y) => `<rect x="21" y="${y}" width="22" height="7" rx="3.5" fill="${a}" ${st(1)}/><circle cx="26.5" cy="${y + 3.5}" r="3" fill="#8fb8b8" ${st(.8)}/><circle cx="37.5" cy="${y + 3.5}" r="3" fill="#8fb8b8" ${st(.8)}/>`;
+      return [
+        { top: wideHat('#5a3a22', a, true) + `<g fill="#8fb8b8" stroke="${a}" stroke-width="1.6"><circle cx="27" cy="17" r="3.2"/><circle cx="37" cy="17" r="3.2"/></g>` },
+        { top: `<path d="M18 31c-2-11 4-18 14-18s16 7 14 18c-3-3-8-4-14-4s-11 1-14 4Z" fill="#6b4a2a" ${st(1.4)}/><path d="M18 31l-2 8 4-2M46 31l2 8-4-2" fill="#6b4a2a" ${st(1.1)}/>` + goggles(19) },
+        { top: wideHat('#3a2a1a', a, false) + `<circle cx="32" cy="19" r="3" fill="${a}" ${st(.9)}/><path d="M32 16v6M29 19h6" stroke="${INK}" stroke-width=".8"/>` },
+        { top: `<path d="M17 28c0-9 7-14 15-14s15 5 15 14c-9-2-21-2-30 0Z" fill="#5a5a66" ${st(1.4)}/><path d="M17 28c6-2 24-2 30 0l4 3c-8-1-26-1-38 0Z" fill="#4a4a56" ${st(1.3)}/>` },
+        { top: capHair('#6b3a1f') + `<circle cx="32" cy="11.5" r="5" fill="#6b3a1f" ${st(1.3)}/><circle cx="39" cy="14" r="2.5" fill="${a}" ${st(.9)}/>` },
+        { top: `<path d="M26 16c3-1 7-1 10 0" stroke="#fff" stroke-opacity=".5" stroke-width="1.4" fill="none" stroke-linecap="round"/>`, extra: STACHE + `<circle cx="37" cy="31.5" r="4.2" fill="#8fb8b8" fill-opacity=".35" stroke="${a}" stroke-width="1.5"/><path d="M41 33c2 5 2 9 0 14" stroke="${a}" fill="none" stroke-width="1"/>` },
+        { top: capHair('#3a2a1a') + goggles(19) },
+        { top: capHair('#3a2a2a') + `<path d="M20 22l2-8 4 5 3-7 3 7 3-7 3 7 4-5 2 8c-6 2-18 2-24 0Z" fill="${a}" ${st(1.2)}/>` },
+        { top: `<path d="M18 27c-1-9 5-15 14-15s15 6 14 15c-5-2-9-3-14-3s-9 1-14 3Z" fill="#555a66" ${st(1.4)}/><rect x="24" y="14" width="16" height="4" rx="1.5" fill="${a}" ${st(.8)}/>` },
+        { top: capHair('#2a2a2a') + `<circle cx="42" cy="17" r="2" fill="${a}" ${st(.8)}/>` },
+      ][s];
+    },
+  };
+  const GOTHIC = {
+    id: 'gt', skins: ['#e6e0f0', '#d8d0ea', '#cfd8ee', '#e8dcea'],
+    bg: ['#5a3280', '#1c1030', '#07040f'],
+    deco: `<circle cx="49" cy="14" r="7" fill="#e8e0f8" opacity=".95"/><circle cx="52" cy="12" r="6" fill="#241240"/><g fill="#e8e0f8"><circle cx="10" cy="12" r=".9"/><circle cx="17" cy="6" r=".7"/><circle cx="8" cy="30" r=".8"/><circle cx="56" cy="38" r=".8"/></g><path d="M8 20l3 2 3-2-1 4H9Z" fill="#0b0716"/><circle cx="32" cy="32" r="30.6" fill="none" stroke="#b79be0" stroke-width="1.5"/>`,
+    coat: ['#3a2a52', '#5a1f3a', '#1f2a4a', '#2f2f3a', '#4a2a4a', '#1f3a3a', '#5a3a1f', '#2a1a3a', '#4a2f3a', '#3a3a52'],
+    acc: ['#c9b8f0', '#e8c0d0', '#b8d0f0', '#d9c8a0', '#e0b8f0', '#b8e0d0', '#e8d098', '#c9b8f0', '#e8c0d0', '#d0d0f0'],
+    neck: (s, a) => `<path d="M21 49c3 5 19 5 22 0l1 4c-4 5-20 5-24 0Z" fill="#f2eef8" ${st(1.1)}/><g fill="#f2eef8" ${st(.7)}><circle cx="24" cy="55" r="1.6"/><circle cx="28.5" cy="57.5" r="1.6"/><circle cx="33.5" cy="58" r="1.6"/><circle cx="38.5" cy="57" r="1.6"/><circle cx="42" cy="54" r="1.6"/></g><circle cx="32" cy="52.5" r="2.1" fill="${a}" ${st(.9)}/>`,
+    tops: (s, a) => [
+      { top: `<circle cx="17" cy="31" r="3.4" fill="#e8e4f0" ${st(1.1)}/><circle cx="47" cy="31" r="3.4" fill="#e8e4f0" ${st(1.1)}/><path d="M16 31c-3-12 4-21 16-21s19 9 16 21c-2-3-3-8-3-10-3 2-6 3-10 3s-7-1-10-3c0 2-1 7-3 10Z" fill="#e8e4f0" ${st(1.4)}/><path d="M28 10l4 3 4-3-4-2Z" fill="${a}" ${st(.8)}/>` },
+      { top: `<path d="M12 27l20-14 20 14c-6 3-34 3-40 0Z" fill="#1f1a2e" ${st(1.4)}/><path d="M14 27c10 3 26 3 36 0" stroke="${a}" stroke-width="1.6" fill="none"/><path d="M44 21c2-7 7-8 8-12-5 1-9 5-8 12Z" fill="${a}" ${st(.9)}/>` },
+      { top: `<path d="M22 18c0 8 3 14 10 14s10-6 10-14" fill="#0b0716" opacity=".3"/><ellipse cx="32" cy="17" rx="10" ry="4.5" fill="#14101f" ${st(1.3)}/><circle cx="40" cy="15" r="2.6" fill="#b5243a" ${st(.8)}/>` },
+      { top: wideHat('#14101f', a, true) },
+      { top: `<path d="M17 33c-2-12 4-19 15-19s17 7 15 19c-1-6-6-9-15-9s-14 3-15 9Z" fill="#f2eef8" ${st(1.4)}/><path d="M20 40c4 8 20 8 24 0" fill="none" stroke="${a}" stroke-width="2"/>` },
+      { top: capHair('#2a1a3a') + `<g fill="#f2eef8" ${st(.9)}><rect x="22" y="9" width="3.6" height="8" rx=".8"/><rect x="30" y="6" width="3.6" height="9" rx=".8"/><rect x="38" y="9" width="3.6" height="8" rx=".8"/></g><g fill="#ffd166"><path d="M23.800 4.500c2 2 2 3.500 0 5-2-1.500-2-3 0-5Z"/><path d="M31.800 1.500c2 2 2 3.500 0 5-2-1.500-2-3 0-5Z"/><path d="M39.800 4.500c2 2 2 3.500 0 5-2-1.500-2-3 0-5Z"/></g>` },
+      { back: `<path d="M16 32c-3 10 0 18 6 20M48 32c3 10 0 18-6 20" stroke="#5a3a1f" stroke-width="5" fill="none" stroke-linecap="round"/>`, top: capHair('#5a3a1f') + `<circle cx="42" cy="21" r="3" fill="#b5243a" ${st(.9)}/><path d="M42 18c2 1 3 3 2 5" stroke="#7a1428" fill="none" stroke-width=".8"/>` },
+      { back: `<path d="M12 42C8 22 18 9 32 9s24 13 20 33Z" fill="#14101f" ${st(1.4)}/>`, top: `<path d="M19 28c3-6 8-8 13-8s10 2 13 8" fill="none" stroke="${a}" stroke-width="1.5"/>` },
+      { top: `<path d="M32 3c3 4 3 7 0 10-3-3-3-6 0-10Z" fill="#ffd166"/>`, extra: `<path d="M26 38c2-2 4-2 6-.6 2-1.4 4-1.4 6 .6-2 1.6-4 1.4-6 .2-2 1.2-4 1.4-6-.2Z" fill="#e8e4f0" ${st(.8)}/>` },
+      { top: capHair('#3a2a52') + `<circle cx="42" cy="18" r="2.2" fill="#f6efe0" ${st(.8)}/>` },
+    ][s],
+  };
+  const decoAvatar = packAvatar(DECO), steamAvatar = packAvatar(STEAM), gothicAvatar = packAvatar(GOTHIC);
+
   const SKINS = {
     classic: { name: 'Classic Detectives', price: 0, rarity: 'Basic', desc: 'The original cast.', draw: (p) => avatar(p), emoji: null },
     pets: { name: 'Pet Detectives', price: 120, rarity: 'Common', desc: 'Cats, dogs, foxes, owls and more. Paws off the evidence!', draw: petAvatar, emoji: ['🐱', '🐶', '🦊', '🐰', '🐻', '🐼', '🦉', '🐸', '🐯', '🐨'] },
@@ -811,6 +893,9 @@
     sea: { name: 'Deep Sea Gang', price: 480, rarity: 'Epic', desc: 'Ten sea creatures: octopus, shark, turtle, crab, seahorse, jellyfish, pufferfish, starfish, whale and swordfish.', draw: seaAvatar },
     masquerade: { name: 'Masquerade Ball', price: 0, rarity: 'Premium', desc: 'Venetian masks and feathers.', draw: masqueradeAvatar },
     cyber: { name: 'Cyber Agents', price: 0, rarity: 'Premium', desc: 'Glowing visors and scan lines.', draw: cyberAvatar },
+    deco: { name: 'Jazz Age', price: 0, rarity: 'Premium', desc: 'Art deco gold, bow ties and pearls.', draw: decoAvatar },
+    steam: { name: 'Steampunk Guild', price: 0, rarity: 'Premium', desc: 'Brass goggles, gears and top hats.', draw: steamAvatar },
+    gothic: { name: 'Haunted Gala', price: 0, rarity: 'Premium', desc: 'Powdered wigs, lace and candlelight.', draw: gothicAvatar },
     partners: { name: 'Partners in Crime', price: 0, rarity: 'Exclusive', desc: 'Only for detectives who duel a new friend.', draw: partnersAvatar },
   };
 
