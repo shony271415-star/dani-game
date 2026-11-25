@@ -410,6 +410,35 @@
   .mini-race .ic svg { width: 22px; height: 22px; }
   .other-ways { margin: 8px 0; text-align: start; } .other-ways summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
   .forget { text-align: center; margin: 4px 0; } .linkish { background: none; border: none; text-decoration: underline; font-size: 13px; opacity: .75; color: inherit; min-height: 36px; }
+  /* compact phone layout: more clue cards visible under the board */
+  @media (max-width: 480px) {
+    body.noir .suspects { gap: 5px; padding: 6px 8px 14px; }
+    body.noir .suspect { padding-block: 5px; gap: 8px; box-shadow: 0 3px 0 rgba(0,0,0,.45); }
+    body.noir .suspect .face { width: 38px; height: 44px; padding: 2px 2px 5px; }
+    body.noir .suspect .face svg { width: 100%; height: 100%; }
+    body.noir .suspect .face .lt { width: 18px; height: 18px; font-size: 11px; bottom: -7px; right: -7px; }
+    body.noir .suspect .nm { font-size: 13px; letter-spacing: .6px; line-height: 1.1; }
+    body.noir .suspect .cl { font-size: 12.5px; line-height: 1.28; }
+    body.noir .suspect .cl div { margin-top: 1px; }
+    body.noir .suspect.placed::after { top: 3px; font-size: 10px; }
+  }
+  @media (max-width: 480px) and (max-height: 760px) {
+    body.noir .intro { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 3px 12px 0; font-size: 12.5px; }
+    body.noir .board-wrap { padding: 5px 8px 0; }
+    body.noir .tools { margin: 5px 4px 0; padding: 3px; gap: 3px; }
+    body.noir .tool { min-height: 38px; font-size: 10.5px; }
+    body.noir .tool .ic svg { width: 20px; height: 20px; }
+    body.noir .status { margin-top: 3px; min-height: 16px; font-size: 12px; }
+    body.noir .play-area { padding-bottom: 3px; }
+  }
+  /* option B for small phones: all clue cards in one swipeable row, so board + tools + clues fit one screen */
+  @media (max-width: 480px) and (max-height: 760px) {
+    body.noir.cs .intro { display: none; }
+    body.noir.cs .suspects { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; gap: 8px; padding: 8px 10px 12px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    body.noir.cs .suspects::-webkit-scrollbar { display: none; }
+    body.noir.cs .suspect { flex: 0 0 84%; scroll-snap-align: center; align-self: stretch; }
+    body.noir.cs .suspect .cl { font-size: 13px; }
+  }
   /* remove-ads button, top corner opposite the coins (only shown when the game has ads) */
   .noads-pill { position: absolute; top: calc(14px + env(safe-area-inset-top)); left: 14px; right: auto; z-index: 3; background: rgba(0,0,0,.35); border: 1px solid rgba(217,164,65,.5); color: #f3e6c8; border-radius: 20px; padding: 6px 12px; min-height: 36px; font: 700 13px "Oswald", sans-serif; letter-spacing: 1px; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; }
   body.noir #home > .noads-pill, #home > .noads-pill { position: absolute; }

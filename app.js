@@ -1539,6 +1539,7 @@
     $('home').classList.remove('active');
     $('map').classList.remove('active');
     $('game').classList.add('active');
+    document.body.classList.toggle('cs', store.clueView === 'strip');
     if (slot === 'challenge') S.challenge = pendingChallenge || (p.cur && p.cur.challenge) || null;
     $('game').classList.toggle('tut', slot === 'tutorial');
     paintCaseHeader();
@@ -1834,9 +1835,17 @@
   }
 
   /* ---------- drawing ---------- */
+  // board side in pixels. On short phone screens small boards are drawn smaller, so more clue cards fit under them
+  function boardPx(N) {
+    const h = window.innerHeight, w = window.innerWidth;
+    let px = Math.min(w * 0.94, 470, h * (h <= 720 ? 0.39 : 0.44));
+    if (h <= 760 && w <= 480 && N <= 6) px = Math.min(px, h * 0.35);
+    if (h <= 760 && w <= 480 && store && store.clueView === 'strip') px = Math.min(w * 0.94, 470, h * 0.47);   // clues in one swipeable row: the board gets the room
+    return Math.floor(px);
+  }
   function zoneLabelCells(P, occupied) {
     // one label per area, on a square near its bottom, without two labels overlapping
-    const N = P.N, cellPx = Math.min(window.innerWidth * 0.94, 470, window.innerHeight * (window.innerHeight <= 720 ? 0.39 : 0.44)) / N;
+    const N = P.N, cellPx = boardPx(N) / N;
     const fontPx = Math.max(8, cellPx * 0.19);
     const span = (z) => (I.zone(P.zones[z].name).n.length * fontPx * 0.58 + 10) / cellPx; // label width in squares
     const taken = []; // [row, from, to]
@@ -1876,6 +1885,7 @@
     const P = S.P, N = P.N, big = N > 6, autoX = autoXSet();
     const board = $('board');
     board.style.setProperty('--n', N);
+    board.style.setProperty('--bs', boardPx(N) + 'px');
     board.style.gridTemplateColumns = `repeat(${N}, 1fr)`;
     board.style.gridTemplateRows = `repeat(${N}, 1fr)`;
     board.innerHTML = '';
