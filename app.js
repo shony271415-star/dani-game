@@ -1539,7 +1539,6 @@
     $('home').classList.remove('active');
     $('map').classList.remove('active');
     $('game').classList.add('active');
-    document.body.classList.toggle('cs', store.clueView === 'strip');
     if (slot === 'challenge') S.challenge = pendingChallenge || (p.cur && p.cur.challenge) || null;
     $('game').classList.toggle('tut', slot === 'tutorial');
     paintCaseHeader();
@@ -1840,7 +1839,6 @@
     const h = window.innerHeight, w = window.innerWidth;
     let px = Math.min(w * 0.94, 470, h * (h <= 720 ? 0.39 : 0.44));
     if (h <= 760 && w <= 480 && N <= 6) px = Math.min(px, h * 0.35);
-    if (h <= 760 && w <= 480 && store && store.clueView === 'strip') px = Math.min(w * 0.94, 470, h * 0.47);   // clues in one swipeable row: the board gets the room
     return Math.floor(px);
   }
   function zoneLabelCells(P, occupied) {
