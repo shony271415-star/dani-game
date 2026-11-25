@@ -574,7 +574,10 @@
  "{0} left today": "Quedan {0} hoy",
  "Watch a short video: double coins (+{0})": "Mira un vídeo corto: monedas dobles (+{0})",
  "Coins doubled!": "¡Monedas duplicadas!",
- "No video available right now. Try again later.": "No hay vídeo disponible ahora. Inténtalo más tarde."
+ "No video available right now. Try again later.": "No hay vídeo disponible ahora. Inténtalo más tarde.",
+ "Replace your progress?": "¿Reemplazar tu progreso?",
+ "Keep my progress": "Conservar mi progreso",
+ "Replace": "Reemplazar"
 },
     pl: {
  "{0} cases solved": {

@@ -569,7 +569,10 @@
  "{0} left today": "Осталось сегодня: {0}",
  "Watch a short video: double coins (+{0})": "Короткое видео: двойные монеты (+{0})",
  "Coins doubled!": "Монеты удвоены!",
- "No video available right now. Try again later.": "Сейчас нет доступного видео. Попробуйте позже."
+ "No video available right now. Try again later.": "Сейчас нет доступного видео. Попробуйте позже.",
+ "Replace your progress?": "Заменить прогресс?",
+ "Keep my progress": "Оставить мой прогресс",
+ "Replace": "Заменить"
 },
     pl: {
  "{0} cases solved": {

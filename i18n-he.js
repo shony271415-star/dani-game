@@ -570,7 +570,10 @@
  "{0} left today": "נשארו {0} להיום",
  "Watch a short video: double coins (+{0})": "צפו בסרטון קצר: מטבעות כפולים (+{0})",
  "Coins doubled!": "המטבעות הוכפלו!",
- "No video available right now. Try again later.": "אין סרטון זמין כרגע. נסו שוב מאוחר יותר."
+ "No video available right now. Try again later.": "אין סרטון זמין כרגע. נסו שוב מאוחר יותר.",
+ "Replace your progress?": "להחליף את ההתקדמות?",
+ "Keep my progress": "להשאיר את ההתקדמות שלי",
+ "Replace": "להחליף"
 },
     pl: {
  "{0} cases solved": {

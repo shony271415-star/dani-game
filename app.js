@@ -710,16 +710,30 @@
     ['journey', 'easy', 'medium', 'hard', 'expert', 'extreme', 'daily'].forEach((k) => { if (o[k]) o[k] = { ...o[k], cur: null, next: null }; });
     return 'MG1.' + b64e(o);
   }
-  function restoreCode(code) {
+  function parseBackup(code) {
     const m = String(code).trim().match(/MG1\.([A-Za-z0-9_-]+)/), o = m && b64d(m[1]);
-    if (!o || typeof o !== 'object' || !o.profile) return false;
-    // never lose progress: keep whichever side is further along
-    const mine = prog('journey').caseNum, theirs = (o.journey && o.journey.caseNum) || 1;
-    if (theirs < mine && !confirm(tr('This backup is on level {0}, but you are on level {1}. Replace your progress anyway?', theirs, mine))) return null;
+    return o && typeof o === 'object' && o.profile ? o : null;
+  }
+  function applyBackup(o) {
     Object.keys(store).forEach((k) => delete store[k]);
     Object.assign(store, o, { engine: E.VERSION });
     save(); applySkin(); I.setLang(store.lang || I.detect()); renderGreet();
-    return true;
+    closeModal(); showHome();
+    toast(`<span class="ti">${ic('check', '✓')}</span><span><b>${tr('Progress restored!')}</b><small>${tr('Level {0}, {1} coins.', prog('journey').caseNum, coins())}</small></span>`);
+  }
+  // never lose progress by accident: a backup that is behind the current game needs a clear yes (styled dialog, not the browser's)
+  function restoreCode(code) {
+    const o = parseBackup(code);
+    if (!o) return false;
+    const mine = prog('journey').caseNum, theirs = (o.journey && o.journey.caseNum) || 1;
+    if (theirs >= mine) { applyBackup(o); return true; }
+    modal(`<div class="big">${ic('lock', '💾')}</div><h2>${tr('Replace your progress?')}</h2>
+      <p>${tr('This backup is on level {0}, but you are on level {1}. Replace your progress anyway?', theirs, mine)}</p>
+      <div class="row"><button class="secondary" data-act="keep">${tr('Keep my progress')}</button><button class="primary" data-act="replace">${tr('Replace')}</button></div>`, {
+      keep: () => { closeModal(); showBackup(); },
+      replace: () => applyBackup(o),
+    }, true);
+    return null;
   }
   function showBackup() {
     const code = backupCode();
@@ -734,9 +748,7 @@
       copy: async (b) => { try { await navigator.clipboard.writeText(code); b.textContent = tr('Copied ✓'); } catch (e) { $('backup-box').select(); b.textContent = tr('Select & copy ↑'); } },
       send: () => share(tr('My Crime Grid progress backup (paste it in Settings → Save progress → Restore):'), code),
       restore: () => {
-        const r = restoreCode($('restore-box').value);
-        if (r === true) { closeModal(); showHome(); toast(`<span class="ti">${ic('check', '✓')}</span><span><b>${tr('Progress restored!')}</b><small>${tr('Level {0}, {1} coins.', prog('journey').caseNum, coins())}</small></span>`); }
-        else if (r === false) { $('bk-msg').textContent = tr('That code does not look right. Copy the whole thing, starting with MG1.'); shake($('modal-body')); }
+        if (restoreCode($('restore-box').value) === false) { $('bk-msg').textContent = tr('That code does not look right. Copy the whole thing, starting with MG1.'); shake($('modal-body')); }
       },
     });
   }
