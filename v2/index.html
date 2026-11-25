@@ -410,6 +410,11 @@
   .mini-race .ic svg { width: 22px; height: 22px; }
   .other-ways { margin: 8px 0; text-align: start; } .other-ways summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
   .forget { text-align: center; margin: 4px 0; } .linkish { background: none; border: none; text-decoration: underline; font-size: 13px; opacity: .75; color: inherit; min-height: 36px; }
+  /* remove-ads button, top corner opposite the coins (only shown when the game has ads) */
+  .noads-pill { position: absolute; top: calc(14px + env(safe-area-inset-top)); left: 14px; right: auto; z-index: 3; background: rgba(0,0,0,.35); border: 1px solid rgba(217,164,65,.5); color: #f3e6c8; border-radius: 20px; padding: 6px 12px; min-height: 36px; font: 700 13px "Oswald", sans-serif; letter-spacing: 1px; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; }
+  body.noir #home > .noads-pill, #home > .noads-pill { position: absolute; }
+  body.rtl .noads-pill { left: auto; right: 14px; }
+  .noads-pill[hidden] { display: none; } .noads-pill .ic svg { width: 16px; height: 16px; }
   /* Partners in Crime: crimson and gold, shimmering frame */
   .skin-partners .face, .skin-partners .token, .pf.skin-partners, .skin-partners .af { animation: partners 2.6s ease-in-out infinite; }
   @keyframes partners { 0%, 100% { box-shadow: 0 0 0 2px #d9a441, 0 0 12px #b5243a; } 50% { box-shadow: 0 0 0 2px #ffe08a, 0 0 22px rgba(255,200,90,.95); } }
@@ -1073,6 +1078,7 @@ body.noir .cell.coach-hl { box-shadow: inset 0 0 0 4px #ffb300, inset 0 0 14px r
   <svg class="hb-sky" aria-hidden="true" viewBox="0 0 390 130" preserveAspectRatio="none" focusable="false"><g fill="#06060d"><rect x="300" y="64" width="90" height="70"/><rect x="330" y="40" width="28" height="40"/><path d="M0 130V80h24V60h22v30h18V40h26v50h20V70h30v-20h24v50h22V60h28v30h20V30h30v60h24V70h28v60Z"/></g>
       <g fill="#e8b13a" opacity=".75"><rect x="30" y="68" width="4" height="5"/><rect x="74" y="52" width="4" height="5"/><rect x="108" y="76" width="4" height="5"/><rect x="170" y="60" width="4" height="5"/><rect x="236" y="44" width="4" height="5"/><rect x="262" y="80" width="4" height="5"/><rect x="318" y="64" width="4" height="5"/><rect x="50" y="90" width="4" height="5"/><rect x="146" y="88" width="4" height="5"/><rect x="204" y="84" width="4" height="5"/><rect x="340" y="50" width="4" height="5"/><rect x="344" y="92" width="4" height="5"/></g></svg>  
   <div class="coins-pill" id="coins-pill"></div>
+  <button class="noads-pill" id="noads-pill" hidden></button>
   <div class="logo" id="home-logo" aria-hidden="true">
     <svg viewBox="0 0 92 92" width="84" height="84" focusable="false"><g stroke="#f4e9d3" stroke-width="3" fill="none" opacity=".9"><rect x="6" y="6" width="60" height="60" rx="6"/><path d="M26 6v60M46 6v60M6 26h60M6 46h60"/></g><circle cx="36" cy="36" r="6.5" fill="#c9303c"/><circle cx="62" cy="62" r="17" fill="#cfe9f5" fill-opacity=".22" stroke="#e8b13a" stroke-width="5"/><path d="M52 52a14 14 0 0 1 8-4" stroke="#fff" stroke-opacity=".6" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M74 74l14 14" stroke="#8a5a2a" stroke-width="7" stroke-linecap="round"/></svg>
   </div>

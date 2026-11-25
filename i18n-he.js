@@ -537,7 +537,11 @@
  "You lost {0} coins.": "הפסדתם {0} מטבעות.",
  "To invite {0} inside the game, add them once with their detective ID (Friends screen).": "כדי להזמין את {0} בתוך המשחק, הוסיפו אותו פעם אחת עם מספר הבלש שלו (במסך חברים).",
  "{0} can't get invites yet. Send the code another way.": "{0} עדיין לא יכול לקבל הזמנות. שלחו לו את הקוד בדרך אחרת.",
- "{0} invites you to a live duel ({1}) for {2} coins each. The winner takes {3}!": "{0} מזמין אתכם לדו-קרב חי ({1}) על {2} מטבעות מכל אחד. המנצח לוקח {3}!"
+ "{0} invites you to a live duel ({1}) for {2} coins each. The winner takes {3}!": "{0} מזמין אתכם לדו-קרב חי ({1}) על {2} מטבעות מכל אחד. המנצח לוקח {3}!",
+ "No ads": "בלי פרסומות",
+ "Remove ads": "הסרת פרסומות",
+ "Enjoy Crime Grid without ads. One payment, no subscription. It comes back if you reinstall the game.": "נהנים מ-Crime Grid בלי פרסומות. תשלום אחד, בלי מנוי. הוא חוזר גם אם מתקינים את המשחק מחדש.",
+ "Ads removed. Thank you!": "הפרסומות הוסרו. תודה!"
 },
     pl: {
  "{0} cases solved": {

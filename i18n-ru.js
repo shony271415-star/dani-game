@@ -536,7 +536,11 @@
  "You lost {0} coins.": "Вы потеряли {0} монет.",
  "To invite {0} inside the game, add them once with their detective ID (Friends screen).": "Чтобы звать {0} прямо в игре, один раз добавьте друга по его ID детектива (экран «Друзья»).",
  "{0} can't get invites yet. Send the code another way.": "{0} пока не может получать приглашения. Отправьте код другим способом.",
- "{0} invites you to a live duel ({1}) for {2} coins each. The winner takes {3}!": "{0} зовёт вас на живую дуэль ({1}) на {2} монет с каждого. Победитель забирает {3}!"
+ "{0} invites you to a live duel ({1}) for {2} coins each. The winner takes {3}!": "{0} зовёт вас на живую дуэль ({1}) на {2} монет с каждого. Победитель забирает {3}!",
+ "No ads": "Без рекламы",
+ "Remove ads": "Отключить рекламу",
+ "Enjoy Crime Grid without ads. One payment, no subscription. It comes back if you reinstall the game.": "Играйте в Crime Grid без рекламы. Один платёж, без подписки. Покупка вернётся, если переустановить игру.",
+ "Ads removed. Thank you!": "Реклама отключена. Спасибо!"
 },
     pl: {
  "{0} cases solved": {

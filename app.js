@@ -51,9 +51,14 @@
     { iap: 'coins_3000', coins: 3000, usd: '$3.99', tag: 'Best value' },
     { iap: 'coins_7500', coins: 7500, usd: '$7.99' },
   ];
+  /* ---------- ads: none yet. When ads are added, show them only if adsAllowed(); players can pay once to remove them ---------- */
+  const ADS_ON = false;   // flip to true in the release that contains real ads (window.CG_ADS_ON is only for tests)
+  const REMOVE_ADS = { iap: 'remove_ads', usd: '$3.99' };
+  const adsAllowed = () => !!(ADS_ON || window.CG_ADS_ON) && !store.noAds;
+  window.CGAds = { allowed: () => adsAllowed() };
   const IAP = {
     service: null, prices: {},
-    ids: () => [...COIN_PACKS.map((c) => c.iap), ...PACKS.filter((x) => x.iap).map((x) => x.iap)],
+    ids: () => [REMOVE_ADS.iap, ...COIN_PACKS.map((c) => c.iap), ...PACKS.filter((x) => x.iap).map((x) => x.iap)],
     price(id, fallback) { return this.prices[id] || fallback; },
     async init() {
       // only exists when the game runs as the Google Play app (Trusted Web Activity with Play Billing on)
@@ -69,6 +74,11 @@
     async grant(id, token, restoring) {
       const coinPack = COIN_PACKS.find((c) => c.iap === id), skin = PACKS.find((x) => x.iap === id);
       store.owned = store.owned || ['classic'];
+      if (id === REMOVE_ADS.iap) {
+        store.noAds = true; store.paid = true; save(); renderNoAds();
+        try { if (this.service && this.service.acknowledge) await this.service.acknowledge(token, 'onetime'); } catch (e) { /* retried next launch via listPurchases */ }
+        return tr('Ads removed. Thank you!');
+      }
       store.paidTokens = store.paidTokens || [];
       if (coinPack) {
         // a token is paid out once, even if the store call below fails and the purchase shows up again next launch
@@ -100,7 +110,7 @@
         await res.complete('success');
         sfx('unlock'); confetti();
         toast(`<span class="ti">${ic('gift', '🎁')}</span><span><b>${tr('Thank you!')}</b><small>${msg}</small></span>`);
-        showShop();
+        if (id === REMOVE_ADS.iap) { closeModal(); renderNoAds(); } else showShop();
       } catch (e) { /* cancelled or failed: nothing was charged */ }
     },
   };
@@ -506,6 +516,18 @@
   function totalSolved() { return DIFFS.reduce((n, d) => n + prog(d.key).solved, 0) + prog('journey').solved + Object.keys(store.dailyLog || {}).length; }
   function coins() { if (typeof store.coins !== 'number') store.coins = 30; return store.coins; }
   function addCoins(n) { coins(); store.coins += n; save(); renderCoins(); }
+  function renderNoAds() {
+    const el = $('noads-pill');
+    if (!el) return;
+    el.hidden = !adsAllowed();
+    if (el.hidden) return;
+    el.innerHTML = `<span class="ic">${ART ? ART.ui('lock') : '🚫'}</span> ${tr('No ads')}`;
+    el.onclick = () => modal(`<div class="big">${ic('lock', '🚫')}</div><h2>${tr('Remove ads')}</h2>
+      <p>${tr('Enjoy Crime Grid without ads. One payment, no subscription. It comes back if you reinstall the game.')}</p>
+      <div class="row"><button class="primary premium-btn" data-act="buy">${tr('Buy for {0}', IAP.price(REMOVE_ADS.iap, REMOVE_ADS.usd))}</button><button class="secondary" data-act="close">${tr('Not now')}</button></div>`, {
+      buy: () => IAP.buy(REMOVE_ADS.iap),
+    });
+  }
   function renderCoins() { const el = $('coins-pill'); if (el) el.innerHTML = `${coinIc()} <b>${I.num(coins())}</b><span class="cp-shop">${tr('SHOP')}</span>`; }
   function checkAchievements(ctx) {
     store.ach = store.ach || {};
@@ -564,6 +586,7 @@
     if (!wasHome) window.scrollTo(0, 0);
     renderGreet();
     renderCoins();
+    renderNoAds();
     renderJourney();
     renderDaily();
     renderRetention();
@@ -662,7 +685,7 @@
   }
 
   /* ---------- backup code: move progress to another phone or browser ---------- */
-  const BACKUP_KEYS = ['lang', 'profile', 'coins', 'missions', 'winStreak', 'bestStreak', 'chestStars', 'owned', 'skin', 'journey', 'jStars', 'easy', 'medium', 'hard', 'expert', 'extreme', 'daily', 'dailyLog', 'ach', 'trophies',
+  const BACKUP_KEYS = ['noAds', 'lang', 'profile', 'coins', 'missions', 'winStreak', 'bestStreak', 'chestStars', 'owned', 'skin', 'journey', 'jStars', 'easy', 'medium', 'hard', 'expert', 'extreme', 'daily', 'dailyLog', 'ach', 'trophies',
     'themesSolved', 'friends', 'bonusDay', 'bonusStreak', 'pid', 'sound', 'seenHowto', 'tutorialDone', 'paid', 'engine'];
   function backupCode() {
     const o = {};
