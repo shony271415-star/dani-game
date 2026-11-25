@@ -24,6 +24,9 @@ The owner speaks Hebrew: answer in short, simple Hebrew. Be honest about what wa
 - Setup and Play Data safety notes: `store/MULTIPLAYER-SETUP.md`. Privacy policy: `privacy.html`.
 - Test locally with the Firebase Database and Auth emulators (set `window.CG_NET_CONFIG` with `authBase`, `ns`). Two Playwright contexts simulate two players.
 
+## Ads and Remove Ads
+- The game has NO ads yet (`ADS_ON = false` in `app.js`). A "No ads" button (top corner of the home screen) and the `remove_ads` purchase are already built but stay hidden until `ADS_ON` is true. Any future ad code must check `window.CGAds.allowed()` first. The purchase sets `store.noAds` (kept in the backup code, restored by `listPurchases`, acknowledged).
+
 ## Google Play plan
 - Package through PWABuilder (Trusted Web Activity). Version 1: no ads, purchases only. Version 2: native wrapper for rewarded ads and push.
 - `assetlinks.json` must be served from the ROOT of the domain (a project page cannot do it). It needs a separate user-site repo, plus both signing fingerprints.

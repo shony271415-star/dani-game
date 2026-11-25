@@ -94,6 +94,7 @@ The game already contains the purchase code (Google Play Billing through the Dig
 | `coins_7500` | 7,500 coins | $7.99 |
 | `skin_masquerade` | Masquerade Ball skin pack | $1.99 |
 | `skin_cyber` | Cyber Agents skin pack | $2.99 |
+| `remove_ads` | Removes ads for good (one-time, non-consumable: do NOT make it a subscription) | $3.99 |
 
 3. **Package with billing on:** when packaging on PWABuilder, turn on the Google Play Billing option in the Android settings, so the app can talk to Play Billing.
 4. **Test before going live:** Play Console → Settings → License testing: add your Gmail. Purchases made with that account in the testing track are free test purchases.
