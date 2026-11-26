@@ -572,7 +572,19 @@
  "No video available right now. Try again later.": "Сейчас нет доступного видео. Попробуйте позже.",
  "Replace your progress?": "Заменить прогресс?",
  "Keep my progress": "Оставить мой прогресс",
- "Replace": "Заменить"
+ "Replace": "Заменить",
+ "Report or block": "Пожаловаться или заблокировать",
+ "Report this player, or block them so they can never invite you again.": "Пожалуйтесь на игрока или заблокируйте его, чтобы он больше не мог вас приглашать.",
+ "Report: {0}": "Жалоба: {0}",
+ "Offensive name": "Оскорбительное имя",
+ "Cheating": "Обман",
+ "Harassment": "Преследование",
+ "Something else": "Другое",
+ "Block {0}": "Заблокировать {0}",
+ "Blocked. {0} can no longer invite you.": "Заблокирован. {0} больше не сможет вас приглашать.",
+ "Report sent. Thank you!": "Жалоба отправлена. Спасибо!",
+ "You blocked this player.": "Вы заблокировали этого игрока.",
+ "Unblock all ({0})": "Разблокировать всех ({0})"
 },
     pl: {
  "{0} cases solved": {

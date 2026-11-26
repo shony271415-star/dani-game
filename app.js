@@ -250,7 +250,7 @@
   const linkFor = (key, payload) => `${location.origin}${location.pathname}#${key}=${b64e(payload)}`;
   function myId() { if (!store.pid) { store.pid = Math.random().toString(36).slice(2, 10); save(); } return store.pid; }
   function myCard() {
-    return { i: myId(), n: (store.profile && store.profile.name) || 'Detective', l: prog('journey').caseNum, s: skinId(), d: dailyStreak(), t: totalSolved(), u: (window.CGNet && window.CGNet.uid()) || undefined };
+    return { i: myId(), n: safeName(store.profile && store.profile.name, 'Detective'), l: prog('journey').caseNum, s: skinId(), d: dailyStreak(), t: totalSolved(), u: (window.CGNet && window.CGNet.uid()) || undefined };
   }
   async function share(text, url) {
     try { if (navigator.share) { await navigator.share({ title: 'Crime Grid', text, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
@@ -571,8 +571,19 @@
     $('name-in').value = cur || '';
     $('name-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') saveProfile(); });
   }
+  // nicknames are shown to other players, so keep them clean: no links, emails, phone numbers or common slurs
+  const BAD_SHORT = ['dick', 'cock', 'sex', 'porn', 'anal', 'cum', 'tit', 'tits', 'kkk', 'isis', 'rape'];
+  const BAD_LONG = ['fuck', 'shit', 'bitch', 'cunt', 'nigg', 'fagg', 'whore', 'slut', 'pussy', 'nazi', 'hitler', 'blowjob', 'nigga', 'retard', 'pizd', 'blyat', 'blyad', 'huy', 'ebat', 'suka', 'mudak', 'pidor', 'pidar', 'puta', 'mierda', 'cabron', 'pendej', 'maricon', 'verga', 'coño', 'joder', 'זונה', 'שרמוט', 'כוסית', 'כוס', 'זין', 'חרא', 'מניאק', 'בןזונה', 'הומו', 'סרטן', 'хуй', 'хуе', 'пизд', 'ебан', 'ебат', 'блят', 'блядь', 'сука', 'мудак', 'пидор', 'гандон', 'шлюх', 'залуп'];
+  function safeName(n, fallback) {
+    let t = String(n == null ? '' : n).replace(/\s+/g, ' ').trim().slice(0, 18);
+    const low = t.toLowerCase();
+    const flat = low.replace(/[^a-z0-9\u0590-\u05ff\u0400-\u04ff\u00f1]/g, '').replace(/0/g, 'o').replace(/1/g, 'i').replace(/3/g, 'e').replace(/4/g, 'a').replace(/5/g, 's').replace(/\$/g, 's').replace(/@/g, 'a');
+    const words = low.split(/[^a-z\u0590-\u05ff\u0400-\u04ff]+/).filter(Boolean);
+    const bad = /https?:|www\.|\.com|\.net|@[a-z]|\d{6,}/i.test(low) || BAD_LONG.some((w) => flat.includes(w)) || BAD_SHORT.some((w) => words.includes(w));
+    return bad || !t ? (fallback || tr('Detective')) : t;
+  }
   function saveProfile() {
-    const name = $('name-in').value.trim();
+    const name = safeName($('name-in').value, '');
     if (!name) { $('name-in').focus(); shake($('modal-body')); return; }
     const firstTime = !store.profile;
     store.profile = { name };
@@ -806,7 +817,7 @@
     store.friends = store.friends || [];
     const k = store.friends.findIndex((x) => x.i === String(card.i).slice(0, 12) || (card.u && x.u === card.u));
     const old = k >= 0 ? store.friends[k] : {};
-    const f = { i: String(card.i).slice(0, 12), n: String(card.n).slice(0, 18), l: Math.max(1, Math.min(1e7, +card.l || old.l || 1)), s: PACK[card.s] ? card.s : old.s || 'classic', d: +card.d || old.d || 0, t: +card.t || old.t || 0, at: today().num };
+    const f = { i: String(card.i).slice(0, 12), n: safeName(card.n, 'Detective'), l: Math.max(1, Math.min(1e7, +card.l || old.l || 1)), s: PACK[card.s] ? card.s : old.s || 'classic', d: +card.d || old.d || 0, t: +card.t || old.t || 0, at: today().num };
     const u = card.u || old.u;
     if (u) f.u = String(u).slice(0, 40);
     if (card.tag || old.tag) f.tag = String(card.tag || old.tag).slice(0, 6);
@@ -821,11 +832,39 @@
     const canRace = !!NET;
     return `<div class="friend-row"><span class="pf skin-${f.s}">${face(fp, f.s)}</span><div><b>${esc(f.n)}${online ? ` <span class="on-dot" title="${esc(tr('Online now'))}"></span>` : ''}</b><small>${tr('Level {0} · {1} cases · {2}-day streak · updated {3}', f.l, f.t, f.d, age ? tr('{0}d ago', age) : tr('today'))}</small></div>
       ${canRace ? `<button class="mini-race" data-act="racef" data-id="${f.i}" aria-label="${esc(tr('Duel {0}', f.n))}">${ic('knife', '⚔️')}<span>${tr('Duel')}</span></button>` : ''}
+      ${NET && f.u ? `<button class="mini-x" data-act="more" data-id="${f.i}" aria-label="${esc(tr('Report or block'))}">⋯</button>` : ''}
       <button class="mini-x" data-act="rm" data-id="${f.i}" aria-label="${esc(tr('Remove'))}">✕</button></div>`;
   }
   function friendListHtml(online) {
     return (store.friends || []).sort((x, y) => y.l - x.l).map((f) => friendRow(f, online && online[f.u])).join('')
       || `<p><small>${NET ? tr('No friends yet. Tell a friend your detective ID, or add theirs.') : tr('No friends yet. Send your link to a friend, and ask for theirs!')}</small></p>`;
+  }
+  function blockUid(u) {
+    store.blocked = [...new Set([...(store.blocked || []), String(u)])].slice(-200);
+    store.friends = (store.friends || []).filter((x) => x.u !== u);
+    save();
+  }
+  // Play's user-generated-content rules: players can report and block others from inside the game
+  function reportBlock(f) {
+    modal(`<div class="big">${ic('lock', '🛡️')}</div><h2>${esc(f.n)}</h2>
+      <p><small>${tr('Report this player, or block them so they can never invite you again.')}</small></p>
+      <div class="help-list">
+        ${['Offensive name', 'Cheating', 'Harassment', 'Something else'].map((r, i) => `<button class="secondary" data-act="rep" data-r="${i}">${tr('Report: {0}', tr(r))}</button>`).join('')}
+        <button class="primary" data-act="blk">${tr('Block {0}', esc(f.n))}</button>
+      </div>
+      <div class="row"><button class="secondary" data-act="back">${tr('Back')}</button></div>`, {
+      rep: async (b) => {
+        const why = ['Offensive name', 'Cheating', 'Harassment', 'Something else'][+b.dataset.r] || 'Something else';
+        try {
+          await NET.signIn();
+          const id = Array.from(crypto.getRandomValues(new Uint8Array(9)), (x) => 'abcdefghijklmnopqrstuvwxyz0123456789'[x % 36]).join('');
+          await NET.put('reports/' + id, { from: NET.uid(), about: String(f.u).slice(0, 40), n: String(f.n).slice(0, 18), why, at: NET.TS });
+          closeModal(); toast(`<span class="ti">${ic('check', '✓')}</span><span><b>${tr('Report sent. Thank you!')}</b></span>`);
+        } catch (e) { raceFail(e); }
+      },
+      blk: () => { blockUid(f.u); toast(`<span class="ti">${ic('check', '✓')}</span><span><b>${tr('Blocked. {0} can no longer invite you.', esc(f.n))}</b></span>`); showFriends(); },
+      back: showFriends,
+    });
   }
   function showFriends() {
     const ids = NET && store.netOff ? `<div class="my-id"><button class="primary" data-act="getid">${tr('Get a detective ID')}</button></div><p class="id-msg"><small>${tr('Friends you add here can invite you to duels right inside the game.')}</small></p>`
@@ -839,9 +878,11 @@
       <details class="other-ways"${NET ? '' : ' open'}><summary>${tr('Other ways to add friends')}</summary>
         <p><small>${tr("You're on level <b>{0}</b>. Send your link so friends see you on their map. Send it again whenever you want them to see your new progress.", prog('journey').caseNum)}</small></p>
         <div class="row"><button class="secondary" data-act="mine">${tr('Send my link')}</button><button class="secondary" data-act="add">${tr('Add a friend')}</button></div></details>
-      ${NET && store.netTag ? `<p class="forget"><button class="linkish" data-act="forget">${tr('Delete my online ID')}</button></p>` : ''}
+      ${NET && store.netTag ? `<p class="forget"><button class="linkish" data-act="forget">${tr('Delete my online ID')}</button>${(store.blocked || []).length ? ` · <button class="linkish" data-act="unblock">${tr('Unblock all ({0})', store.blocked.length)}</button>` : ''}</p>` : ''}
       <div class="row"><button class="secondary" data-act="close">${tr('Close')}</button></div>`, {
       race: () => raceMenu(),
+      more: (b) => { const f = (store.friends || []).find((x) => x.i === b.dataset.id); if (f) reportBlock(f); },
+      unblock: () => { store.blocked = []; save(); showFriends(); },
       racef: (b) => {
         const f = (store.friends || []).find((x) => x.i === b.dataset.id);
         if (!f) return;
@@ -1129,6 +1170,7 @@
       if (!room || !room.host) return raceFail(null, tr('This duel has ended, or the code is wrong.'));
       const me = NET.uid();
       if (room.host.uid === me) return enterRace(code, 'host');
+      if ((store.blocked || []).includes(room.host.uid)) return raceFail(null, tr('You blocked this player.'));
       if (room.guest && room.guest.uid !== me) return raceFail(null, tr('This duel already has two detectives.'));
       if (room.go && !(room.guest && room.guest.uid === me)) return raceFail(null, tr('This duel has already started.'));
       const stake = Math.max(0, Math.min(500, Math.floor(+room.stake || 0)));
@@ -1206,7 +1248,7 @@
       if (R.stop) R.stop();
       return;
     }
-    R.foe = room[otherRole()] || null;
+    R.foe = room[otherRole()] ? { ...room[otherRole()], n: safeName(room[otherRole()].n, 'Detective') } : null;
     if (R.foe && !prevFoe) {   // friends both ways, no link swapping needed
       addFriend({ i: R.foe.i, n: R.foe.n, l: R.foe.l, s: R.foe.s, d: 0, t: R.foe.t, u: R.foe.uid }, true);
       sfx('coin');
@@ -1405,7 +1447,8 @@
   }
   function onInbox(id, m) {
     const drop = () => NET.del(`inbox/${NET.uid()}/${id}`).catch(() => {});
-    if (!m || !m.from || !m.n) return drop();
+    if (!m || !m.from || !m.n || (store.blocked || []).includes(m.from)) return drop();
+    m.n = safeName(m.n, 'Detective');
     const card = { i: m.i || String(m.from).slice(0, 12), n: m.n, l: m.l, s: m.s, d: 0, t: 0, u: m.from };
     if (m.t === 'friend') {
       const known = (store.friends || []).some((f) => f.u === m.from);
@@ -1427,7 +1470,9 @@
       <div class="race-vs"><div class="race-p"><span class="pf skin-${PACK[m.s] ? m.s : 'classic'}">${face({ name: m.n, g: 'f', letter: m.n[0], color: '#7aa7ff', emoji: '🙂' }, PACK[m.s] ? m.s : 'classic')}</span><b>${esc(m.n)}</b></div></div>
       <p>${stake ? tr('{0} invites you to a live duel ({1}) for {2} coins each. The winner takes {3}!', esc(m.n), esc(dname(m.diff)), I.num(stake), I.num(stake * 2)) : tr('{0} invites you to a live duel ({1}). First to solve the case wins!', esc(m.n), esc(dname(m.diff)))}</p>
       ${stake && coins() < stake ? `<p><small>${tr('You need {0} coins to join this duel.', I.num(stake))}</small></p>` : ''}
-      <div class="row"><button class="primary" data-act="join"${stake && coins() < stake ? ' disabled' : ''}>${ic('knife', '⚔️')} ${tr('Join')}</button><button class="secondary" data-act="no">${tr('Not now')}</button></div>`, {
+      <div class="row"><button class="primary" data-act="join"${stake && coins() < stake ? ' disabled' : ''}>${ic('knife', '⚔️')} ${tr('Join')}</button><button class="secondary" data-act="no">${tr('Not now')}</button></div>
+      <p class="forget"><button class="linkish" data-act="blk">${tr('Block {0}', esc(m.n))}</button></p>`, {
+      blk: () => { drop(); blockUid(m.from); closeModal(); toast(`<span class="ti">${ic('check', '✓')}</span><span><b>${tr('Blocked. {0} can no longer invite you.', esc(m.n))}</b></span>`); },
       join: () => { drop(); joinRace(m.code, stake); },
       no: () => { decline(); closeModal(); },
     }, true);
@@ -1476,6 +1521,7 @@
           await NET.del('users/' + uid);
           if (tag) await NET.del('tags/' + tag).catch(() => {});
           await NET.del('inbox/' + uid).catch(() => {});
+          await NET.deleteAccount().catch(() => {});   // the anonymous sign-in account itself
           store.netTag = null; store.netOff = true; save();
           NET.forget();
           toast(`<span class="ti">${ic('check', '✓')}</span><span><b>${tr('Online ID deleted.')}</b></span>`);
@@ -2404,7 +2450,7 @@
   }
 
   /* ---------- "case closed" cinematic (v2) and the Wordle-style result card ---------- */
-  const GAME_URL = 'https://shony271415-star.github.io/dani-game/v2/';
+  const GAME_URL = location.origin + location.pathname.replace(/[^/]*$/, '');   // always the address the game is served from, so moving it needs no code change
   // one square per suspect (no spoilers): green = solved by logic alone, yellow = used a clue/check, red = a suspect was revealed
   function resultSquares() {
     const n = S.P.people.length, red = Math.min(S.hints || 0, n), yellow = Math.min(S.helps || 0, n - red);

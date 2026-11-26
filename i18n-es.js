@@ -577,7 +577,19 @@
  "No video available right now. Try again later.": "No hay vídeo disponible ahora. Inténtalo más tarde.",
  "Replace your progress?": "¿Reemplazar tu progreso?",
  "Keep my progress": "Conservar mi progreso",
- "Replace": "Reemplazar"
+ "Replace": "Reemplazar",
+ "Report or block": "Denunciar o bloquear",
+ "Report this player, or block them so they can never invite you again.": "Denuncia a este jugador o bloquéalo para que no pueda invitarte más.",
+ "Report: {0}": "Denuncia: {0}",
+ "Offensive name": "Nombre ofensivo",
+ "Cheating": "Trampas",
+ "Harassment": "Acoso",
+ "Something else": "Otra cosa",
+ "Block {0}": "Bloquear a {0}",
+ "Blocked. {0} can no longer invite you.": "Bloqueado. {0} ya no podrá invitarte.",
+ "Report sent. Thank you!": "Denuncia enviada. ¡Gracias!",
+ "You blocked this player.": "Has bloqueado a este jugador.",
+ "Unblock all ({0})": "Desbloquear a todos ({0})"
 },
     pl: {
  "{0} cases solved": {

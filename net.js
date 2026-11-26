@@ -92,6 +92,8 @@
     del: (p) => req('DELETE', p),
     query: (p, qs) => req('GET', p, undefined, qs),
     watch,
+    // deletes the anonymous Firebase account itself (call after the profile, tag and inbox are gone)
+    deleteAccount: async () => { const t = await token(); await post(`${AUTH_BASE}identitytoolkit.googleapis.com/v1/accounts:delete?key=${CONFIG.apiKey}`, { idToken: t }); },
     forget: () => { auth = null; try { localStorage.removeItem(AUTH_KEY); } catch (e) { /* ignore */ } },
   };
 })();

@@ -12,7 +12,7 @@ const path = require('path');
 const E = require('../engine.js');
 
 const OUT = path.resolve(process.argv[2] || path.join(__dirname, '..'));
-const OWNER = process.argv[3] || 'Dani';
+const OWNER = process.argv[3] || 'Crime Grid';
 const PLAN = [
   { diff: 'hard', label: 'Inspector', count: 6, seed: 9000000, accept: (g) => g.level === 2 && g.trials >= 2 },
   { diff: 'expert', label: 'Expert', count: 12, seed: 9100000, accept: (g) => g.level === 2 && g.trials >= 6 },

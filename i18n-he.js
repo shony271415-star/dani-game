@@ -573,7 +573,19 @@
  "No video available right now. Try again later.": "אין סרטון זמין כרגע. נסו שוב מאוחר יותר.",
  "Replace your progress?": "להחליף את ההתקדמות?",
  "Keep my progress": "להשאיר את ההתקדמות שלי",
- "Replace": "להחליף"
+ "Replace": "להחליף",
+ "Report or block": "דיווח או חסימה",
+ "Report this player, or block them so they can never invite you again.": "דווחו על השחקן, או חסמו אותו כדי שלא יוכל להזמין אתכם שוב.",
+ "Report: {0}": "דיווח: {0}",
+ "Offensive name": "שם פוגעני",
+ "Cheating": "רמאות",
+ "Harassment": "הטרדה",
+ "Something else": "משהו אחר",
+ "Block {0}": "חסימת {0}",
+ "Blocked. {0} can no longer invite you.": "נחסם. {0} לא יוכל יותר להזמין אתכם.",
+ "Report sent. Thank you!": "הדיווח נשלח. תודה!",
+ "You blocked this player.": "חסמתם את השחקן הזה.",
+ "Unblock all ({0})": "ביטול כל החסימות ({0})"
 },
     pl: {
  "{0} cases solved": {

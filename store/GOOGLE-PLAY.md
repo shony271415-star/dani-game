@@ -7,8 +7,8 @@ Everything here is ready to copy into the Google Play Console.
 |---|---|---|
 | App icon | `store/app-icon-512.png` | 512×512 PNG |
 | Feature graphic | `store/feature-graphic.png` | 1024×500 |
-| Phone screenshots | `store/screenshots/1-home.png` … `7-duel.png` (home, two puzzle boards, draft mode, expert board, case closed, shop, live duel) | 2–8 images, 1080×1920 |
-| Promo video (30 s, silent, vertical) | `promo/crime-grid-30s.mp4` | use for the Play listing video link, TikTok, Reels, Shorts |
+| Phone screenshots | `store/screenshots/1-home.png`, `2-inspector.png`, `3-draft.png`, `4-expert.png`, `5-case-closed.png`, `6-shop.png`, `7-duel.png` | 2–8 images, 1080×1920 |
+| Promo video (30 s, silent, vertical) | `promo/crime-grid-30s.mp4` | Play wants a YouTube link, so upload it to YouTube and paste that link; also fine for TikTok, Reels, Shorts |
 | Privacy policy URL | https://shony271415-star.github.io/dani-game/privacy.html | required |
 | The game itself | https://shony271415-star.github.io/dani-game/v2/ | the address to package |
 
@@ -17,7 +17,7 @@ Everything here is ready to copy into the Google Play Console.
 **App name** (max 30): `Crime Grid: Murder Puzzles`
 
 **Short description** (max 80):
-`Sudoku meets murder mystery. Place the suspects, find the killer. New case daily!`
+`Sudoku meets murder mystery. Place the suspects, find the killer. Daily case!`  (77 characters; the limit is 80)
 (Do not use competitor names, "Murdoku" or "#1" anywhere in the listing.)
 
 **Full description:**
@@ -108,7 +108,7 @@ The game already contains the purchase code (Google Play Billing through the Dig
 | `skin_deco` | Jazz Age skin pack | $2.99 |
 | `skin_steam` | Steampunk Guild skin pack | $2.99 |
 | `skin_gothic` | Haunted Gala skin pack | $1.99 |
-| `remove_ads` | Removes ads for good (one-time, non-consumable: do NOT make it a subscription) | $3.99 |
+| `remove_ads` (create it only in the release that has ads) | Removes ads for good (one-time, non-consumable: do NOT make it a subscription) | $3.99 |
 
 3. **Package with billing on:** when packaging on PWABuilder, turn on the Google Play Billing option in the Android settings, so the app can talk to Play Billing.
 4. **Test before going live:** Play Console → Settings → License testing: add your Gmail. Purchases made with that account in the testing track are free test purchases.
