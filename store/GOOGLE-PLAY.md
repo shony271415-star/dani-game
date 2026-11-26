@@ -9,8 +9,8 @@ Everything here is ready to copy into the Google Play Console.
 | Feature graphic | `store/feature-graphic.png` | 1024×500 |
 | Phone screenshots | `store/screenshots/1-home.png`, `2-inspector.png`, `3-draft.png`, `4-expert.png`, `5-case-closed.png`, `6-shop.png`, `7-duel.png` | 2–8 images, 1080×1920 |
 | Promo video (30 s, silent, vertical) | `promo/crime-grid-30s.mp4` | Play wants a YouTube link, so upload it to YouTube and paste that link; also fine for TikTok, Reels, Shorts |
-| Privacy policy URL | https://shony271415-star.github.io/dani-game/privacy.html | required |
-| The game itself | https://shony271415-star.github.io/dani-game/v2/ | the address to package |
+| Privacy policy URL | https://lamplit-logic.github.io/privacy.html | required |
+| The game itself | https://lamplit-logic.github.io/v2/ | the address to package |
 
 ## Store listing
 
@@ -84,10 +84,10 @@ Tips:
 ---
 
 ## Packaging the web game as an Android app (PWABuilder)
-1. Open https://www.pwabuilder.com and enter `https://shony271415-star.github.io/dani-game/v2/`.
-2. Choose **Package for stores → Android → Generate**. Keep the suggested package ID or set one like `io.github.shony271415.crimegrid`.
+1. Open https://www.pwabuilder.com and enter `https://lamplit-logic.github.io/v2/`.
+2. Choose **Package for stores → Android → Generate**. Keep the suggested package ID or set one like `io.github.lamplitlogic.crimegrid`.
 3. Download the zip. It contains the `.aab` file (upload this to Google Play), a **signing key** (keep it safe: you need it for every update) and an `assetlinks.json` file.
-4. **Remove the browser bar (optional, recommended):** Android only trusts the app fully when `assetlinks.json` is published at `https://shony271415-star.github.io/.well-known/assetlinks.json`. That address belongs to a repository named exactly `shony271415-star.github.io`. Create it on GitHub, then the file can be added there. Without it the game still works, but it shows a small address bar at the top.
+4. **Remove the browser bar (optional, recommended):** Android only trusts the app fully when `assetlinks.json` is published at `https://lamplit-logic.github.io/.well-known/assetlinks.json`. That address belongs to a repository named exactly `lamplit-logic.github.io`. Create it on GitHub, then the file can be added there. Without it the game still works, but it shows a small address bar at the top.
 
 ---
 

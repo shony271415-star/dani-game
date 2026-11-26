@@ -24,7 +24,7 @@
 ### לפני העלאת הפרסומת האינטראקטיבית
 הכפתור שולח כרגע לכתובת האתר. כשהמשחק יעלה ל-Google Play, בונים מחדש עם הקישור לחנות:
 ```
-node tools/promo/make-playable.js "https://play.google.com/store/apps/details?id=io.github.shony271415.crimegrid"
+node tools/promo/make-playable.js "https://play.google.com/store/apps/details?id=io.github.lamplitlogic.crimegrid"
 ```
 הקובץ עובד ב-AppLovin, Unity, ironSource ו-Mintegral (דרך MRAID), ובקמפייני אפליקציות של Google Ads (דרך ExitApi). אין בו בקשות חיצוניות, כמו שהרשתות דורשות. אחרי 45 שניות מוצג כרטיס הסיום גם אם השחקן הפסיק לשחק.
 

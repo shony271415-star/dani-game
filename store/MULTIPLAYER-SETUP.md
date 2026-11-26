@@ -29,7 +29,7 @@
 ## 5. הגבלת המפתח
 - https://console.cloud.google.com → לבחור את הפרויקט → APIs & Services → Credentials → המפתח "Browser key".
 - Application restrictions: לבחור **Websites** ולהוסיף:
-  - `https://shony271415-star.github.io/*`
+  - `https://lamplit-logic.github.io/*`
   - אם עוברים לדומיין או לריפו אחר, להוסיף גם אותו.
 - API restrictions: להשאיר את מה ש-Firebase יצר.
 - לא נבדק: האם עטיפת ה-TWA שולחת את אותו referrer. אחרי הבנייה צריך לבדוק במכשיר אמיתי.

@@ -45,7 +45,7 @@ Main sources:
 | 9 | No in-app **report** or **block** for other players' nicknames (grep of `app.js` and `net.js` found none). Nicknames are free text and visible to friends and duel opponents. | See risk 3 below. Needs code before production. | [AI] build later |
 | 10 | `HANDOFF.md` says the product is Hebrew-first for the owner, but the console and store listing must be in the languages you add. | Listing is written in English below; Hebrew, Russian, Spanish translations of the listing are not in the repo. | [AI] translate later |
 | 11 | `MULTIPLAYER-SETUP.md` section 5 (API key restricted to websites) is flagged as untested for the TWA. A TWA sends requests from the web origin, so it should work, but test on a real phone. | Test in the closed test (section 6, day 0). | [DEV] |
-| 12 | Package name in `GOOGLE-PLAY.md` is only a suggestion. It can never change after upload. | Use `io.github.shony271415.crimegrid` (see section 2, step 3) unless you own a better domain. | [DEV] |
+| 12 | Package name in `GOOGLE-PLAY.md` is only a suggestion. It can never change after upload. | Use `io.github.lamplitlogic.crimegrid` (see section 2, step 3) unless you own a better domain. | [DEV] |
 
 ---
 
@@ -64,9 +64,9 @@ Main sources:
 7. **[DEV] Make a Google Group or list of testers now** (section 6). You need at least 12 real people who use Android and have Gmail addresses. Start recruiting today; it is the slowest part.
 8. **[DEV] Get a second Android phone or the one you will test on** and a Gmail address for license testing (section 5).
 9. **[DEV] Fix the GitHub Pages root issue** (needed for the address bar to disappear):
-   - Create a new public repo named exactly `shony271415-star.github.io`.
+   - Create a new public repo named exactly `lamplit-logic.github.io`.
    - Add `.well-known/assetlinks.json` (content comes from PWABuilder, then you add the Play signing fingerprint, section 2 step 9) and an empty file called `.nojekyll`, otherwise GitHub's site builder hides folders that start with a dot. [UNVERIFIED] for the `.nojekyll` detail (from memory), check by opening the file URL in a browser.
-   - The file must open at `https://shony271415-star.github.io/.well-known/assetlinks.json` with HTTP 200, as JSON, with no redirect. Source: assetlinks guides above.
+   - The file must open at `https://lamplit-logic.github.io/.well-known/assetlinks.json` with HTTP 200, as JSON, with no redirect. Source: assetlinks guides above.
    - [AI] can write these files into the new repo if you give access.
 10. **[DEV] Decide the open questions** in the "Decisions" box at the end.
 
@@ -80,12 +80,12 @@ Main sources:
    - App or game: **Game**
    - Free or paid: **Free** (you cannot switch a free app to paid later; in-app purchases are fine on free)
    - Accept the declarations (Developer Program Policies, US export laws).
-2. **[DEV] Package the game with PWABuilder** (https://www.pwabuilder.com): enter `https://shony271415-star.github.io/dani-game/v2/`, then Package for stores, Android.
+2. **[DEV] Package the game with PWABuilder** (https://www.pwabuilder.com): enter `https://lamplit-logic.github.io/v2/`, then Package for stores, Android.
 3. **[DEV] Fill the Android options**:
-   - Package ID: `io.github.shony271415.crimegrid` (permanent)
+   - Package ID: `io.github.lamplitlogic.crimegrid` (permanent)
    - App name: `Crime Grid`
    - Version: 1 / version name 1.0.0 (every new upload needs a higher version code)
-   - Host: `shony271415-star.github.io`; Start URL: `/dani-game/v2/`
+   - Host: `lamplit-logic.github.io`; Start URL: `/v2/`
    - Display mode: standalone; orientation: portrait
    - **Google Play Billing: ON** (this also sets the right billing flags)
    - **Signing key:** let PWABuilder generate it, then **download and back up the keystore and its password in two places**. Losing it means you cannot update the app unless Play App Signing is enrolled (it is by default for new apps).
@@ -115,7 +115,7 @@ Console: Grow, Store presence, Main store listing (path may be "Store settings /
 | Category | Game, Puzzle |
 | Tags | Puzzle, Logic, Brain games, Detective (pick from the console's list; it may not accept your own text) |
 | Contact email | your support email (public) |
-| Contact website | `https://shony271415-star.github.io/dani-game/v2/` |
+| Contact website | `https://lamplit-logic.github.io/v2/` |
 | Contact phone | optional; but required for trader display (section 1 step 5) |
 
 **Full description (fixed: stake wording removed, offline claim kept accurate):**
@@ -153,7 +153,7 @@ Rules: no competitor names ("Murdoku"), no "#1", no "download and get coins", no
 
 Console: Policy and programs, App content (a list of tasks). Order that works: Privacy policy, App access, Ads, Content rating, Target audience, Data safety, then the rest. Google says Target audience needs the ads declaration, app access and privacy policy done first.
 
-1. **[DEV] Privacy policy URL:** `https://shony271415-star.github.io/dani-game/privacy.html`. Must open without login and be consistent with Data safety. Do the privacy.html edits (problems 2, 3, 4) before submitting for production.
+1. **[DEV] Privacy policy URL:** `https://lamplit-logic.github.io/privacy.html`. Must open without login and be consistent with Data safety. Do the privacy.html edits (problems 2, 3, 4) before submitting for production.
 2. **[DEV] App access:** "All functionality is available without special access" (no login). Add a note: "Friends and duels need internet; an anonymous sign-in happens automatically; no credentials required."
 3. **[DEV] Ads:** **No, my app does not contain ads.** (v1 has `ADS_ON = false`.) When you ship ads or the rewarded-video bridge, change this and the Data safety form first.
 4. **[DEV] Content rating (IARC questionnaire).** Email: your support email; category: **Game**. Answers:
@@ -312,7 +312,7 @@ Plan for launch **around 22 to 30 December 2026** at the earliest. A holiday slo
 3. Duel coin stakes in v1: keep, hide, or limit to 0. Recommended: hide or set to 0 for v1, bring back after approval with a clear "no cash value" label.
 4. Ship v1 without `remove_ads`: recommended yes.
 5. Whether to let [AI] add report/block for nicknames and a nickname filter before production (recommended yes).
-6. Whether to create the `shony271415-star.github.io` repo (needed for the address bar), or buy a custom domain.
+6. Whether to create the `lamplit-logic.github.io` repo (needed for the address bar), or buy a custom domain.
 7. Who the 12+ testers are, and a backup list.
 8. Which countries to launch in.
 
